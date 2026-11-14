@@ -7,454 +7,201 @@
 <title>Конструктор</title>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <style>
-  /* ============================================================
-     ТЕМЫ. Светлая — по умолчанию (как macOS).
-     Всё оформление на переменных, поэтому тема меняется одной
-     строкой: document.documentElement.dataset.theme = 'dark'.
-     ============================================================ */
   :root {
-    --bg: #f5f5f7;
-    --bg-2: #ffffff;
-    --bg-3: #ececf0;
-    --text: #1d1d1f;
-    --text-dim: #86868b;
-    --text-muted: #c7c7cc;
+    --bg: #f5f5f7; --bg-2: #ffffff; --bg-3: #ececf0;
+    --text: #1d1d1f; --text-dim: #86868b; --text-muted: #c7c7cc;
     --border: #e0e0e5;
-    --accent: #007aff;
-    --accent-soft: rgba(0, 122, 255, 0.12);
-    --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.06);
-    --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08);
-    --shadow-lg: 0 10px 30px rgba(0, 0, 0, 0.12);
-    --radius-sm: 12px;
-    --radius: 18px;
-    --radius-lg: 24px;
-    --tap: 44px;
-    --gap: 10px;
-    --dock-bg: rgba(255, 255, 255, 0.72);
-    --dock-border: rgba(0, 0, 0, 0.06);
+    --accent: #007aff; --accent-soft: rgba(0,122,255,0.12);
+    --shadow-sm: 0 1px 3px rgba(0,0,0,0.06);
+    --shadow-md: 0 4px 12px rgba(0,0,0,0.08);
+    --shadow-lg: 0 10px 30px rgba(0,0,0,0.12);
+    --radius-sm: 12px; --radius: 18px; --radius-lg: 24px;
+    --tap: 44px; --gap: 10px;
+    --dock-bg: rgba(255,255,255,0.72);
+    --dock-border: rgba(0,0,0,0.06);
+    --green: #34c759; --red: #ff3b30;
   }
-
   [data-theme="dark"] {
-    --bg: #1c1c1e;
-    --bg-2: #2c2c2e;
-    --bg-3: #3a3a3c;
-    --text: #f5f5f7;
-    --text-dim: #98989d;
-    --text-muted: #48484a;
+    --bg: #1c1c1e; --bg-2: #2c2c2e; --bg-3: #3a3a3c;
+    --text: #f5f5f7; --text-dim: #98989d; --text-muted: #48484a;
     --border: #38383a;
-    --accent: #0a84ff;
-    --accent-soft: rgba(10, 132, 255, 0.18);
-    --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.2);
-    --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.3);
-    --shadow-lg: 0 10px 30px rgba(0, 0, 0, 0.4);
-    --dock-bg: rgba(44, 44, 46, 0.72);
-    --dock-border: rgba(255, 255, 255, 0.08);
+    --accent: #0a84ff; --accent-soft: rgba(10,132,255,0.18);
+    --shadow-sm: 0 1px 3px rgba(0,0,0,0.2);
+    --shadow-md: 0 4px 12px rgba(0,0,0,0.3);
+    --shadow-lg: 0 10px 30px rgba(0,0,0,0.4);
+    --dock-bg: rgba(44,44,46,0.72);
+    --dock-border: rgba(255,255,255,0.08);
   }
-
-  * {
-    box-sizing: border-box;
-    -webkit-tap-highlight-color: transparent;
-    -webkit-touch-callout: none;
-  }
-
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; -webkit-touch-callout: none; }
   html, body {
-    margin: 0;
-    padding: 0;
-    background: var(--bg);
-    color: var(--text);
+    margin: 0; padding: 0; background: var(--bg); color: var(--text);
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
-    font-size: 15px;
-    line-height: 1.35;
-    min-height: 100vh;
+    font-size: 15px; line-height: 1.35; min-height: 100vh;
     overscroll-behavior-y: contain;
     transition: background 0.2s, color 0.2s;
   }
-
   /* Запрет выделения на интерактиве — убирает iOS-«лупу» */
-  .day-card, .task-row, .task-text, .icon-btn, .mini-btn,
-  .dock-item, .swatch, .filters button, .segmented button,
-  .btn, .day-name, .day-body {
-    -webkit-user-select: none;
-    user-select: none;
-    -webkit-user-drag: none;
+  .day-card, .task-row, .task-text, .icon-btn, .mini-btn, .dock-item,
+  .swatch, .filters button, .setting-options button, .btn, .day-name, .day-body,
+  .checkbox, .check-item, .check-text, .notify-toggle-row, .toggle, .category-header {
+    -webkit-user-select: none; user-select: none; -webkit-user-drag: none;
   }
-
-  /* ============================================================
-     КАРКАС
-     ============================================================ */
   .app {
-    max-width: 720px;
-    margin: 0 auto;
-    /* большой bottom-padding — чтобы контент не прятался за доком */
-    padding: 12px 16px calc(110px + env(safe-area-inset-bottom));
+    max-width: 720px; margin: 0 auto;
+    padding: 12px 16px calc(120px + env(safe-area-inset-bottom));
     padding-top: calc(12px + env(safe-area-inset-top));
   }
-
-  /* ============================================================
-     ШАПКА
-     ============================================================ */
+  /* Шапка */
   .app-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 12px;
-    margin-bottom: 16px;
-    min-height: 44px;
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 12px; margin-bottom: 16px; min-height: 44px;
   }
   .app-header h1 {
-    margin: 0;
-    font-size: 28px;
-    font-weight: 700;
-    letter-spacing: -0.5px;
-    flex: 1;
+    margin: 0; font-size: 28px; font-weight: 700; letter-spacing: -0.5px; flex: 1;
   }
-  .header-actions {
-    display: flex;
-    gap: 8px;
-  }
-
+  .header-actions { display: flex; gap: 8px; }
   .icon-btn {
-    min-width: var(--tap);
-    min-height: var(--tap);
-    border: none;
-    background: var(--bg-3);
-    color: var(--text);
-    border-radius: var(--radius-sm);
-    font-size: 18px;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    padding: 0;
+    min-width: var(--tap); min-height: var(--tap); border: none;
+    background: var(--bg-3); color: var(--text); border-radius: var(--radius-sm);
+    font-size: 18px; display: inline-flex; align-items: center;
+    justify-content: center; cursor: pointer; padding: 0;
     transition: background 0.15s, transform 0.1s;
   }
-  .icon-btn:active {
-    background: var(--accent-soft);
-    transform: scale(0.94);
-  }
-
-  /* ============================================================
-     ПАНЕЛЬ ПОИСКА (выезжает под шапкой)
-     ============================================================ */
+  .icon-btn:active { background: var(--accent-soft); transform: scale(0.94); }
+  /* Поиск */
   .search-overlay {
-    max-height: 0;
-    overflow: hidden;
-    margin-bottom: 0;
-    transition: max-height 0.2s ease, margin-bottom 0.2s ease;
+    max-height: 0; overflow: hidden; margin-bottom: 0;
+    transition: max-height 0.2s, margin-bottom 0.2s;
   }
-  .search-overlay.open {
-    max-height: 60px;
-    margin-bottom: 12px;
-  }
+  .search-overlay.open { max-height: 60px; margin-bottom: 12px; }
   .search-field {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    background: var(--bg-2);
-    border: 1px solid var(--border);
-    border-radius: var(--radius-sm);
-    padding: 0 12px;
-    min-height: var(--tap);
-    box-shadow: var(--shadow-sm);
+    display: flex; align-items: center; gap: 8px; background: var(--bg-2);
+    border: 1px solid var(--border); border-radius: var(--radius-sm);
+    padding: 0 12px; min-height: var(--tap); box-shadow: var(--shadow-sm);
   }
   .search-field input {
-    flex: 1;
-    background: transparent;
-    border: none;
-    color: var(--text);
-    font-size: 15px;
-    outline: none;
-    padding: 10px 0;
-    font-family: inherit;
+    flex: 1; background: transparent; border: none; color: var(--text);
+    font-size: 15px; outline: none; padding: 10px 0; font-family: inherit;
   }
   .search-field input::-webkit-search-cancel-button { -webkit-appearance: none; }
-  .search-field .close-search {
-    background: transparent;
-    border: none;
-    color: var(--text-dim);
-    font-size: 16px;
-    cursor: pointer;
-    padding: 4px;
-    min-width: 32px;
-    min-height: 32px;
+  .close-search {
+    background: transparent; border: none; color: var(--text-dim);
+    font-size: 16px; cursor: pointer; padding: 4px; min-width: 32px; min-height: 32px;
   }
-
-  /* ============================================================
-     ПРЕДУПРЕЖДЕНИЕ О СВАЙПЕ (компактное)
-     ============================================================ */
+  /* Warn — только fallback */
   .warn {
-    background: rgba(245, 158, 11, 0.12);
-    color: #b4730a;
-    padding: 8px 12px;
-    border-radius: var(--radius-sm);
-    font-size: 12px;
-    line-height: 1.4;
-    display: flex;
-    gap: 8px;
-    align-items: flex-start;
-    margin-bottom: 12px;
+    background: rgba(245,158,11,0.12); color: #b4730a;
+    padding: 8px 12px; border-radius: var(--radius-sm); font-size: 12px;
+    display: flex; gap: 8px; align-items: flex-start; margin-bottom: 12px;
   }
-  [data-theme="dark"] .warn {
-    background: rgba(245, 158, 11, 0.18);
-    color: #f5c98a;
-  }
+  [data-theme="dark"] .warn { background: rgba(245,158,11,0.18); color: #f5c98a; }
   .warn.hidden { display: none; }
   .warn-close {
-    background: transparent;
-    border: none;
-    color: inherit;
-    font-size: 14px;
-    padding: 0 4px;
-    margin-left: auto;
-    cursor: pointer;
-    min-width: 24px;
-    min-height: 24px;
-    opacity: 0.7;
+    background: transparent; border: none; color: inherit; font-size: 14px;
+    padding: 0 4px; margin-left: auto; cursor: pointer; opacity: 0.7;
   }
-
-  /* ============================================================
-     ФИЛЬТРЫ (чипсы)
-     ============================================================ */
+  /* Фильтры */
   .filters {
-    display: flex;
-    gap: 8px;
-    overflow-x: auto;
-    padding-bottom: 10px;
-    margin-bottom: 10px;
-    scrollbar-width: none;
+    display: flex; gap: 8px; overflow-x: auto; padding-bottom: 10px;
+    margin-bottom: 10px; scrollbar-width: none;
   }
   .filters::-webkit-scrollbar { display: none; }
   .filters button {
-    min-height: 36px;
-    padding: 0 14px;
-    border-radius: 18px;
-    border: none;
-    background: var(--bg-3);
-    color: var(--text-dim);
-    font-size: 13px;
-    font-weight: 500;
-    white-space: nowrap;
-    cursor: pointer;
-    font-family: inherit;
+    min-height: 36px; padding: 0 14px; border-radius: 18px; border: none;
+    background: var(--bg-3); color: var(--text-dim); font-size: 13px;
+    font-weight: 500; white-space: nowrap; cursor: pointer; font-family: inherit;
     transition: background 0.15s, color 0.15s;
   }
-  .filters button.active {
-    background: var(--accent);
-    color: #fff;
-  }
-
-  /* ============================================================
-     НЕДЕЛЯ
-     ============================================================ */
+  .filters button.active { background: var(--accent); color: #fff; }
+  /* Неделя */
   .week-grid {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: var(--gap);
+    display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: var(--gap);
   }
   .day-card {
-    background: var(--bg-2);
-    border-radius: var(--radius);
-    padding: 12px 14px;
-    min-height: 96px;
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-    cursor: pointer;
-    box-shadow: var(--shadow-sm);
-    position: relative;
-    overflow: hidden;
-    transition: transform 0.12s, box-shadow 0.15s;
+    background: var(--bg-2); border-radius: var(--radius); padding: 12px 14px;
+    min-height: 96px; display: flex; flex-direction: column; gap: 6px;
+    cursor: pointer; box-shadow: var(--shadow-sm); position: relative;
+    overflow: hidden; transition: transform 0.12s, box-shadow 0.15s;
   }
   .day-card::before {
-    content: '';
-    position: absolute;
-    top: 12px;
-    left: 0;
-    bottom: 12px;
-    width: 3px;
-    background: var(--card-color, var(--accent));
-    border-radius: 0 2px 2px 0;
+    content: ''; position: absolute; top: 12px; left: 0; bottom: 12px;
+    width: 3px; background: var(--card-color, var(--accent)); border-radius: 0 2px 2px 0;
   }
-  .day-card:active {
-    transform: scale(0.98);
-    box-shadow: var(--shadow-md);
-  }
-  .day-card.dragging {
-    opacity: 0.45;
-    transform: scale(0.96);
-  }
-  .day-card.drag-target {
-    box-shadow: 0 0 0 2px var(--accent);
-  }
-
+  .day-card:active { transform: scale(0.98); box-shadow: var(--shadow-md); }
+  .day-card.dragging { opacity: 0.45; transform: scale(0.96); }
+  .day-card.drag-target { box-shadow: 0 0 0 2px var(--accent); }
   .day-head {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 4px;
-    padding-left: 8px;
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 4px; padding-left: 8px;
   }
-  .day-name {
-    font-weight: 700;
-    font-size: 17px;
-    letter-spacing: -0.3px;
-  }
-  .day-actions {
-    display: flex;
-    gap: 0;
-  }
+  .day-name { font-weight: 700; font-size: 17px; letter-spacing: -0.3px; }
+  .day-actions { display: flex; gap: 0; }
   .mini-btn {
-    position: relative;
-    width: 30px;
-    height: 30px;
-    border: none;
-    background: transparent;
-    color: var(--text-dim);
-    border-radius: 8px;
-    font-size: 15px;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    padding: 0;
-    font-family: inherit;
+    position: relative; width: 30px; height: 30px; border: none;
+    background: transparent; color: var(--text-dim); border-radius: 8px;
+    font-size: 15px; display: inline-flex; align-items: center;
+    justify-content: center; cursor: pointer; padding: 0; font-family: inherit;
   }
-  .mini-btn::before {
-    content: '';
-    position: absolute;
-    inset: -7px;
-  }
-  .mini-btn:active {
-    background: var(--accent-soft);
-    color: var(--accent);
-  }
-  .drag-handle {
-    cursor: grab;
-    touch-action: none;
-  }
-
-  .day-body {
-    font-size: 12px;
-    color: var(--text-dim);
-    padding-left: 8px;
-    margin-top: auto;
-  }
-  .task-count {
-    color: var(--text);
-    font-size: 13px;
-    font-weight: 500;
-  }
+  .mini-btn::before { content: ''; position: absolute; inset: -7px; }
+  .mini-btn:active { background: var(--accent-soft); color: var(--accent); }
+  .drag-handle { cursor: grab; touch-action: none; }
+  .day-body { font-size: 12px; color: var(--text-dim); padding-left: 8px; margin-top: auto; }
+  .task-count { color: var(--text); font-size: 13px; font-weight: 500; }
   .task-preview {
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    margin-top: 2px;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 2px;
   }
-
   .empty {
-    text-align: center;
-    color: var(--text-dim);
-    padding: 40px 20px;
-    font-size: 14px;
-    grid-column: 1 / -1;
-    margin: 0;
+    text-align: center; color: var(--text-dim); padding: 40px 20px;
+    font-size: 14px; grid-column: 1 / -1; margin: 0;
   }
-
-  /* ============================================================
-     DOCK-БАР (снизу, как в macOS)
-     ============================================================ */
+  /* Dock — карусель + кнопка "добавить" */
   .dock {
-    position: fixed;
-    bottom: calc(12px + env(safe-area-inset-bottom));
-    left: 50%;
-    transform: translateX(-50%);
-    background: var(--dock-bg);
-    backdrop-filter: blur(20px) saturate(180%);
+    position: fixed; bottom: calc(12px + env(safe-area-inset-bottom));
+    left: 50%; transform: translateX(-50%);
+    background: var(--dock-bg); backdrop-filter: blur(20px) saturate(180%);
     -webkit-backdrop-filter: blur(20px) saturate(180%);
-    border: 1px solid var(--dock-border);
-    border-radius: var(--radius-lg);
-    padding: 8px;
-    display: flex;
-    gap: 4px;
-    box-shadow: var(--shadow-lg);
-    z-index: 100;
-    max-width: calc(100vw - 32px);
+    border: 1px solid var(--dock-border); border-radius: var(--radius-lg);
+    padding: 8px; display: flex; gap: 4px; align-items: center;
+    box-shadow: var(--shadow-lg); z-index: 100;
+    max-width: calc(100vw - 24px);
   }
+  .dock-scroll {
+    display: flex; gap: 4px; overflow-x: auto; scrollbar-width: none;
+    max-width: calc(100vw - 100px);
+  }
+  .dock-scroll::-webkit-scrollbar { display: none; }
   .dock-item {
-    width: 58px;
-    height: 58px;
-    border: none;
-    background: transparent;
-    border-radius: 16px;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 26px;
-    transition: background 0.15s, transform 0.1s;
-    position: relative;
-    padding: 0;
+    width: 56px; height: 56px; border: none; background: transparent;
+    border-radius: 16px; cursor: pointer; display: flex; align-items: center;
+    justify-content: center; font-size: 24px; flex: none;
+    transition: background 0.15s, transform 0.1s; position: relative; padding: 0;
   }
-  .dock-item:active {
-    transform: scale(0.92);
-  }
-  .dock-item.active {
-    background: var(--accent-soft);
-  }
+  .dock-item:active { transform: scale(0.92); }
+  .dock-item.active { background: var(--accent-soft); }
   .dock-item.active::after {
-    content: '';
-    position: absolute;
-    bottom: 4px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 4px;
-    height: 4px;
-    background: var(--accent);
-    border-radius: 50%;
+    content: ''; position: absolute; bottom: 4px; left: 50%;
+    transform: translateX(-50%); width: 4px; height: 4px;
+    background: var(--accent); border-radius: 50%;
   }
-  .dock-item .dock-badge {
-    position: absolute;
-    top: 6px;
-    right: 6px;
-    background: var(--accent);
-    color: #fff;
-    font-size: 10px;
-    font-weight: 700;
-    min-width: 18px;
-    height: 18px;
-    border-radius: 9px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 0 5px;
-    border: 2px solid var(--dock-bg);
+  .dock-add {
+    width: 56px; height: 56px; border: 2px dashed var(--border);
+    background: transparent; color: var(--text-dim); border-radius: 16px;
+    font-size: 26px; cursor: pointer; flex: none; display: flex;
+    align-items: center; justify-content: center; transition: background 0.15s, color 0.15s;
   }
-
-  /* ============================================================
-     МОДАЛКИ (bottom-sheet)
-     ============================================================ */
+  .dock-add:active { background: var(--accent-soft); color: var(--accent); border-color: var(--accent); }
+  /* Модалки */
   .modal {
-    position: fixed;
-    inset: 0;
-    background: rgba(0, 0, 0, 0.4);
-    display: none;
-    align-items: flex-end;
-    justify-content: center;
-    z-index: 200;
-    backdrop-filter: blur(2px);
-    -webkit-backdrop-filter: blur(2px);
+    position: fixed; inset: 0; background: rgba(0,0,0,0.4);
+    display: none; align-items: flex-end; justify-content: center;
+    z-index: 200; backdrop-filter: blur(2px); -webkit-backdrop-filter: blur(2px);
   }
   .modal.open { display: flex; }
   .modal-card {
-    background: var(--bg-2);
-    border-radius: var(--radius-lg) var(--radius-lg) 0 0;
-    padding: 20px;
-    width: 100%;
-    max-width: 500px;
+    background: var(--bg-2); border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+    padding: 20px; width: 100%; max-width: 500px;
     padding-bottom: calc(20px + env(safe-area-inset-bottom));
-    max-height: 85vh;
-    display: flex;
-    flex-direction: column;
+    max-height: 88vh; display: flex; flex-direction: column;
     animation: modalSlideUp 0.2s ease;
   }
   @keyframes modalSlideUp {
@@ -462,245 +209,237 @@
     to   { transform: translateY(0);    opacity: 1; }
   }
   .modal h2 {
-    margin: 0 0 16px;
-    font-size: 20px;
-    font-weight: 700;
-    letter-spacing: -0.4px;
+    margin: 0 0 16px; font-size: 20px; font-weight: 700; letter-spacing: -0.4px;
   }
   .modal-head {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 14px;
-    gap: 12px;
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 14px; gap: 12px;
   }
   .modal-head h2 { margin: 0; }
-
-  /* ============================================================
-     КОМПАКТНАЯ ПАЛИТРА (маленькие кружки)
-     ============================================================ */
+  /* Палитра (компактная) */
   .swatches {
-    display: grid;
-    grid-template-columns: repeat(8, 1fr);
-    gap: 8px;
-    margin-bottom: 18px;
+    display: grid; grid-template-columns: repeat(8, 1fr); gap: 8px; margin-bottom: 18px;
   }
-  @media (max-width: 340px) {
-    .swatches { grid-template-columns: repeat(4, 1fr); }
-  }
+  @media (max-width: 340px) { .swatches { grid-template-columns: repeat(4, 1fr); } }
   .swatch {
-    aspect-ratio: 1;
-    border: none;
-    border-radius: 50%;
-    cursor: pointer;
-    padding: 0;
-    transition: transform 0.1s;
-    position: relative;
+    aspect-ratio: 1; border: none; border-radius: 50%; cursor: pointer;
+    padding: 0; transition: transform 0.1s; position: relative;
   }
   .swatch:active { transform: scale(0.88); }
-  .swatch.active {
-    box-shadow: 0 0 0 2px var(--bg-2), 0 0 0 4px currentColor;
-  }
-
-  /* ============================================================
-     НАСТРОЙКИ — расширенная шестерёнка
-     ============================================================ */
-  .setting-block {
-    padding: 12px 0;
-    border-bottom: 1px solid var(--border);
-  }
+  .swatch.active { box-shadow: 0 0 0 2px var(--bg-2), 0 0 0 4px currentColor; }
+  /* Настройки */
+  .setting-block { padding: 12px 0; border-bottom: 1px solid var(--border); }
   .setting-block:last-of-type { border-bottom: none; }
   .setting-label {
-    font-size: 13px;
-    color: var(--text-dim);
-    text-transform: uppercase;
-    letter-spacing: 0.4px;
-    font-weight: 600;
-    margin-bottom: 10px;
+    font-size: 12px; color: var(--text-dim); text-transform: uppercase;
+    letter-spacing: 0.4px; font-weight: 600; margin-bottom: 10px;
   }
-  .setting-options {
-    display: flex;
-    gap: 8px;
-    flex-wrap: wrap;
-  }
+  .setting-options { display: flex; gap: 8px; flex-wrap: wrap; }
   .setting-options button {
-    flex: 1;
-    min-width: 60px;
-    min-height: 44px;
-    border: 1px solid var(--border);
-    background: var(--bg-3);
-    color: var(--text);
-    border-radius: var(--radius-sm);
-    font-size: 14px;
-    font-weight: 500;
-    cursor: pointer;
-    font-family: inherit;
+    flex: 1; min-width: 60px; min-height: 44px; border: 1px solid var(--border);
+    background: var(--bg-3); color: var(--text); border-radius: var(--radius-sm);
+    font-size: 14px; font-weight: 500; cursor: pointer; font-family: inherit;
     transition: background 0.15s, color 0.15s, border-color 0.15s;
   }
   .setting-options button.active {
-    background: var(--accent);
-    color: #fff;
-    border-color: var(--accent);
+    background: var(--accent); color: #fff; border-color: var(--accent);
   }
-
-  /* ============================================================
-     КНОПКИ (универсальные)
-     ============================================================ */
+  /* Кнопки */
   .btn {
-    width: 100%;
-    min-height: 50px;
-    border: none;
-    background: var(--bg-3);
-    color: var(--text);
-    border-radius: var(--radius-sm);
-    font-size: 16px;
-    font-weight: 600;
-    cursor: pointer;
-    font-family: inherit;
+    width: 100%; min-height: 50px; border: none; background: var(--bg-3);
+    color: var(--text); border-radius: var(--radius-sm); font-size: 16px;
+    font-weight: 600; cursor: pointer; font-family: inherit;
     transition: opacity 0.15s, transform 0.1s;
   }
-  .btn.primary {
-    background: var(--accent);
-    color: #fff;
-  }
-  .btn.danger {
-    background: rgba(255, 59, 48, 0.12);
-    color: #ff3b30;
-  }
-  .btn:active {
-    opacity: 0.8;
-    transform: scale(0.98);
-  }
+  .btn.primary { background: var(--accent); color: #fff; }
+  .btn.danger { background: rgba(255,59,48,0.12); color: var(--red); }
+  .btn:active { opacity: 0.8; transform: scale(0.98); }
   .btn + .btn { margin-top: 8px; }
-
-  /* ============================================================
-     СПИСОК ЗАДАЧ В ДНЕ
-     ============================================================ */
+  /* Задачи + чекбоксы */
   .task-list {
-    max-height: 50vh;
-    overflow-y: auto;
-    overscroll-behavior: contain;
-    margin-bottom: 12px;
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
+    max-height: 50vh; overflow-y: auto; overscroll-behavior: contain;
+    margin-bottom: 12px; display: flex; flex-direction: column; gap: 8px;
   }
-  .task-row {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    background: var(--bg-3);
-    border-radius: var(--radius-sm);
-    padding: 4px 4px 4px 14px;
-    min-height: 48px;
+  .task-row, .check-item {
+    display: flex; align-items: center; gap: 8px; background: var(--bg-3);
+    border-radius: var(--radius-sm); padding: 4px 4px 4px 8px; min-height: 52px;
   }
-  .task-text {
-    flex: 1;
-    font-size: 15px;
-    word-break: break-word;
-    padding: 8px 0;
-    cursor: text;
+  .task-text, .check-text {
+    flex: 1; font-size: 15px; word-break: break-word; padding: 8px 4px;
+    cursor: text; transition: opacity 0.15s;
   }
-  .task-edit-input {
-    flex: 1;
-    background: transparent;
-    border: none;
-    color: var(--text);
-    font-size: 15px;
-    font-family: inherit;
-    outline: none;
-    padding: 8px 0;
+  .task-text.done, .check-text.done {
+    text-decoration: line-through; opacity: 0.55; color: var(--text-dim);
+  }
+  .task-edit-input, .check-edit-input {
+    flex: 1; background: transparent; border: none; color: var(--text);
+    font-size: 15px; font-family: inherit; outline: none; padding: 8px 0;
     border-bottom: 2px solid var(--accent);
   }
-  .add-row {
-    display: flex;
-    gap: 8px;
+  /* iOS-кружок чекбокса */
+  .checkbox {
+    width: 26px; height: 26px; min-width: 26px; border-radius: 50%;
+    border: 2px solid var(--text-muted); background: transparent;
+    cursor: pointer; padding: 0; display: inline-flex; align-items: center;
+    justify-content: center; transition: all 0.15s; position: relative;
+    color: var(--cb-color, var(--accent));
   }
-  .add-row input {
-    flex: 1;
-    background: var(--bg-3);
-    border: 1px solid var(--border);
-    color: var(--text);
-    font-size: 15px;
-    font-family: inherit;
-    padding: 12px 14px;
-    border-radius: var(--radius-sm);
-    min-height: var(--tap);
-    outline: none;
+  .checkbox::before { content: ''; position: absolute; inset: -9px; }
+  .checkbox svg { width: 15px; height: 15px; display: block; }
+  .checkbox.checked {
+    background: var(--cb-color, var(--accent));
+    border-color: var(--cb-color, var(--accent));
   }
-  .add-row input:focus {
-    border-color: var(--accent);
+  /* Иконка колокольчика */
+  .bell-btn { color: var(--text-dim); opacity: 0.5; }
+  .bell-btn.active { color: var(--accent); opacity: 1; }
+  .add-row { display: flex; gap: 8px; }
+  .add-row input, .modal-input {
+    flex: 1; background: var(--bg-3); border: 1px solid var(--border);
+    color: var(--text); font-size: 15px; font-family: inherit;
+    padding: 12px 14px; border-radius: var(--radius-sm);
+    min-height: var(--tap); outline: none; width: 100%;
   }
-
-  /* ============================================================
-     ЗАГЛУШКИ ДЛЯ МОДУЛЕЙ («скоро»)
-     ============================================================ */
+  .add-row input:focus, .modal-input:focus { border-color: var(--accent); }
+  /* Тренировки — табы */
+  .training-tabs {
+    display: flex; gap: 6px; background: var(--bg-3); padding: 4px;
+    border-radius: var(--radius-sm); margin-bottom: 14px;
+  }
+  .training-tabs button {
+    flex: 1; min-height: 40px; border: none; background: transparent;
+    color: var(--text-dim); border-radius: 8px; font-size: 14px; font-weight: 600;
+    cursor: pointer; font-family: inherit; transition: background 0.15s, color 0.15s;
+  }
+  .training-tabs button.active { background: var(--bg-2); color: var(--text); }
+  /* Категории (Тренировки/Питание/Свой список) */
+  .category-card {
+    background: var(--bg-2); border-radius: var(--radius); padding: 14px;
+    margin-bottom: 10px; box-shadow: var(--shadow-sm);
+  }
+  .category-header {
+    display: flex; align-items: center; gap: 8px; margin-bottom: 10px;
+  }
+  .category-name {
+    font-weight: 700; font-size: 16px; letter-spacing: -0.2px; flex: 1;
+  }
+  .category-meta { font-size: 12px; color: var(--text-dim); }
+  .category-items {
+    display: flex; flex-direction: column; gap: 6px;
+  }
+  .check-item {
+    background: var(--bg-3); padding: 4px 4px 4px 8px; min-height: 46px;
+  }
+  .check-meta {
+    font-size: 12px; color: var(--text-dim); white-space: nowrap;
+    padding: 0 6px;
+  }
+  .add-item-row {
+    display: flex; gap: 6px; margin-top: 8px;
+  }
+  .add-item-row input {
+    flex: 1; background: var(--bg-3); border: 1px solid var(--border);
+    color: var(--text); font-size: 14px; font-family: inherit;
+    padding: 10px 12px; border-radius: var(--radius-sm);
+    min-height: 42px; outline: none;
+  }
+  .add-item-row input:focus { border-color: var(--accent); }
+  .add-category-btn {
+    width: 100%; min-height: 44px; border: 2px dashed var(--border);
+    background: transparent; color: var(--text-dim); border-radius: var(--radius);
+    font-size: 14px; font-weight: 600; cursor: pointer; font-family: inherit;
+    margin-bottom: 10px;
+  }
+  .add-category-btn:active { border-color: var(--accent); color: var(--accent); }
+  /* Заглушки */
   .placeholder {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-    padding: 80px 20px;
-    color: var(--text-dim);
-    gap: 16px;
+    display: flex; flex-direction: column; align-items: center;
+    justify-content: center; text-align: center; padding: 80px 20px;
+    color: var(--text-dim); gap: 16px;
   }
-  .placeholder-icon {
-    font-size: 64px;
-    opacity: 0.5;
-  }
+  .placeholder-icon { font-size: 64px; opacity: 0.5; }
   .placeholder-title {
-    font-size: 20px;
-    font-weight: 700;
-    color: var(--text);
-    letter-spacing: -0.4px;
+    font-size: 20px; font-weight: 700; color: var(--text); letter-spacing: -0.4px;
   }
-  .placeholder-sub {
-    font-size: 14px;
-    max-width: 280px;
-    line-height: 1.5;
+  .placeholder-sub { font-size: 14px; max-width: 280px; line-height: 1.5; }
+  /* Toggle-переключатель (iOS-style) */
+  .toggle {
+    width: 51px; height: 31px; border-radius: 16px; background: var(--bg-3);
+    border: none; cursor: pointer; position: relative; transition: background 0.2s;
+    padding: 0;
   }
-
-  /* ============================================================
-     TOAST
-     ============================================================ */
+  .toggle::after {
+    content: ''; position: absolute; top: 2px; left: 2px; width: 27px;
+    height: 27px; border-radius: 50%; background: #fff;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2); transition: transform 0.2s;
+  }
+  .toggle.on { background: var(--accent); }
+  .toggle.on::after { transform: translateX(20px); }
+  .notify-toggle-row {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 8px 0 16px; border-bottom: 1px solid var(--border); margin-bottom: 12px;
+  }
+  .check-row {
+    display: flex; align-items: center; gap: 10px; padding: 10px 0;
+    min-height: 44px; cursor: pointer; font-size: 15px;
+  }
+  .check-row input {
+    width: 22px; height: 22px; accent-color: var(--accent); cursor: pointer;
+  }
+  .notify-info {
+    background: var(--accent-soft); color: var(--accent);
+    padding: 10px 12px; border-radius: var(--radius-sm);
+    font-size: 12px; line-height: 1.4; margin: 12px 0;
+  }
+  /* Библиотека шаблонов */
+  .template-library {
+    display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px;
+    margin-bottom: 12px;
+  }
+  .tpl-tile {
+    background: var(--bg-3); border: 2px solid transparent;
+    border-radius: var(--radius-sm); padding: 12px; cursor: pointer;
+    display: flex; align-items: center; gap: 10px; font-family: inherit;
+    color: var(--text); font-size: 14px; font-weight: 500; text-align: left;
+    transition: border-color 0.15s, background 0.15s;
+  }
+  .tpl-tile.enabled {
+    border-color: var(--accent); background: var(--accent-soft);
+  }
+  .tpl-tile-icon { font-size: 22px; }
+  .custom-template-form {
+    display: flex; gap: 8px; margin-bottom: 10px;
+  }
+  .tpl-icon-input {
+    width: 60px; text-align: center; font-size: 20px;
+    background: var(--bg-3); border: 1px solid var(--border);
+    border-radius: var(--radius-sm); color: var(--text);
+    font-family: inherit; padding: 8px;
+  }
+  .tpl-name-input {
+    flex: 1; background: var(--bg-3); border: 1px solid var(--border);
+    border-radius: var(--radius-sm); color: var(--text); font-family: inherit;
+    font-size: 15px; padding: 8px 12px;
+  }
+  /* Toast */
   .toast {
-    position: fixed;
-    bottom: calc(100px + env(safe-area-inset-bottom));
-    left: 50%;
-    transform: translate(-50%, 20px);
-    background: rgba(0, 0, 0, 0.85);
-    color: #fff;
-    padding: 10px 18px;
-    border-radius: 20px;
-    font-size: 13px;
-    font-weight: 500;
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.2s, transform 0.2s;
-    z-index: 300;
-    max-width: 90vw;
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
+    position: fixed; bottom: calc(100px + env(safe-area-inset-bottom));
+    left: 50%; transform: translate(-50%, 20px); background: rgba(0,0,0,0.85);
+    color: #fff; padding: 10px 18px; border-radius: 20px; font-size: 13px;
+    font-weight: 500; opacity: 0; pointer-events: none;
+    transition: opacity 0.2s, transform 0.2s; z-index: 300; max-width: 90vw;
+    backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
   }
-  .toast.show {
-    opacity: 1;
-    transform: translate(-50%, 0);
-  }
-
+  .toast.show { opacity: 1; transform: translate(-50%, 0); }
   .hint {
-    color: var(--text-dim);
-    font-size: 12px;
-    margin: 16px 0 0;
-    text-align: center;
-    line-height: 1.5;
+    color: var(--text-dim); font-size: 12px; margin: 16px 0 0;
+    text-align: center; line-height: 1.5;
   }
 </style>
 </head>
 <body>
 
 <div class="app">
-  <!-- ===== Шапка ===== -->
   <header class="app-header">
     <h1 id="pageTitle">Планировщик</h1>
     <div class="header-actions">
@@ -714,7 +453,6 @@
     </div>
   </header>
 
-  <!-- ===== Раскрывающийся поиск ===== -->
   <div class="search-overlay" id="searchOverlay">
     <div class="search-field">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
@@ -726,21 +464,18 @@
     </div>
   </div>
 
-  <!-- ===== Баннер о свайпе ===== -->
-  <div class="warn" id="swipeWarn">
+  <div class="warn hidden" id="swipeWarn">
     <span aria-hidden="true">⚠️</span>
     <span>Свайп вниз от верхнего края закрывает Mini App. Скролльте по центру.</span>
     <button class="warn-close" id="warnClose" aria-label="Скрыть">✕</button>
   </div>
 
-  <!-- ===== Содержимое текущего вида ===== -->
   <div id="content"></div>
 </div>
 
-<!-- ===== DOCK ===== -->
 <nav class="dock" id="dock"></nav>
 
-<!-- ===== Модалка: цвет карточки дня ===== -->
+<!-- Модалка: цвет карточки -->
 <div class="modal" id="colorModal">
   <div class="modal-card">
     <h2>Цвет карточки</h2>
@@ -749,7 +484,7 @@
   </div>
 </div>
 
-<!-- ===== Модалка: акцентный цвет ===== -->
+<!-- Модалка: акцентный цвет -->
 <div class="modal" id="accentModal">
   <div class="modal-card">
     <h2>Акцентный цвет</h2>
@@ -758,11 +493,10 @@
   </div>
 </div>
 
-<!-- ===== Модалка: настройки структуры ===== -->
+<!-- Модалка: настройки -->
 <div class="modal" id="settingsModal">
   <div class="modal-card">
     <h2>Настройки</h2>
-
     <div class="setting-block">
       <div class="setting-label">Тема</div>
       <div class="setting-options" data-setting="theme">
@@ -770,7 +504,6 @@
         <button data-value="dark">🌙 Тёмная</button>
       </div>
     </div>
-
     <div class="setting-block">
       <div class="setting-label">Колонок в неделе</div>
       <div class="setting-options" data-setting="weekColumns">
@@ -779,7 +512,6 @@
         <button data-value="3">3</button>
       </div>
     </div>
-
     <div class="setting-block">
       <div class="setting-label">Выходные</div>
       <div class="setting-options" data-setting="showWeekend">
@@ -787,14 +519,22 @@
         <button data-value="false">Скрыть</button>
       </div>
     </div>
-
     <div class="setting-block">
       <div class="setting-label">Акцентный цвет</div>
       <div class="setting-options">
         <button id="openAccentPicker">🎨 Выбрать цвет</button>
       </div>
     </div>
-
+    <div class="setting-block">
+      <div class="setting-label">Уведомления от бота</div>
+      <div class="setting-label" style="text-transform:none;letter-spacing:0;font-weight:400;margin-bottom:6px;font-size:12px;">
+        URL вашего бота (для отправки напоминаний)
+      </div>
+      <input type="url" id="backendUrl" class="modal-input"
+             placeholder="https://ваш-бот.workers.dev/api/reminders"
+             style="margin-bottom:8px;">
+      <button id="testBackendBtn" class="btn">Проверить связь</button>
+    </div>
     <div class="setting-block">
       <div class="setting-label">Данные</div>
       <div class="setting-options" style="flex-direction:column;">
@@ -804,12 +544,11 @@
         </button>
       </div>
     </div>
-
     <button class="btn primary" data-close style="margin-top:16px;">Готово</button>
   </div>
 </div>
 
-<!-- ===== Модалка: задачи дня ===== -->
+<!-- Модалка: задачи дня -->
 <div class="modal" id="dayModal">
   <div class="modal-card">
     <div class="modal-head">
@@ -824,7 +563,74 @@
   </div>
 </div>
 
-<!-- ===== Toast ===== -->
+<!-- Модалка: напоминание -->
+<div class="modal" id="notifyModal">
+  <div class="modal-card">
+    <h2>Напоминание</h2>
+    <div class="notify-toggle-row">
+      <span style="font-weight:500;">Включить напоминание</span>
+      <button class="toggle" id="notifyToggle" aria-label="Вкл/выкл"></button>
+    </div>
+    <div id="notifyWhen" style="display:none;">
+      <div class="setting-block">
+        <div class="setting-label">Когда напомнить</div>
+        <label class="check-row">
+          <input type="checkbox" id="notifyOnDay">
+          <span>В день события</span>
+        </label>
+        <label class="check-row">
+          <input type="checkbox" id="notifyHourBefore">
+          <span>За час до события</span>
+        </label>
+        <label class="check-row">
+          <input type="checkbox" id="notifyDayBefore">
+          <span>За день до события</span>
+        </label>
+      </div>
+      <div class="setting-block">
+        <div class="setting-label">Время события (для расчёта)</div>
+        <input type="time" id="notifyTime" class="modal-input">
+      </div>
+      <div class="setting-block">
+        <div class="setting-label">Или точная дата и время</div>
+        <input type="datetime-local" id="notifyCustomAt" class="modal-input">
+      </div>
+    </div>
+    <div class="notify-info">
+      🔔 Отправляет бот. Адрес бэкенда настраивается в ⚙️ → Уведомления.
+      Если бэкенд не подключён — напоминание сохранится, но не отправится.
+    </div>
+    <button class="btn primary" data-close>Готово</button>
+  </div>
+</div>
+
+<!-- Модалка: добавить шаблон -->
+<div class="modal" id="addTemplateModal">
+  <div class="modal-card">
+    <h2>Добавить шаблон</h2>
+    <div class="template-library" id="templateLibrary"></div>
+    <div class="setting-block">
+      <div class="setting-label">Свой шаблон</div>
+      <div class="custom-template-form">
+        <input type="text" id="customTplIcon" maxlength="2" value="✨" class="tpl-icon-input">
+        <input type="text" id="customTplName" placeholder="Название..." class="tpl-name-input">
+      </div>
+      <button class="btn primary" id="createCustomTpl">Создать и добавить</button>
+    </div>
+    <button class="btn" data-close style="margin-top:12px;">Готово</button>
+  </div>
+</div>
+
+<!-- Модалка: подтверждение удаления -->
+<div class="modal" id="confirmModal">
+  <div class="modal-card">
+    <h2 id="confirmTitle">Удалить?</h2>
+    <p id="confirmText" style="color:var(--text-dim);margin:0 0 16px;font-size:14px;"></p>
+    <button class="btn danger" id="confirmYes">Удалить</button>
+    <button class="btn" data-close style="margin-top:8px;">Отмена</button>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
 
 <script>
@@ -837,35 +643,37 @@ const tg = window.Telegram?.WebApp;
 if (tg) {
   tg.ready();
   tg.expand();
+  // Свайп вниз отключаем — метод доступен с Telegram 7.7+ (декабрь 2024).
+  // Если метод недоступен (очень старый клиент) — покажем предупреждение.
+  let swipeBlocked = false;
   if (typeof tg.disableVerticalSwipes === 'function') {
-    try { tg.disableVerticalSwipes(); } catch (e) {}
+    try { tg.disableVerticalSwipes(); swipeBlocked = true; } catch (e) {}
   }
+  window.__swipeBlocked = swipeBlocked;
 }
 document.addEventListener('contextmenu', (e) => e.preventDefault());
 
 /* ============================================================
    КОНСТАНТЫ
    ============================================================ */
-const STORAGE_KEY = 'miniapp-constructor-v2';
+const STORAGE_KEY = 'miniapp-constructor-v3';
 
-// Приятные пастельные цвета для карточек (iOS-like)
 const CARD_PALETTE = [
   '#5ac8fa', '#af52de', '#ff2d55', '#ff9500',
   '#34c759', '#30b0c7', '#5856d6', '#ffcc00',
 ];
-
-// Акцентные цвета (более насыщенные, iOS system colors)
 const ACCENT_PALETTE = [
   '#007aff', '#5856d6', '#af52de', '#ff2d55',
   '#ff9500', '#34c759', '#30b0c7', '#8e8e93',
 ];
 
-// Метаданные модулей (иконки в доке)
-const VIEWS = {
-  planner:   { title: 'Планировщик', icon: '📅' },
-  notes:     { title: 'Заметки',     icon: '📝' },
-  reminders: { title: 'Напоминания', icon: '⏰' },
-  words:     { title: 'Слова',       icon: '📚' },
+// Базовые встроенные шаблоны. planner нельзя удалить — он якорь.
+const BASE_VIEWS = {
+  planner:   { title: 'Планировщик', icon: '📅', removable: false },
+  training:  { title: 'Тренировки',  icon: '💪', removable: true  },
+  notes:     { title: 'Заметки',     icon: '📝', removable: true  },
+  reminders: { title: 'Напоминания', icon: '⏰', removable: true  },
+  words:     { title: 'Слова',       icon: '📚', removable: true  },
 };
 
 const WEEK_ORDER = [
@@ -878,6 +686,15 @@ const WEEK_ORDER = [
   { id: 'sun', day: 'Вс', full: 'Воскресенье', color: '#5856d6' },
 ];
 
+const DEFAULT_NOTIFY = {
+  enabled: false,
+  onDay: true,
+  hourBefore: false,
+  dayBefore: false,
+  time: null,        // 'HH:MM'
+  customAt: null,    // ISO string
+};
+
 const DEFAULT_STATE = {
   theme: 'light',
   accent: '#007aff',
@@ -885,10 +702,39 @@ const DEFAULT_STATE = {
   showWeekend: true,
   plannerFilter: 'all',
   warnDismissed: false,
-  week: WEEK_ORDER.map(d => ({ ...d, tasks: [] })),
+  backendUrl: '',
+  // Порядок шаблонов в доке. planner всегда первый.
+  enabledViews: ['planner', 'training', 'notes', 'reminders', 'words'],
+  customViews: [], // {id, title, icon, items:[...]}
+  week: WEEK_ORDER.map(d => ({
+    ...d,
+    tasks: [], // {id, text, done, color, time, notify}
+  })),
+  training: {
+    activeTab: 'workouts',
+    workouts: [
+      { id: 'w1', name: 'Утро', items: [
+        { id: 'wi1', text: 'Отжимания 3×15', done: false, notify: { ...DEFAULT_NOTIFY } },
+        { id: 'wi2', text: 'Приседания 3×20', done: false, notify: { ...DEFAULT_NOTIFY } },
+      ]},
+      { id: 'w2', name: 'Вечер', items: [
+        { id: 'wi3', text: 'Растяжка 10 мин', done: false, notify: { ...DEFAULT_NOTIFY } },
+      ]},
+    ],
+    nutrition: [
+      { id: 'n1', name: 'Завтрак', items: [
+        { id: 'ni1', text: 'Овсянка с ягодами', meta: '350 ккал', done: false, notify: { ...DEFAULT_NOTIFY } },
+      ]},
+      { id: 'n2', name: 'Обед', items: [
+        { id: 'ni2', text: 'Курица с рисом', meta: '550 ккал', done: false, notify: { ...DEFAULT_NOTIFY } },
+      ]},
+      { id: 'n3', name: 'Ужин', items: [
+        { id: 'ni3', text: 'Салат с рыбой', meta: '400 ккал', done: false, notify: { ...DEFAULT_NOTIFY } },
+      ]},
+    ],
+  },
 };
 
-// Стартовые задачи (только для новых пользователей)
 const SEED_TASKS = {
   mon: ['Встреча с командой'],
   wed: ['Отчёт за неделю'],
@@ -901,19 +747,22 @@ const SEED_TASKS = {
 function loadState() {
   try {
     const saved = JSON.parse(localStorage.getItem(STORAGE_KEY));
-    if (saved && typeof saved === 'object') {
-      return { ...DEFAULT_STATE, ...saved };
-    }
+    if (saved && typeof saved === 'object') return { ...DEFAULT_STATE, ...saved };
   } catch (e) {}
-  // Первый запуск — накатываем seed-задачи
+  // Первый запуск — seed-данные
   const fresh = JSON.parse(JSON.stringify(DEFAULT_STATE));
   fresh.week.forEach(d => {
-    if (SEED_TASKS[d.id]) d.tasks = [...SEED_TASKS[d.id]];
+    if (SEED_TASKS[d.id]) {
+      d.tasks = SEED_TASKS[d.id].map(t => makeTask(t));
+    }
   });
   return fresh;
 }
 function saveState() {
-  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch (e) {}
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    syncBackend(); // тихо отправляем напоминания на бэкенд, если он есть
+  } catch (e) {}
 }
 
 let state = loadState();
@@ -921,18 +770,27 @@ let currentView = 'planner';
 let searchQuery = '';
 let currentDayId = null;
 let dragState = null;
+let currentNotifyTarget = null; // { type: 'task'|'workout'|'nutrition'|'custom', ref, item }
+
+const $  = (sel, root = document) => root.querySelector(sel);
+const $$ = (sel, root = document) => [...root.querySelectorAll(sel)];
 
 /* ============================================================
    УТИЛИТЫ
    ============================================================ */
-const $  = (sel, root = document) => root.querySelector(sel);
-const $$ = (sel, root = document) => [...root.querySelectorAll(sel)];
-
+function makeId(prefix = 'id') {
+  return prefix + '_' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+}
+function makeTask(text) {
+  return {
+    id: makeId('t'), text, done: false, color: null, time: null,
+    notify: { ...DEFAULT_NOTIFY },
+  };
+}
 function escapeHtml(s) {
   return String(s).replace(/[&<>"']/g, c =>
     ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[c]));
 }
-
 let toastTimer = null;
 function toast(msg) {
   const el = $('#toast');
@@ -941,38 +799,89 @@ function toast(msg) {
   clearTimeout(toastTimer);
   toastTimer = setTimeout(() => el.classList.remove('show'), 2000);
 }
-
 function haptic(type = 'light') {
   try { tg?.HapticFeedback?.impactOccurred(type); } catch (e) {}
 }
+function hasAnyNotify(n) {
+  return n && n.enabled && (n.onDay || n.hourBefore || n.dayBefore || n.customAt);
+}
 
 /* ============================================================
-   ТЕМА И АКЦЕНТ
+   ТЕМА / АКЦЕНТ
    ============================================================ */
 function applyTheme() {
   document.documentElement.dataset.theme = state.theme;
-  // Красим статус-бар Telegram под фон
   try {
     const color = state.theme === 'dark' ? '#1c1c1e' : '#f5f5f7';
     tg?.setHeaderColor?.(color);
     tg?.setBackgroundColor?.(color);
   } catch (e) {}
 }
-
 function applyAccent() {
   document.documentElement.style.setProperty('--accent', state.accent);
   const [r, g, b] = [1, 3, 5].map(i => parseInt(state.accent.slice(i, i + 2), 16));
-  document.documentElement.style.setProperty(
-    '--accent-soft', `rgba(${r}, ${g}, ${b}, 0.16)`);
+  document.documentElement.style.setProperty('--accent-soft', `rgba(${r}, ${g}, ${b}, 0.16)`);
 }
 
 /* ============================================================
-   DOCK
+   БЭКЕНД: отправка напоминаний
+   ============================================================ */
+async function syncBackend() {
+  if (!state.backendUrl) return;
+  try {
+    // Собираем ВСЕ элементы с активными напоминаниями
+    const reminders = [];
+    const push = (text, dayId, item) => {
+      if (!hasAnyNotify(item.notify)) return;
+      reminders.push({
+        id: item.id, text, dayId,
+        time: item.notify.time || item.time || '09:00',
+        onDay: item.notify.onDay,
+        hourBefore: item.notify.hourBefore,
+        dayBefore: item.notify.dayBefore,
+        customAt: item.notify.customAt,
+      });
+    };
+    state.week.forEach(d =>
+      d.tasks.forEach(t => push(t.text, d.id, t)));
+    state.training.workouts.forEach(c =>
+      c.items.forEach(i => push(i.text, null, i)));
+    state.training.nutrition.forEach(c =>
+      c.items.forEach(i => push(i.text, null, i)));
+    state.customViews.forEach(v =>
+      v.items.forEach(i => push(i.text, null, i)));
+
+    // user id нужен боту, чтобы знать кому слать
+    const userId = tg?.initDataUnsafe?.user?.id || null;
+    await fetch(state.backendUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ userId, reminders }),
+    });
+  } catch (e) {
+    // молча: пользователь не должен видеть сетевые ошибки бэкенда
+  }
+}
+
+/* ============================================================
+   DOCK (карусель + кнопка добавить)
    ============================================================ */
 function renderDock() {
   const dock = $('#dock');
   dock.innerHTML = '';
-  for (const [id, meta] of Object.entries(VIEWS)) {
+
+  const scroll = document.createElement('div');
+  scroll.className = 'dock-scroll';
+
+  // Порядок: как в state.enabledViews + пользовательские в конце
+  const orderedIds = [
+    ...state.enabledViews.filter(id => BASE_VIEWS[id]),
+    ...state.customViews.map(v => v.id),
+  ];
+
+  for (const id of orderedIds) {
+    const meta = BASE_VIEWS[id] || state.customViews.find(v => v.id === id);
+    if (!meta) continue;
     const btn = document.createElement('button');
     btn.className = 'dock-item' + (id === currentView ? ' active' : '');
     btn.dataset.view = id;
@@ -983,19 +892,32 @@ function renderDock() {
       haptic();
       switchView(id);
     });
-    dock.appendChild(btn);
+    scroll.appendChild(btn);
   }
+  dock.appendChild(scroll);
+
+  // Кнопка "Добавить шаблон" — статично справа
+  const addBtn = document.createElement('button');
+  addBtn.className = 'dock-add';
+  addBtn.setAttribute('aria-label', 'Добавить шаблон');
+  addBtn.textContent = '+';
+  addBtn.addEventListener('click', () => {
+    haptic();
+    renderTemplateLibrary();
+    openModal($('#addTemplateModal'));
+  });
+  dock.appendChild(addBtn);
 }
 
 /* ============================================================
-   ПЕРЕКЛЮЧЕНИЕ ВИДОВ
+   РОУТЕР
    ============================================================ */
 function switchView(view) {
   currentView = view;
-  $('#pageTitle').textContent = VIEWS[view].title;
+  const meta = BASE_VIEWS[view] || state.customViews.find(v => v.id === view);
+  $('#pageTitle').textContent = meta?.title || 'Модуль';
   renderDock();
   renderContent();
-  // Закрываем поиск при смене вида
   closeSearch();
   window.scrollTo({ top: 0, behavior: 'instant' });
 }
@@ -1003,29 +925,39 @@ function switchView(view) {
 function renderContent() {
   const content = $('#content');
   content.innerHTML = '';
-  if (currentView === 'planner') {
-    renderPlanner(content);
-  } else {
-    renderPlaceholder(content, currentView);
-  }
+
+  if (currentView === 'planner')      return renderPlanner(content);
+  if (currentView === 'training')     return renderTraining(content);
+  if (currentView === 'notes')        return renderPlaceholder(content, 'notes');
+  if (currentView === 'reminders')    return renderPlaceholder(content, 'reminders');
+  if (currentView === 'words')        return renderPlaceholder(content, 'words');
+
+  // Пользовательский шаблон
+  const custom = state.customViews.find(v => v.id === currentView);
+  if (custom) return renderCustomView(content, custom);
+
+  // Если удалили текущий вид — уходим в планировщик
+  switchView('planner');
 }
 
 /* ============================================================
-   ЗАГЛУШКИ ДЛЯ НЕ-ПЛАНИРОВЩИКА
+   КОМПОНЕНТ: iOS-кружок чекбокса
    ============================================================ */
-function renderPlaceholder(root, viewId) {
-  const meta = VIEWS[viewId];
-  const messages = {
-    notes:     'Здесь будут заметки с папками, тегами и поиском.',
-    reminders: 'Здесь будут напоминания с датой, временем и повтором.',
-    words:     'Здесь будут карточки слов с повторением по системе Лейтнера.',
-  };
-  root.innerHTML = `
-    <div class="placeholder">
-      <div class="placeholder-icon">${meta.icon}</div>
-      <div class="placeholder-title">${meta.title}</div>
-      <div class="placeholder-sub">${messages[viewId] || 'Скоро'}</div>
-    </div>`;
+function makeCheckbox(checked, onToggle, color) {
+  const btn = document.createElement('button');
+  btn.type = 'button';
+  btn.className = 'checkbox' + (checked ? ' checked' : '');
+  if (color) btn.style.setProperty('--cb-color', color);
+  btn.setAttribute('aria-label', checked ? 'Снять отметку' : 'Отметить');
+  btn.innerHTML = checked
+    ? '<svg viewBox="0 0 20 20" fill="none" stroke="#fff" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 10l4 4 8-8"/></svg>'
+    : '';
+  btn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    haptic();
+    onToggle();
+  });
+  return btn;
 }
 
 /* ============================================================
@@ -1034,15 +966,14 @@ function renderPlaceholder(root, viewId) {
 function renderPlanner(root) {
   root.innerHTML = `
     <div class="filters" id="plannerFilters">
-      <button data-filter="all" class="${state.plannerFilter === 'all' ? 'active' : ''}">Все дни</button>
-      <button data-filter="busy" class="${state.plannerFilter === 'busy' ? 'active' : ''}">С задачами</button>
-      <button data-filter="empty" class="${state.plannerFilter === 'empty' ? 'active' : ''}">Свободные</button>
-      <button data-filter="today" class="${state.plannerFilter === 'today' ? 'active' : ''}">Сегодня</button>
+      <button data-filter="all" class="${state.plannerFilter==='all'?'active':''}">Все</button>
+      <button data-filter="busy" class="${state.plannerFilter==='busy'?'active':''}">С задачами</button>
+      <button data-filter="empty" class="${state.plannerFilter==='empty'?'active':''}">Свободные</button>
+      <button data-filter="today" class="${state.plannerFilter==='today'?'active':''}">Сегодня</button>
     </div>
     <div class="week-grid" id="weekGrid"></div>
-    <p class="hint">Удерживайте ☰ — перетащить день. 🎨 — цвет. Тап на задачу — редактировать.</p>
+    <p class="hint">Удерживайте ☰ — перетащить. 🎨 — цвет. Тап по карточке — задачи.</p>
   `;
-
   $('#plannerFilters').addEventListener('click', (e) => {
     const btn = e.target.closest('[data-filter]');
     if (!btn) return;
@@ -1053,7 +984,6 @@ function renderPlanner(root) {
     renderWeekGrid();
     haptic();
   });
-
   renderWeekGrid();
 }
 
@@ -1061,27 +991,23 @@ function renderWeekGrid() {
   const grid = $('#weekGrid');
   if (!grid) return;
   grid.innerHTML = '';
-  grid.style.gridTemplateColumns =
-    `repeat(${state.weekColumns}, minmax(0, 1fr))`;
+  grid.style.gridTemplateColumns = `repeat(${state.weekColumns}, minmax(0, 1fr))`;
 
   const q = searchQuery;
-  // Сегодняшний день недели (0=Вс, 1=Пн ... 6=Сб)
   const todayIdx = new Date().getDay();
   const todayId = ['sun','mon','tue','wed','thu','fri','sat'][todayIdx];
 
   const visible = state.week.filter(d => {
-    // Выходные скрыты — пропускаем сб/вс
     if (!state.showWeekend && (d.id === 'sat' || d.id === 'sun')) return false;
     const matchQ = !q ||
       d.day.toLowerCase().includes(q) ||
       d.full.toLowerCase().includes(q) ||
-      d.tasks.some(t => t.toLowerCase().includes(q));
+      d.tasks.some(t => t.text.toLowerCase().includes(q));
     const matchF =
       state.plannerFilter === 'all'   ? true :
       state.plannerFilter === 'busy'  ? d.tasks.length > 0 :
       state.plannerFilter === 'empty' ? d.tasks.length === 0 :
-      state.plannerFilter === 'today' ? d.id === todayId :
-                                        true;
+      state.plannerFilter === 'today' ? d.id === todayId : true;
     return matchQ && matchF;
   });
 
@@ -1098,9 +1024,10 @@ function renderWeekGrid() {
     card.draggable = false;
     card.style.setProperty('--card-color', d.color);
 
-    const taskWord = d.tasks.length === 1 ? 'задача'
-                   : (d.tasks.length >= 2 && d.tasks.length <= 4) ? 'задачи'
-                   : 'задач';
+    const doneCount = d.tasks.filter(t => t.done).length;
+    const total = d.tasks.length;
+    const word = total === 1 ? 'задача'
+               : (total >= 2 && total <= 4) ? 'задачи' : 'задач';
 
     card.innerHTML = `
       <div class="day-head">
@@ -1109,39 +1036,29 @@ function renderWeekGrid() {
           <button class="mini-btn palette-btn" draggable="false"
                   aria-label="Цвет" title="Цвет">🎨</button>
           <button class="mini-btn drag-handle" draggable="false"
-                  aria-label="Перетащить" title="Перетащить"
-                  data-drag-handle>☰</button>
+                  aria-label="Перетащить" title="Перетащить">☰</button>
         </div>
       </div>
       <div class="day-body">
         <div class="task-count">${
-          d.tasks.length
-            ? d.tasks.length + ' ' + taskWord
-            : 'Свободно'
+          total ? `${doneCount}/${total} ${word}` : 'Свободно'
         }</div>
-        ${d.tasks.length
-          ? `<div class="task-preview">${escapeHtml(d.tasks[0])}${
-              d.tasks.length > 1 ? '…' : ''}</div>`
-          : ''}
+        ${total ? `<div class="task-preview">${escapeHtml(d.tasks[0].text)}${
+          total > 1 ? '…' : ''}</div>` : ''}
       </div>`;
 
     card.addEventListener('click', (e) => {
       if (e.target.closest('.palette-btn, .drag-handle')) return;
       openDay(d.id);
     });
-
     card.querySelector('.palette-btn').addEventListener('click', (e) => {
       e.stopPropagation();
-      openCardColorPicker(d.color, (newColor) => {
-        d.color = newColor;
-        saveState();
-        renderWeekGrid();
+      openCardColorPicker(d.color, (c) => {
+        d.color = c; saveState(); renderWeekGrid();
       });
     });
-
     card.querySelector('.drag-handle')
       .addEventListener('pointerdown', (e) => startDrag(e, card));
-
     grid.appendChild(card);
   }
 }
@@ -1151,20 +1068,16 @@ function renderWeekGrid() {
    ============================================================ */
 function startDrag(e, card) {
   if (e.button && e.button !== 0) return;
-  e.preventDefault();
-  e.stopPropagation();
+  e.preventDefault(); e.stopPropagation();
   haptic();
   dragState = { card, target: null };
   card.classList.add('dragging');
-
   document.addEventListener('pointermove', onDragMove);
   document.addEventListener('pointerup', endDrag);
   document.addEventListener('pointercancel', endDrag);
   document.addEventListener('touchmove', preventDuringDrag, { passive: false });
 }
-function preventDuringDrag(e) {
-  if (dragState) e.preventDefault();
-}
+function preventDuringDrag(e) { if (dragState) e.preventDefault(); }
 function onDragMove(e) {
   if (!dragState) return;
   $$('.drag-target').forEach(el => el.classList.remove('drag-target'));
@@ -1173,9 +1086,7 @@ function onDragMove(e) {
   if (target && target !== dragState.card) {
     target.classList.add('drag-target');
     dragState.target = target;
-  } else {
-    dragState.target = null;
-  }
+  } else dragState.target = null;
 }
 function endDrag() {
   if (dragState?.target) {
@@ -1201,72 +1112,7 @@ function endDrag() {
 }
 
 /* ============================================================
-   МОДАЛКИ
-   ============================================================ */
-function openModal(m) {
-  m.classList.add('open');
-  document.body.style.overflow = 'hidden';
-  updateBackButton();
-}
-function closeModal(m) {
-  m.classList.remove('open');
-  if (!$$('.modal.open').length) document.body.style.overflow = '';
-  updateBackButton();
-}
-function updateBackButton() {
-  if (!tg?.BackButton) return;
-  const hasModal = $$('.modal.open').length > 0;
-  if (hasModal) tg.BackButton.show();
-  else tg.BackButton.hide();
-}
-
-/* ============================================================
-   ПАЛИТРА КАРТОЧКИ (компактная)
-   ============================================================ */
-function openCardColorPicker(current, onPick) {
-  const modal = $('#colorModal');
-  const wrap = $('#swatches');
-  wrap.innerHTML = '';
-  for (const color of CARD_PALETTE) {
-    const b = document.createElement('button');
-    b.className = 'swatch' + (color === current ? ' active' : '');
-    b.style.background = color;
-    b.style.color = color; // для box-shadow в .active
-    b.draggable = false;
-    b.setAttribute('aria-label', color);
-    b.addEventListener('click', () => { onPick(color); closeModal(modal); });
-    wrap.appendChild(b);
-  }
-  openModal(modal);
-}
-
-/* ============================================================
-   ПАЛИТРА АКЦЕНТА
-   ============================================================ */
-function openAccentPicker() {
-  const modal = $('#accentModal');
-  const wrap = $('#accentSwatches');
-  wrap.innerHTML = '';
-  for (const color of ACCENT_PALETTE) {
-    const b = document.createElement('button');
-    b.className = 'swatch' + (color === state.accent ? ' active' : '');
-    b.style.background = color;
-    b.style.color = color;
-    b.draggable = false;
-    b.setAttribute('aria-label', color);
-    b.addEventListener('click', () => {
-      state.accent = color;
-      saveState();
-      applyAccent();
-      closeModal(modal);
-    });
-    wrap.appendChild(b);
-  }
-  openModal(modal);
-}
-
-/* ============================================================
-   ЭКРАН ДНЯ + РЕДАКТИРОВАНИЕ ЗАДАЧ
+   ЭКРАН ДНЯ
    ============================================================ */
 function openDay(dayId) {
   currentDayId = dayId;
@@ -1285,40 +1131,58 @@ function renderTasks() {
   list.innerHTML = '';
 
   if (!day.tasks.length) {
-    list.innerHTML = '<p class="empty">Задач пока нет.<br>Добавьте первую ↓</p>';
+    list.innerHTML = '<p class="empty">Задач нет. Добавьте первую ↓</p>';
     return;
   }
 
-  day.tasks.forEach((text, idx) => {
+  day.tasks.forEach((task) => {
     const row = document.createElement('div');
     row.className = 'task-row';
-    row.innerHTML = `
-      <span class="task-text" data-idx="${idx}">${escapeHtml(text)}</span>
-      <button class="mini-btn" draggable="false" aria-label="Удалить"
-              data-del="${idx}">✕</button>`;
 
-    // Тап на текст → редактирование
-    row.querySelector('.task-text').addEventListener('click', () => {
-      startEditTask(idx, row);
-    });
-
-    row.querySelector('[data-del]').addEventListener('click', () => {
-      day.tasks.splice(idx, 1);
+    // Чекбокс — использует цвет карточки дня
+    const cb = makeCheckbox(task.done, () => {
+      task.done = !task.done;
       saveState();
       renderTasks();
       renderWeekGrid();
+    }, day.color);
+    row.appendChild(cb);
+
+    // Текст (тап → редактирование)
+    const textEl = document.createElement('span');
+    textEl.className = 'task-text' + (task.done ? ' done' : '');
+    textEl.textContent = task.text;
+    textEl.addEventListener('click', () => editInline(textEl, task.text, (newText) => {
+      task.text = newText; saveState(); renderTasks(); renderWeekGrid();
+    }));
+    row.appendChild(textEl);
+
+    // Колокольчик напоминания
+    const bell = document.createElement('button');
+    bell.className = 'mini-btn bell-btn' + (hasAnyNotify(task.notify) ? ' active' : '');
+    bell.setAttribute('aria-label', 'Напоминание');
+    bell.textContent = '🔔';
+    bell.addEventListener('click', () => openNotifyModal({ type: 'task', item: task, dayId: day.id }));
+    row.appendChild(bell);
+
+    // Удалить
+    const del = document.createElement('button');
+    del.className = 'mini-btn';
+    del.setAttribute('aria-label', 'Удалить');
+    del.textContent = '✕';
+    del.addEventListener('click', () => {
+      const idx = day.tasks.indexOf(task);
+      if (idx >= 0) day.tasks.splice(idx, 1);
+      saveState(); renderTasks(); renderWeekGrid();
     });
+    row.appendChild(del);
+
     list.appendChild(row);
   });
 }
 
-function startEditTask(idx, rowEl) {
-  const day = state.week.find(d => d.id === currentDayId);
-  if (!day) return;
-  const oldText = day.tasks[idx];
-  const textEl = rowEl.querySelector('.task-text');
-  if (!textEl) return;
-
+// Универсальное inline-редактирование
+function editInline(textEl, oldText, onSave) {
   const input = document.createElement('input');
   input.type = 'text';
   input.value = oldText;
@@ -1328,81 +1192,443 @@ function startEditTask(idx, rowEl) {
   input.setSelectionRange(input.value.length, input.value.length);
 
   let done = false;
-  function save() {
-    if (done) return;
-    done = true;
-    const newText = input.value.trim();
-    if (newText && newText !== oldText) {
-      day.tasks[idx] = newText;
-      saveState();
-      renderWeekGrid();
-    }
-    renderTasks();
+  function finish(save) {
+    if (done) return; done = true;
+    const val = input.value.trim();
+    if (save && val && val !== oldText) onSave(val);
+    else onSave(oldText); // восстановить
   }
-  function cancel() {
-    if (done) return;
-    done = true;
-    renderTasks();
-  }
-
-  input.addEventListener('blur', save);
+  input.addEventListener('blur', () => finish(true));
   input.addEventListener('keydown', (e) => {
     if (e.key === 'Enter') { e.preventDefault(); input.blur(); }
-    else if (e.key === 'Escape') { e.preventDefault(); cancel(); }
+    else if (e.key === 'Escape') { e.preventDefault(); finish(false); }
   });
 }
 
-function addTaskFromInput() {
-  const input = $('#newTask');
-  const text = input.value.trim();
-  if (!text) return;
-  const day = state.week.find(d => d.id === currentDayId);
-  if (!day) return;
-  day.tasks.push(text);
-  input.value = '';
+/* ============================================================
+   ТРЕНИРОВКИ
+   ============================================================ */
+function renderTraining(root) {
+  const t = state.training;
+  root.innerHTML = `
+    <div class="training-tabs">
+      <button data-tab="workouts" class="${t.activeTab==='workouts'?'active':''}">💪 Тренировки</button>
+      <button data-tab="nutrition" class="${t.activeTab==='nutrition'?'active':''}">🥗 Питание</button>
+    </div>
+    <div id="trainingBody"></div>
+  `;
+  $$('.training-tabs button').forEach(b =>
+    b.addEventListener('click', () => {
+      t.activeTab = b.dataset.tab;
+      saveState();
+      renderTraining(root);
+    }));
+  renderTrainingBody();
+}
+
+function renderTrainingBody() {
+  const body = $('#trainingBody');
+  if (!body) return;
+  const t = state.training;
+  const categories = t.activeTab === 'workouts' ? t.workouts : t.nutrition;
+  const metaLabel = t.activeTab === 'workouts' ? 'подходы/повторы' : 'ккал';
+  body.innerHTML = '';
+
+  for (const cat of categories) {
+    const card = document.createElement('div');
+    card.className = 'category-card';
+
+    const total = cat.items.length;
+    const done = cat.items.filter(i => i.done).length;
+
+    const head = document.createElement('div');
+    head.className = 'category-header';
+    head.innerHTML = `
+      <span class="category-name">${escapeHtml(cat.name)}</span>
+      <span class="category-meta">${done}/${total}</span>
+    `;
+    // Кнопка удаления категории
+    const delCat = document.createElement('button');
+    delCat.className = 'mini-btn';
+    delCat.textContent = '✕';
+    delCat.setAttribute('aria-label', 'Удалить категорию');
+    delCat.addEventListener('click', () => {
+      askConfirm(`Удалить «${cat.name}» и все пункты?`, () => {
+        const arr = t.activeTab === 'workouts' ? t.workouts : t.nutrition;
+        const idx = arr.indexOf(cat);
+        if (idx >= 0) arr.splice(idx, 1);
+        saveState(); renderTrainingBody();
+      });
+    });
+    head.appendChild(delCat);
+    card.appendChild(head);
+
+    // Список пунктов
+    const itemsBox = document.createElement('div');
+    itemsBox.className = 'category-items';
+    for (const item of cat.items) {
+      const row = document.createElement('div');
+      row.className = 'check-item';
+      row.appendChild(makeCheckbox(item.done, () => {
+        item.done = !item.done;
+        saveState(); renderTrainingBody();
+      }));
+      const txt = document.createElement('span');
+      txt.className = 'check-text' + (item.done ? ' done' : '');
+      txt.textContent = item.text;
+      txt.addEventListener('click', () => editInline(txt, item.text, (newText) => {
+        item.text = newText; saveState(); renderTrainingBody();
+      }));
+      row.appendChild(txt);
+
+      if (item.meta) {
+        const meta = document.createElement('span');
+        meta.className = 'check-meta';
+        meta.textContent = item.meta;
+        row.appendChild(meta);
+      }
+
+      const bell = document.createElement('button');
+      bell.className = 'mini-btn bell-btn' + (hasAnyNotify(item.notify) ? ' active' : '');
+      bell.textContent = '🔔';
+      bell.setAttribute('aria-label', 'Напоминание');
+      bell.addEventListener('click', () => openNotifyModal({
+        type: t.activeTab, item, categoryId: cat.id,
+      }));
+      row.appendChild(bell);
+
+      const del = document.createElement('button');
+      del.className = 'mini-btn';
+      del.textContent = '✕';
+      del.setAttribute('aria-label', 'Удалить');
+      del.addEventListener('click', () => {
+        const idx = cat.items.indexOf(item);
+        if (idx >= 0) cat.items.splice(idx, 1);
+        saveState(); renderTrainingBody();
+      });
+      row.appendChild(del);
+
+      itemsBox.appendChild(row);
+    }
+    card.appendChild(itemsBox);
+
+    // Добавить пункт
+    const addRow = document.createElement('div');
+    addRow.className = 'add-item-row';
+    const addInput = document.createElement('input');
+    addInput.type = 'text';
+    addInput.placeholder = t.activeTab === 'workouts'
+      ? 'Упражнение (например, Отжимания 3×15)…'
+      : 'Блюдо (например, Овсянка 350 ккал)…';
+    const addBtn = document.createElement('button');
+    addBtn.className = 'icon-btn';
+    addBtn.textContent = '+';
+    const addItem = () => {
+      const val = addInput.value.trim();
+      if (!val) return;
+      cat.items.push({
+        id: makeId('i'), text: val, meta: '', done: false,
+        notify: { ...DEFAULT_NOTIFY },
+      });
+      addInput.value = '';
+      saveState(); renderTrainingBody();
+      haptic();
+    };
+    addBtn.addEventListener('click', addItem);
+    addInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') { e.preventDefault(); addItem(); }
+    });
+    addRow.appendChild(addInput);
+    addRow.appendChild(addBtn);
+    card.appendChild(addRow);
+
+    body.appendChild(card);
+  }
+
+  // Кнопка "Добавить категорию"
+  const addCatBtn = document.createElement('button');
+  addCatBtn.className = 'add-category-btn';
+  addCatBtn.textContent = '+ Добавить категорию';
+  addCatBtn.addEventListener('click', () => {
+    const name = prompt('Название категории:');
+    if (!name || !name.trim()) return;
+    const arr = t.activeTab === 'workouts' ? t.workouts : t.nutrition;
+    arr.push({ id: makeId('c'), name: name.trim(), items: [] });
+    saveState(); renderTrainingBody();
+  });
+  body.appendChild(addCatBtn);
+
+  body.insertAdjacentHTML('beforeend',
+    `<p class="hint">Тап по тексту — редактировать. 🔔 — напоминание. Кружок — отметить.</p>`);
+}
+
+/* ============================================================
+   ПОЛЬЗОВАТЕЛЬСКИЕ ШАБЛОНЫ
+   ============================================================ */
+function renderCustomView(root, view) {
+  root.innerHTML = `<div id="customBody"></div>`;
+  const body = $('#customBody');
+
+  if (!view.items) view.items = [];
+
+  const card = document.createElement('div');
+  card.className = 'category-card';
+
+  const head = document.createElement('div');
+  head.className = 'category-header';
+  head.innerHTML = `<span class="category-name">${escapeHtml(view.title)}</span>
+    <span class="category-meta">${view.items.filter(i=>i.done).length}/${view.items.length}</span>`;
+  card.appendChild(head);
+
+  const itemsBox = document.createElement('div');
+  itemsBox.className = 'category-items';
+  view.items.forEach(item => {
+    const row = document.createElement('div');
+    row.className = 'check-item';
+    row.appendChild(makeCheckbox(item.done, () => {
+      item.done = !item.done;
+      saveState(); renderCustomView(body, view);
+    }));
+    const txt = document.createElement('span');
+    txt.className = 'check-text' + (item.done ? ' done' : '');
+    txt.textContent = item.text;
+    txt.addEventListener('click', () => editInline(txt, item.text, (n) => {
+      item.text = n; saveState(); renderCustomView(body, view);
+    }));
+    row.appendChild(txt);
+
+    const bell = document.createElement('button');
+    bell.className = 'mini-btn bell-btn' + (hasAnyNotify(item.notify) ? ' active' : '');
+    bell.textContent = '🔔';
+    bell.addEventListener('click', () => openNotifyModal({ type: 'custom', item, viewId: view.id }));
+    row.appendChild(bell);
+
+    const del = document.createElement('button');
+    del.className = 'mini-btn';
+    del.textContent = '✕';
+    del.addEventListener('click', () => {
+      const i = view.items.indexOf(item);
+      if (i >= 0) view.items.splice(i, 1);
+      saveState(); renderCustomView(body, view);
+    });
+    row.appendChild(del);
+
+    itemsBox.appendChild(row);
+  });
+  card.appendChild(itemsBox);
+
+  const addRow = document.createElement('div');
+  addRow.className = 'add-item-row';
+  const input = document.createElement('input');
+  input.type = 'text';
+  input.placeholder = 'Новый пункт…';
+  const addBtn = document.createElement('button');
+  addBtn.className = 'icon-btn';
+  addBtn.textContent = '+';
+  const add = () => {
+    const val = input.value.trim();
+    if (!val) return;
+    view.items.push({
+      id: makeId('ci'), text: val, done: false,
+      notify: { ...DEFAULT_NOTIFY },
+    });
+    input.value = '';
+    saveState(); renderCustomView(body, view);
+    haptic();
+  };
+  addBtn.addEventListener('click', add);
+  input.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') { e.preventDefault(); add(); }
+  });
+  addRow.appendChild(input);
+  addRow.appendChild(addBtn);
+  card.appendChild(addRow);
+
+  body.appendChild(card);
+  body.insertAdjacentHTML('beforeend',
+    `<p class="hint">Свой шаблон. Тап по тексту — редактировать. 🔔 — напоминание.</p>`);
+}
+
+/* ============================================================
+   ЗАГЛУШКИ
+   ============================================================ */
+function renderPlaceholder(root, viewId) {
+  const meta = BASE_VIEWS[viewId];
+  const messages = {
+    notes:     'Заметки с папками, тегами и поиском — скоро.',
+    reminders: 'Быстрые напоминания с повтором — скоро.',
+    words:     'Карточки слов по системе Лейтнера — скоро.',
+  };
+  root.innerHTML = `
+    <div class="placeholder">
+      <div class="placeholder-icon">${meta.icon}</div>
+      <div class="placeholder-title">${meta.title}</div>
+      <div class="placeholder-sub">${messages[viewId] || 'Скоро'}</div>
+    </div>`;
+}
+
+/* ============================================================
+   МОДАЛКИ (общие)
+   ============================================================ */
+function openModal(m) {
+  m.classList.add('open');
+  document.body.style.overflow = 'hidden';
+  updateBackButton();
+}
+function closeModal(m) {
+  m.classList.remove('open');
+  if (!$$('.modal.open').length) document.body.style.overflow = '';
+  updateBackButton();
+}
+function updateBackButton() {
+  if (!tg?.BackButton) return;
+  if ($$('.modal.open').length) tg.BackButton.show();
+  else tg.BackButton.hide();
+}
+
+/* ============================================================
+   ПАЛИТРЫ
+   ============================================================ */
+function openCardColorPicker(current, onPick) {
+  const modal = $('#colorModal');
+  const wrap = $('#swatches');
+  wrap.innerHTML = '';
+  for (const color of CARD_PALETTE) {
+    const b = document.createElement('button');
+    b.className = 'swatch' + (color === current ? ' active' : '');
+    b.style.background = color;
+    b.style.color = color;
+    b.draggable = false;
+    b.addEventListener('click', () => { onPick(color); closeModal(modal); });
+    wrap.appendChild(b);
+  }
+  openModal(modal);
+}
+function openAccentPicker() {
+  const modal = $('#accentModal');
+  const wrap = $('#accentSwatches');
+  wrap.innerHTML = '';
+  for (const color of ACCENT_PALETTE) {
+    const b = document.createElement('button');
+    b.className = 'swatch' + (color === state.accent ? ' active' : '');
+    b.style.background = color;
+    b.style.color = color;
+    b.draggable = false;
+    b.addEventListener('click', () => {
+      state.accent = color; saveState(); applyAccent(); closeModal(modal);
+    });
+    wrap.appendChild(b);
+  }
+  openModal(modal);
+}
+
+/* ============================================================
+   НАПОМИНАНИЕ
+   ============================================================ */
+function openNotifyModal(target) {
+  currentNotifyTarget = target;
+  const n = target.item.notify || { ...DEFAULT_NOTIFY };
+  if (!target.item.notify) target.item.notify = n;
+
+  $('#notifyToggle').classList.toggle('on', !!n.enabled);
+  $('#notifyWhen').style.display = n.enabled ? 'block' : 'none';
+  $('#notifyOnDay').checked      = !!n.onDay;
+  $('#notifyHourBefore').checked = !!n.hourBefore;
+  $('#notifyDayBefore').checked  = !!n.dayBefore;
+  $('#notifyTime').value = n.time || '';
+  $('#notifyCustomAt').value = n.customAt || '';
+
+  openModal($('#notifyModal'));
+}
+function saveNotifyFromModal() {
+  if (!currentNotifyTarget) return;
+  const n = currentNotifyTarget.item.notify;
+  n.onDay      = $('#notifyOnDay').checked;
+  n.hourBefore = $('#notifyHourBefore').checked;
+  n.dayBefore  = $('#notifyDayBefore').checked;
+  n.time       = $('#notifyTime').value || null;
+  n.customAt   = $('#notifyCustomAt').value || null;
   saveState();
-  renderTasks();
-  renderWeekGrid();
+  // Перерисовываем текущий вид, чтобы обновить колокольчик
+  renderContent();
+}
+
+/* ============================================================
+   БИБЛИОТЕКА ШАБЛОНОВ
+   ============================================================ */
+function renderTemplateLibrary() {
+  const wrap = $('#templateLibrary');
+  wrap.innerHTML = '';
+  for (const [id, meta] of Object.entries(BASE_VIEWS)) {
+    if (!meta.removable) continue; // planner не показываем как отключаемый
+    const enabled = state.enabledViews.includes(id);
+    const tile = document.createElement('button');
+    tile.className = 'tpl-tile' + (enabled ? ' enabled' : '');
+    tile.innerHTML = `<span class="tpl-tile-icon">${meta.icon}</span>
+      <span>${meta.title}</span>`;
+    tile.addEventListener('click', () => {
+      if (enabled) {
+        // Отключаем только если это не текущий вид
+        if (currentView === id) {
+          toast('Сначала переключитесь на другой шаблон');
+          return;
+        }
+        state.enabledViews = state.enabledViews.filter(v => v !== id);
+      } else {
+        state.enabledViews.push(id);
+      }
+      saveState();
+      renderTemplateLibrary();
+      renderDock();
+      haptic();
+    });
+    wrap.appendChild(tile);
+  }
+  // Пользовательские шаблоны тоже сюда
+  state.customViews.forEach(v => {
+    const tile = document.createElement('button');
+    tile.className = 'tpl-tile enabled';
+    tile.innerHTML = `<span class="tpl-tile-icon">${v.icon}</span><span>${v.title}</span>`;
+    tile.addEventListener('click', () => {
+      if (currentView === v.id) {
+        toast('Сначала переключитесь на другой шаблон');
+        return;
+      }
+      askConfirm(`Удалить шаблон «${v.title}»?`, () => {
+        state.customViews = state.customViews.filter(x => x.id !== v.id);
+        saveState();
+        renderTemplateLibrary();
+        renderDock();
+      });
+    });
+    wrap.appendChild(tile);
+  });
+}
+
+function createCustomTemplate() {
+  const name = $('#customTplName').value.trim();
+  const icon = $('#customTplIcon').value.trim() || '✨';
+  if (!name) { toast('Введите название'); return; }
+  const id = makeId('view');
+  state.customViews.push({ id, title: name, icon, items: [] });
+  state.enabledViews.push(id); // пользовательские тоже в общий список
+  $('#customTplName').value = '';
+  $('#customTplIcon').value = '✨';
+  saveState();
+  renderTemplateLibrary();
+  renderDock();
+  toast('Шаблон «' + name + '» добавлен');
   haptic();
 }
 
 /* ============================================================
-   НАСТРОЙКИ (шестерёнка)
+   ПОДТВЕРЖДЕНИЕ
    ============================================================ */
-function renderSettings() {
-  // Тема
-  $$('[data-setting="theme"] button').forEach(b =>
-    b.classList.toggle('active', b.dataset.value === state.theme));
-  // Колонки
-  $$('[data-setting="weekColumns"] button').forEach(b =>
-    b.classList.toggle('active', Number(b.dataset.value) === state.weekColumns));
-  // Выходные
-  $$('[data-setting="showWeekend"] button').forEach(b =>
-    b.classList.toggle('active',
-      (b.dataset.value === 'true') === state.showWeekend));
-}
-
-function handleSettingClick(e) {
-  const btn = e.target.closest('[data-value]');
-  if (!btn) return;
-  const group = btn.closest('[data-setting]');
-  if (!group) return;
-  const setting = group.dataset.setting;
-  const value = btn.dataset.value;
-
-  if (setting === 'theme') {
-    state.theme = value;
-    applyTheme();
-  } else if (setting === 'weekColumns') {
-    state.weekColumns = Number(value);
-    if (currentView === 'planner') renderWeekGrid();
-  } else if (setting === 'showWeekend') {
-    state.showWeekend = value === 'true';
-    if (currentView === 'planner') renderWeekGrid();
-  }
-  saveState();
-  renderSettings();
-  haptic();
+let confirmCallback = null;
+function askConfirm(text, cb) {
+  $('#confirmText').textContent = text;
+  confirmCallback = cb;
+  openModal($('#confirmModal'));
 }
 
 /* ============================================================
@@ -1422,6 +1648,33 @@ function closeSearch() {
 }
 
 /* ============================================================
+   НАСТРОЙКИ
+   ============================================================ */
+function renderSettings() {
+  $$('[data-setting="theme"] button').forEach(b =>
+    b.classList.toggle('active', b.dataset.value === state.theme));
+  $$('[data-setting="weekColumns"] button').forEach(b =>
+    b.classList.toggle('active', Number(b.dataset.value) === state.weekColumns));
+  $$('[data-setting="showWeekend"] button').forEach(b =>
+    b.classList.toggle('active', (b.dataset.value === 'true') === state.showWeekend));
+  $('#backendUrl').value = state.backendUrl || '';
+}
+function handleSettingClick(e) {
+  const btn = e.target.closest('[data-value]');
+  if (!btn) return;
+  const group = btn.closest('[data-setting]');
+  if (!group) return;
+  const s = group.dataset.setting, v = btn.dataset.value;
+
+  if (s === 'theme') { state.theme = v; applyTheme(); }
+  else if (s === 'weekColumns') { state.weekColumns = Number(v); if (currentView === 'planner') renderWeekGrid(); }
+  else if (s === 'showWeekend') { state.showWeekend = v === 'true'; if (currentView === 'planner') renderWeekGrid(); }
+  saveState();
+  renderSettings();
+  haptic();
+}
+
+/* ============================================================
    ОБРАБОТЧИКИ
    ============================================================ */
 $('#searchBtn').addEventListener('click', openSearch);
@@ -1435,63 +1688,108 @@ $('#settingsBtn').addEventListener('click', () => {
   renderSettings();
   openModal($('#settingsModal'));
 });
-
-// Все кнопки [data-value] в модалке настроек
 $('#settingsModal').addEventListener('click', handleSettingClick);
 
-// Открыть палитру акцента из настроек
 $('#openAccentPicker').addEventListener('click', () => {
   closeModal($('#settingsModal'));
   setTimeout(openAccentPicker, 150);
 });
 
-// Сброс порядка дней
+$('#backendUrl').addEventListener('change', (e) => {
+  state.backendUrl = e.target.value.trim();
+  saveState();
+  toast(state.backendUrl ? 'Адрес сохранён' : 'Адрес очищен');
+});
+
+$('#testBackendBtn').addEventListener('click', async () => {
+  if (!state.backendUrl) { toast('Введите URL'); return; }
+  try {
+    const res = await fetch(state.backendUrl, { method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ userId: tg?.initDataUnsafe?.user?.id, reminders: [], test: true }) });
+    toast(res.ok ? '✓ Связь есть' : '✗ Ошибка ' + res.status);
+  } catch (e) {
+    toast('✗ Не удалось подключиться');
+  }
+});
+
 $('#resetOrderBtn').addEventListener('click', () => {
-  // Сохраняем цвета и задачи по id, восстанавливаем стандартный порядок
   const byId = Object.fromEntries(state.week.map(d => [d.id, d]));
   state.week = WEEK_ORDER.map(base => {
     const old = byId[base.id];
-    return old
-      ? { ...base, color: old.color, tasks: old.tasks }
-      : { ...base, tasks: [] };
+    return old ? { ...base, color: old.color, tasks: old.tasks } : { ...base, tasks: [] };
   });
   saveState();
-  renderWeekGrid();
+  if (currentView === 'planner') renderWeekGrid();
   toast('Порядок восстановлен');
   haptic('medium');
 });
-
-// Полный сброс
 $('#resetAllBtn').addEventListener('click', () => {
-  if (!confirm('Сбросить все настройки и задачи?')) return;
-  localStorage.removeItem(STORAGE_KEY);
-  location.reload();
+  askConfirm('Сбросить все настройки и задачи?', () => {
+    localStorage.removeItem(STORAGE_KEY);
+    location.reload();
+  });
 });
 
-// Баннер о свайпе
+// Баннер свайпа
 $('#warnClose').addEventListener('click', () => {
   state.warnDismissed = true;
   saveState();
   $('#swipeWarn').classList.add('hidden');
 });
 
-// Закрыть модалки по [data-close] и по фону
+// Закрытие модалок
 $$('[data-close]').forEach(b =>
   b.addEventListener('click', () => closeModal(b.closest('.modal'))));
 $$('.modal').forEach(m => {
-  m.addEventListener('click', (e) => {
-    if (e.target === m) closeModal(m);
-  });
+  m.addEventListener('click', (e) => { if (e.target === m) closeModal(m); });
 });
 
-// День: закрыть, добавить задачу
+// День
 $('#dayClose').addEventListener('click', () => closeModal($('#dayModal')));
-$('#addTaskBtn').addEventListener('click', addTaskFromInput);
+$('#addTaskBtn').addEventListener('click', () => {
+  const input = $('#newTask');
+  const text = input.value.trim();
+  if (!text) return;
+  const day = state.week.find(d => d.id === currentDayId);
+  if (!day) return;
+  day.tasks.push(makeTask(text));
+  input.value = '';
+  saveState(); renderTasks(); renderWeekGrid(); haptic();
+});
 $('#newTask').addEventListener('keydown', (e) => {
-  if (e.key === 'Enter') addTaskFromInput();
+  if (e.key === 'Enter') { e.preventDefault(); $('#addTaskBtn').click(); }
 });
 
-// Нативный BackButton Telegram
+// Напоминание
+$('#notifyToggle').addEventListener('click', () => {
+  const on = !$('#notifyToggle').classList.contains('on');
+  $('#notifyToggle').classList.toggle('on', on);
+  $('#notifyWhen').style.display = on ? 'block' : 'none';
+  if (currentNotifyTarget) {
+    currentNotifyTarget.item.notify.enabled = on;
+    saveState();
+  }
+  haptic();
+});
+$('#notifyOnDay').addEventListener('change', saveNotifyFromModal);
+$('#notifyHourBefore').addEventListener('change', saveNotifyFromModal);
+$('#notifyDayBefore').addEventListener('change', saveNotifyFromModal);
+$('#notifyTime').addEventListener('change', saveNotifyFromModal);
+$('#notifyCustomAt').addEventListener('change', saveNotifyFromModal);
+
+// Шаблоны
+$('#createCustomTpl').addEventListener('click', createCustomTemplate);
+
+// Подтверждение
+$('#confirmYes').addEventListener('click', () => {
+  const cb = confirmCallback;
+  confirmCallback = null;
+  closeModal($('#confirmModal'));
+  if (typeof cb === 'function') cb();
+});
+
+// BackButton
 if (tg?.BackButton) {
   tg.BackButton.onClick(() => {
     const open = $$('.modal.open');
@@ -1507,8 +1805,14 @@ if (tg?.BackButton) {
   applyTheme();
   applyAccent();
   renderDock();
-  switchView('planner'); // сразу планировщик!
-  $('#swipeWarn').classList.toggle('hidden', !!state.warnDismissed);
+  switchView('planner');
+
+  // Показываем предупреждение про свайп ТОЛЬКО если:
+  // 1) метод disableVerticalSwipes недоступен (старый Telegram)
+  // 2) пользователь ещё не закрыл его
+  if (!window.__swipeBlocked && !state.warnDismissed) {
+    $('#swipeWarn').classList.remove('hidden');
+  }
   updateBackButton();
 })();
 </script>
