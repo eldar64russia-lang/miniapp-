@@ -14,13 +14,13 @@
 --radius-sm:16px;--radius:26px;--radius-lg:30px;
 --tap:44px;--gap:10px;
 --dock-bg:rgba(255,255,255,.72);--dock-border:rgba(0,0,0,.06);
---card-bg:rgba(255,255,255,.8);--card-blur:blur(8px)}
+--card-bg:rgba(255,255,255,.82)}
 [data-theme=dark]{--bg:#1c1c1e;--bg-2:#2c2c2e;--bg-3:#3a3a3c;--text:#f5f5f7;--text-dim:#98989d;
 --text-muted:#48484a;--border:#38383a;--accent:#0a84ff;--accent-soft:rgba(10,132,255,.18);
 --shadow-sm:0 1px 3px rgba(0,0,0,.2);--shadow-md:0 4px 12px rgba(0,0,0,.3);
 --shadow-lg:0 10px 30px rgba(0,0,0,.4);
 --dock-bg:rgba(44,44,46,.72);--dock-border:rgba(255,255,255,.08);
---card-bg:rgba(44,44,46,.8)}
+--card-bg:rgba(44,44,46,.82)}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;-webkit-touch-callout:none}
 html,body{margin:0;padding:0;background:var(--bg);color:var(--text);
 font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif;
@@ -29,8 +29,8 @@ transition:background .2s,color .2s}
 .day-card,.task-row,.task-text,.icon-btn,.mini-btn,.dock-item,.swatch,.btn,.checkbox,
 .cell-task-text,.day-name,.num-value,.cell-checkbox{
 -webkit-user-select:none;user-select:none;-webkit-user-drag:none}
-mark{background:rgba(255,214,10,.45);color:inherit;padding:0;border-radius:2px}
-[data-theme=dark] mark{background:rgba(255,214,10,.3)}
+mark{background:rgba(255,214,10,.5);color:inherit;padding:0;border-radius:2px}
+[data-theme=dark] mark{background:rgba(255,214,10,.35)}
 .app{max-width:720px;margin:0 auto;padding:12px 16px calc(120px + env(safe-area-inset-bottom));
 padding-top:calc(12px + env(safe-area-inset-top))}
 .app-header{display:flex;align-items:center;justify-content:space-between;gap:12px;
@@ -66,21 +66,18 @@ border-bottom:1px solid var(--border);scrollbar-width:none}
 border:1px solid var(--border);background:var(--bg-2);color:var(--text-dim);
 font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;flex:none}
 .col-nav button.active{background:var(--accent);color:#fff;border-color:var(--accent)}
-.columns-container{display:flex;gap:var(--gap);overflow-x:auto;padding-bottom:12px;
-align-items:flex-start;scrollbar-width:thin;-webkit-overflow-scrolling:touch}
-.column{display:flex;flex-direction:column;gap:var(--gap);flex:0 0 auto;min-width:0}
-.day-card{background:var(--card-bg);backdrop-filter:var(--card-blur);
--webkit-backdrop-filter:var(--card-blur);border-radius:var(--radius);padding:12px 14px;
-display:flex;flex-direction:column;gap:8px;cursor:pointer;box-shadow:var(--shadow-sm);
-position:relative;overflow:hidden;transition:box-shadow .15s,transform .1s}
+.columns-container{display:grid;gap:var(--gap);overflow-x:auto;padding-bottom:12px;
+align-items:start;scrollbar-width:thin;-webkit-overflow-scrolling:touch}
+.day-card{background:var(--card-bg);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+border-radius:var(--radius);padding:12px 14px;display:flex;flex-direction:column;gap:8px;
+cursor:pointer;box-shadow:var(--shadow-sm);position:relative;overflow:hidden;
+transition:box-shadow .15s;min-width:0}
 .day-card::before{content:'';position:absolute;top:12px;left:0;bottom:12px;width:3px;
 background:var(--card-color,var(--accent));border-radius:0 2px 2px 0}
 .day-card:active{box-shadow:var(--shadow-md)}
 .day-card.dragging{opacity:.45}
 .day-card.drag-target{box-shadow:0 0 0 2px var(--accent)}
-body.edit-mode .day-card{border:2px dashed var(--border);cursor:grab;touch-action:none}
-body.edit-mode .day-card::after{content:'☰';position:absolute;top:6px;right:6px;
-font-size:12px;opacity:.5;pointer-events:none}
+body.edit-mode .day-card{outline:2px dashed var(--border);outline-offset:-2px;cursor:grab;touch-action:none}
 .day-head{display:flex;align-items:flex-start;justify-content:space-between;gap:2px;padding-left:6px}
 .day-name{font-weight:700;font-size:15px;letter-spacing:-.2px;flex:1;
 word-break:break-word;min-width:0;padding:2px 0;line-height:1.25}
@@ -91,7 +88,7 @@ color:var(--text-dim);border-radius:8px;font-size:13px;display:inline-flex;
 align-items:center;justify-content:center;cursor:pointer;padding:0;font-family:inherit}
 .mini-btn::before{content:'';position:absolute;inset:-9px}
 .mini-btn:active{background:var(--accent-soft);color:var(--accent)}
-.cell-tasks{display:flex;flex-direction:column;gap:2px;padding-left:6px;
+.cell-tasks{display:flex;flex-direction:column;gap:2px;padding:6px 8px;border-radius:14px;
 overflow-y:auto;overflow-x:hidden;flex:1;min-height:0;-webkit-overflow-scrolling:touch}
 .cell-task{display:flex;align-items:flex-start;gap:6px;padding:2px 0;
 font-size:12px;line-height:1.3;min-width:0}
@@ -106,18 +103,23 @@ color:var(--cb-color,var(--accent));margin-top:1px}
 border-color:var(--cb-color,var(--accent))}
 .cell-checkbox svg{width:10px;height:10px;display:block}
 .cell-checkbox::before{content:'';position:absolute;inset:-10px}
-.cell-empty{font-size:11px;color:var(--text-muted);padding:4px 0;font-style:italic}
-.empty{text-align:center;color:var(--text-dim);padding:40px 20px;font-size:14px;margin:0}
+.cell-empty{font-size:11px;color:var(--text-dim);padding:4px 0;font-style:italic}
+.resize-handle{display:none;position:absolute;right:0;bottom:0;width:26px;height:26px;
+cursor:nwse-resize;touch-action:none;z-index:3}
+body.edit-mode .resize-handle{display:block}
+.resize-handle::after{content:'';position:absolute;right:4px;bottom:4px;
+width:12px;height:12px;border-right:2px solid var(--text-muted);
+border-bottom:2px solid var(--text-muted);border-radius:0 0 4px 0;opacity:.7}
+.empty{text-align:center;color:var(--text-dim);padding:40px 20px;font-size:14px;margin:0;
+grid-column:1 / -1}
 .dock{position:fixed;bottom:calc(12px + env(safe-area-inset-bottom));left:50%;
 transform:translateX(-50%);background:var(--dock-bg);
 backdrop-filter:blur(20px) saturate(180%);-webkit-backdrop-filter:blur(20px) saturate(180%);
 border:1px solid var(--dock-border);border-radius:var(--radius-lg);
-padding:8px;display:flex;gap:6px;align-items:center;
-box-shadow:var(--shadow-lg);z-index:100;
-width:fit-content;max-width:calc(100vw - 24px);overflow:hidden}
+padding:8px;display:flex;gap:6px;align-items:center;flex-wrap:nowrap;
+box-shadow:var(--shadow-lg);z-index:100}
 .dock-scroll{display:flex;gap:6px;overflow-x:auto;overflow-y:hidden;
-min-width:0;flex:1 1 0;scrollbar-width:none;-webkit-overflow-scrolling:touch;
-max-width:calc(100vw - 24px - 16px - 56px - 6px)}
+flex:0 1 auto;scrollbar-width:none;-webkit-overflow-scrolling:touch}
 .dock-scroll::-webkit-scrollbar{display:none}
 .dock-item{width:56px;height:56px;border:none;background:transparent;border-radius:20px;
 cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:24px;
@@ -232,7 +234,7 @@ margin-top:20px;padding-top:12px;border-top:1px solid var(--border)}
   <div class="search-overlay" id="searchOverlay">
     <div class="search-field">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--text-dim)" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
-      <input type="search" id="globalSearch" placeholder="Поиск..." autocomplete="off">
+      <input type="search" id="globalSearch" placeholder="Поиск: слово, день, дата..." autocomplete="off">
       <button class="close-search" id="searchClose">✕</button>
     </div>
   </div>
@@ -252,7 +254,7 @@ margin-top:20px;padding-top:12px;border-top:1px solid var(--border)}
 </div>
 <div id="moduleDelete"></div>
 <button class="btn primary" data-close style="margin-top:16px">Готово</button>
-<div class="version-tag">Версия 9.0</div>
+<div class="version-tag">Версия 10.0</div>
 </div></div>
 
 <div class="modal" id="cellModal"><div class="modal-card">
@@ -270,14 +272,6 @@ margin-top:20px;padding-top:12px;border-top:1px solid var(--border)}
   <div class="color-row">
     <input type="color" id="cellColorCustom" class="color-input">
     <span style="font-size:13px;color:var(--text-dim)">Свой цвет</span>
-  </div>
-</div>
-<div class="setting-block">
-  <div class="setting-label">Высота карточки</div>
-  <div class="counter-row">
-    <button class="counter-btn" data-size="height-minus">−</button>
-    <div class="num-value" id="heightValue" data-size="height-input">96</div>
-    <button class="counter-btn" data-size="height-plus">+</button>
   </div>
 </div>
 <div class="setting-block">
@@ -340,7 +334,7 @@ if (tg) { tg.ready(); tg.expand();
 document.addEventListener('contextmenu', e => e.preventDefault());
 
 const BOT_API = '';
-const STORAGE_KEY = 'miniapp-constructor-v9';
+const STORAGE_KEY = 'miniapp-constructor-v10';
 const CARD_PALETTE = ['#5ac8fa','#af52de','#ff2d55','#ff9500','#34c759','#30b0c7','#5856d6','#ffcc00'];
 const ACCENT_PALETTE = ['#007aff','#5856d6','#af52de','#ff2d55','#ff9500','#34c759','#30b0c7','#8e8e93'];
 const DAY_NAMES = ['Пн','Вт','Ср','Чт','Пт','Сб','Вс'];
@@ -349,43 +343,54 @@ const DEFAULT_HEIGHT = 96;
 const MIN_HEIGHT = 60;
 const MAX_HEIGHT = 800;
 const LONG_PRESS_MS = 400;
+const SEARCH_SYNONYMS = {
+  'пн':['пн','пон','понедельник','mon','monday','1'],
+  'вт':['вт','вто','вторник','tue','tuesday','2'],
+  'ср':['ср','сре','среда','wed','wednesday','3'],
+  'чт':['чт','чет','четверг','thu','thursday','4'],
+  'пт':['пт','пят','пятница','fri','friday','5'],
+  'сб':['сб','суб','суббота','sat','saturday','6'],
+  'вс':['вс','вос','воскресенье','sun','sunday','7','0'],
+};
 
 function makeId(p='id'){return p+'_'+Date.now().toString(36)+Math.random().toString(36).slice(2,6);}
 function makeTask(text){return {id:makeId('t'),text,done:false};}
 function makeCell(name,idx,days){
   return {id:makeId('c'),name:name||'',color:CARD_PALETTE[idx%8],
-    height:DEFAULT_HEIGHT,tasks:[],notify:{...DEFAULT_NOTIFY,days:days||[]}};
+    colSpan:1,height:DEFAULT_HEIGHT,tasks:[],notify:{...DEFAULT_NOTIFY,days:days||[]}};
+}
+function hexToRgba(hex,alpha){
+  let h=String(hex||'').replace('#','');
+  if(h.length===3)h=h.split('').map(c=>c+c).join('');
+  const r=parseInt(h.substring(0,2),16)||0;
+  const g=parseInt(h.substring(2,4),16)||0;
+  const b=parseInt(h.substring(4,6),16)||0;
+  return `rgba(${r},${g},${b},${alpha})`;
 }
 
 function migrateView(view){
-  if(typeof view.columns==='number'&&Array.isArray(view.cells)){
-    const flat=view.cells;const K=Math.max(1,view.columns);
-    const newCols=Array.from({length:K},()=>[]);
-    if(flat.length){
-      const perCol=Math.ceil(flat.length/K);
-      flat.forEach((cell,i)=>{
-        const col=Math.min(K-1,Math.floor(i/perCol));
-        newCols[col].push(cell);
-      });
-    }
-    view.columns=newCols;
-    delete view.cells;
+  if(Array.isArray(view.columns)){
+    view.columnCount=Math.max(1,view.columns.length);
+    view.cells=view.columns.flat();
+    delete view.columns;
   }
-  if(!Array.isArray(view.columns))view.columns=[[]];
+  if(typeof view.columnCount!=='number')view.columnCount=1;
+  if(!Array.isArray(view.cells))view.cells=[];
+  view.cells.forEach(c=>{
+    if(typeof c.colSpan!=='number')c.colSpan=1;
+    if(typeof c.height!=='number')c.height=DEFAULT_HEIGHT;
+  });
   return view;
 }
 
-function makeDefaultColumns(){
+function makeDefaultView(){
   const names=['Пн','Вт','Ср','Чт','Пт'];
-  return [names.map((n,i)=>makeCell(n,i,[i]))];
-}
-
-function makeDefaultViews(){
-  return [{id:'v_planner',type:'planner',title:'Планировщик',icon:'📅',removable:false,
-    columns:makeDefaultColumns()}];
+  const cells=names.map((n,i)=>makeCell(n,i,[i]));
+  return {id:'v_planner',type:'planner',title:'Планировщик',icon:'📅',removable:false,
+    columnCount:1,cells,filter:'all'};
 }
 function makeDefaultState(){
-  return {theme:'light',accent:'#007aff',currentViewId:'v_planner',views:makeDefaultViews()};
+  return {theme:'light',accent:'#007aff',currentViewId:'v_planner',views:[makeDefaultView()]};
 }
 function loadState(){
   try{
@@ -397,12 +402,12 @@ function loadState(){
   }catch(e){}
   return makeDefaultState();
 }
-let state = loadState();
+let state=loadState();
 function saveState(){
   try{localStorage.setItem(STORAGE_KEY,JSON.stringify(state));}catch(e){}
   pushToBackend();
 }
-let currentViewId = state.currentViewId || state.views[0].id;
+let currentViewId=state.currentViewId||state.views[0].id;
 let searchQuery='';
 let currentCellId=null;
 let dragState=null;
@@ -441,12 +446,12 @@ async function pullFromBackend(){
 }
 function mergeDone(local,remote){
   const lookup={};
-  (remote.views||[]).forEach(v=>(v.columns||[]).forEach(col=>col.forEach(c=>
-    (c.tasks||[]).forEach(t=>{lookup[t.id]=t;}))));
-  (local.views||[]).forEach(v=>(v.columns||[]).forEach(col=>col.forEach(c=>
+  (remote.views||[]).forEach(v=>(v.cells||[]).forEach(c=>
+    (c.tasks||[]).forEach(t=>{lookup[t.id]=t;})));
+  (local.views||[]).forEach(v=>(v.cells||[]).forEach(c=>
     (c.tasks||[]).forEach(t=>{
       if(lookup[t.id]&&typeof lookup[t.id].done==='boolean')t.done=lookup[t.id].done;
-    }))));
+    })));
 }
 setInterval(async()=>{if(await pullFromBackend()){renderContent();}},30000);
 
@@ -461,6 +466,12 @@ function applyAccent(){
   document.documentElement.style.setProperty('--accent-soft',`rgba(${r},${g},${b},0.16)`);
 }
 
+function expandSearchWord(word){
+  for(const syns of Object.values(SEARCH_SYNONYMS)){
+    if(syns.includes(word))return syns;
+  }
+  return [word];
+}
 function getSearchWords(){
   if(!searchQuery)return [];
   return searchQuery.split(/\s+/).filter(Boolean);
@@ -468,13 +479,28 @@ function getSearchWords(){
 function matchCell(cell,words){
   if(!words.length)return true;
   const hay=(cell.name+' '+cell.tasks.map(t=>t.text).join(' ')).toLowerCase();
-  return words.every(w=>hay.includes(w));
+  return words.every(w=>{
+    const syns=expandSearchWord(w);
+    return syns.some(s=>hay.includes(s));
+  });
 }
 function highlightText(text,words){
   if(!words.length)return escapeHtml(text);
-  const escaped=words.map(w=>w.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'));
-  const re=new RegExp('('+escaped.join('|')+')','gi');
+  const allForms=new Set();
+  words.forEach(w=>expandSearchWord(w).forEach(s=>allForms.add(s)));
+  const escaped=[...allForms].map(w=>w.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'));
+  const re=new RegExp('('+escaped.sort((a,b)=>b.length-a.length).join('|')+')','gi');
   return escapeHtml(text).replace(re,'<mark>$1</mark>');
+}
+
+function updateDockSize(){
+  const dock=$('#dock');if(!dock)return;
+  const avail=window.innerWidth-24;
+  dock.style.maxWidth=avail+'px';
+  const scroll=dock.querySelector('.dock-scroll');
+  if(!scroll)return;
+  const availForScroll=avail-16-56-6;
+  scroll.style.maxWidth=Math.max(100,availForScroll)+'px';
 }
 
 function renderDock(){
@@ -496,6 +522,8 @@ function renderDock(){
     setTimeout(()=>$('#newViewName').focus(),150);
   });
   dock.appendChild(addBtn);
+  updateDockSize();
+  requestAnimationFrame(updateDockSize);
 }
 
 function switchView(viewId){
@@ -522,20 +550,18 @@ function renderPlanner(root,view){
     <div class="filters" id="plannerFilters"></div>
     <div class="col-nav" id="colNav"></div>
     <div class="columns-container" id="columnsContainer"></div>
-    <p class="hint">${editMode?'Режим редактирования: тащите карточки пальцем':'Тап на имя — переименовать. Тап на поле — задачи. ⚙️ — настройки. ✏️ — режим перетаскивания.'}</p>`;
+    <p class="hint">${editMode?'Режим редактирования: тащите карточку — переставить, тяните уголок вниз-вправо — размер':'Тап на имя — переименовать. Тап на поле — задачи. ⚙️ — настройки. ✏️ — редактирование.'}</p>`;
   renderFilters(view);
   renderColNav(view);
-  renderColumns(view);
-
+  renderGrid(view);
   $('#plannerFilters').addEventListener('click',e=>{
     const b=e.target.closest('[data-filter]');if(!b)return;
     view.filter=b.dataset.filter;saveState();
-    renderFilters(view);renderColumns(view);haptic();
+    renderFilters(view);renderGrid(view);haptic();
   });
   $('#colNav').addEventListener('click',e=>{
     const b=e.target.closest('[data-col]');if(!b)return;
-    const idx=parseInt(b.dataset.col);
-    scrollToColumn(idx);
+    scrollToColumn(parseInt(b.dataset.col));
     $$('#colNav button').forEach(x=>x.classList.toggle('active',x===b));
     haptic();
   });
@@ -556,75 +582,58 @@ function renderFilters(view){
 function renderColNav(view){
   const nav=$('#colNav');if(!nav)return;
   nav.innerHTML='';
-  view.columns.forEach((col,i)=>{
+  if(view.columnCount<=1)return;
+  for(let i=0;i<view.columnCount;i++){
     const b=document.createElement('button');
     b.dataset.col=i;b.textContent=i+1;
     nav.appendChild(b);
-  });
+  }
 }
 
 function scrollToColumn(idx){
   const container=$('#columnsContainer');if(!container)return;
-  const col=container.children[idx];if(!col)return;
-  container.scrollTo({left:col.offsetLeft-container.offsetLeft,behavior:'smooth'});
+  const total=container.scrollWidth-container.clientWidth;
+  if(total<=0)return;
+  const perCol=total/Math.max(1,(currentViewColumnCount()-1));
+  container.scrollTo({left:perCol*idx,behavior:'smooth'});
+}
+function currentViewColumnCount(){
+  const v=state.views.find(x=>x.id===currentViewId);
+  return v?v.columnCount:1;
 }
 
-function getColumnWidth(view){
-  const containerW=window.innerWidth-32;
-  const K=view.columns.length;
-  const gap=10;
-  const ideal=(containerW-gap*(K-1))/K;
-  return Math.max(150,ideal);
-}
-
-function renderColumns(view){
+function renderGrid(view){
   const container=$('#columnsContainer');if(!container)return;
   container.innerHTML='';
-  const colWidth=getColumnWidth(view);
+  container.style.gridTemplateColumns=`repeat(${view.columnCount}, minmax(80px, 1fr))`;
   const words=getSearchWords();
-
-  view.columns.forEach((colCells,colIdx)=>{
-    const colEl=document.createElement('div');
-    colEl.className='column';
-    colEl.style.width=colWidth+'px';
-    colEl.dataset.colIndex=colIdx;
-
-    const visible=colCells.filter(cell=>{
-      const mq=matchCell(cell,words);
-      const f=view.filter||'all';
-      const mf=f==='all'?true
-        :f==='busy'?cell.tasks.length>0
-        :f==='empty'?cell.tasks.length===0
-        :true;
-      return mq&&mf;
-    });
-
-    if(!visible.length){
-      const empty=document.createElement('div');
-      empty.className='empty';empty.style.padding='20px 8px';empty.style.fontSize='11px';
-      empty.textContent='—';
-      colEl.appendChild(empty);
-    }
-
-    visible.forEach(cell=>{
-      colEl.appendChild(buildCellCard(view,cell,colIdx,words));
-    });
-    container.appendChild(colEl);
+  const visible=view.cells.filter(cell=>{
+    const mq=matchCell(cell,words);
+    const f=view.filter||'all';
+    const mf=f==='all'?true:f==='busy'?cell.tasks.length>0:f==='empty'?cell.tasks.length===0:true;
+    return mq&&mf;
+  });
+  if(!visible.length){
+    container.innerHTML='<p class="empty">Нет подходящих</p>';
+    return;
+  }
+  visible.forEach(cell=>{
+    container.appendChild(buildCellCard(view,cell,words));
   });
 }
 
-function buildCellCard(view,cell,colIdx,words){
+function buildCellCard(view,cell,words){
   const card=document.createElement('div');
   card.className='day-card';
   card.dataset.cellId=cell.id;
   card.dataset.draggable='true';
   card.draggable=false;
   card.style.setProperty('--card-color',cell.color);
+  card.style.gridColumn=`span ${Math.min(cell.colSpan||1,view.columnCount)}`;
   card.style.minHeight=(cell.height||DEFAULT_HEIGHT)+'px';
   card.style.maxHeight=(cell.height||DEFAULT_HEIGHT)+'px';
-
   const nameHtml=cell.name?highlightText(cell.name,words):'Назовите';
-
+  const tasksBg=hexToRgba(cell.color,0.12);
   card.innerHTML=`
     <div class="day-head">
       <div class="day-name${cell.name?'':' empty-name'}" data-name>${nameHtml}</div>
@@ -632,7 +641,7 @@ function buildCellCard(view,cell,colIdx,words){
         <button class="mini-btn" data-settings>⚙️</button>
       </div>
     </div>
-    <div class="cell-tasks" data-tasks>
+    <div class="cell-tasks" data-tasks style="background:${tasksBg}">
       ${cell.tasks.length?cell.tasks.map(t=>`
         <div class="cell-task">
           <button class="cell-checkbox${t.done?' checked':''}" data-toggle="${t.id}" style="--cb-color:${cell.color}">
@@ -641,7 +650,8 @@ function buildCellCard(view,cell,colIdx,words){
           <span class="cell-task-text${t.done?' done':''}" data-text="${t.id}">${highlightText(t.text,words)}</span>
         </div>
       `).join(''):'<div class="cell-empty">Нажмите, чтобы добавить задачи</div>'}
-    </div>`;
+    </div>
+    <div class="resize-handle" data-resize></div>`;
 
   card.querySelector('[data-name]').addEventListener('click',e=>{
     e.stopPropagation();
@@ -652,11 +662,9 @@ function buildCellCard(view,cell,colIdx,words){
       el.classList.toggle('empty-name',!cell.name);
     });
   });
-
   card.querySelector('[data-settings]').addEventListener('click',e=>{
     e.stopPropagation();openCellModal(cell);
   });
-
   card.querySelectorAll('[data-toggle]').forEach(btn=>{
     btn.addEventListener('click',e=>{
       e.stopPropagation();
@@ -664,7 +672,6 @@ function buildCellCard(view,cell,colIdx,words){
       if(task){task.done=!task.done;saveState();haptic();refreshCard(card,cell,view);}
     });
   });
-
   card.querySelectorAll('[data-text]').forEach(span=>{
     span.addEventListener('click',e=>{
       e.stopPropagation();
@@ -675,35 +682,67 @@ function buildCellCard(view,cell,colIdx,words){
       });
     });
   });
-
   card.addEventListener('click',e=>{
     if(editMode)return;
     if(suppressClick){suppressClick=false;return;}
-    if(e.target.closest('[data-name],[data-settings],[data-toggle],[data-text]'))return;
+    if(e.target.closest('[data-name],[data-settings],[data-toggle],[data-text],[data-resize]'))return;
     openTasksModal(cell);
   });
-
   card.addEventListener('pointerdown',e=>{
-    if(e.target.closest('[data-name],[data-settings],[data-toggle],[data-text]'))return;
+    if(e.target.closest('[data-name],[data-settings],[data-toggle],[data-text],[data-resize]'))return;
     if(e.button&&e.button!==0)return;
-    if(editMode){
-      startDrag(card,cell,colIdx,view);
-    } else {
-      longPressTimer=setTimeout(()=>startDrag(card,cell,colIdx,view),LONG_PRESS_MS);
-    }
+    if(editMode){startDrag(card,cell,view);}
+    else{longPressTimer=setTimeout(()=>startDrag(card,cell,view),LONG_PRESS_MS);}
   });
   const cancelPress=()=>{if(longPressTimer){clearTimeout(longPressTimer);longPressTimer=null;}};
   card.addEventListener('pointerup',cancelPress);
   card.addEventListener('pointercancel',cancelPress);
   card.addEventListener('pointermove',cancelPress);
 
+  const handle=card.querySelector('[data-resize]');
+  if(handle){
+    handle.addEventListener('pointerdown',e=>{
+      e.stopPropagation();
+      e.preventDefault();
+      startResize(e,card,cell,view);
+    });
+  }
   return card;
+}
+
+function startResize(e,card,cell,view){
+  const startX=e.clientX,startY=e.clientY;
+  const startSpan=cell.colSpan||1;
+  const startHeight=cell.height||DEFAULT_HEIGHT;
+  const rect=card.getBoundingClientRect();
+  const colWidth=rect.width/startSpan+10;
+  haptic();
+  const move=ev=>{
+    const dx=ev.clientX-startX;
+    const dy=ev.clientY-startY;
+    const spanDelta=Math.round(dx/colWidth);
+    cell.colSpan=Math.max(1,Math.min(view.columnCount,startSpan+spanDelta));
+    cell.height=Math.max(MIN_HEIGHT,Math.min(MAX_HEIGHT,startHeight+dy));
+    card.style.gridColumn=`span ${cell.colSpan}`;
+    card.style.minHeight=cell.height+'px';
+    card.style.maxHeight=cell.height+'px';
+  };
+  const up=()=>{
+    document.removeEventListener('pointermove',move);
+    document.removeEventListener('pointerup',up);
+    document.removeEventListener('pointercancel',up);
+    saveState();haptic('medium');
+  };
+  document.addEventListener('pointermove',move,{passive:false});
+  document.addEventListener('pointerup',up);
+  document.addEventListener('pointercancel',up);
 }
 
 function refreshCard(card,cell,view){
   const tasksBox=card.querySelector('[data-tasks]');
   if(!tasksBox)return;
   const words=getSearchWords();
+  tasksBox.style.background=hexToRgba(cell.color,0.12);
   if(!cell.tasks.length){
     tasksBox.innerHTML='<div class="cell-empty">Нажмите, чтобы добавить задачи</div>';
     return;
@@ -755,25 +794,20 @@ function startInlineEdit(el,oldText,isName,onSave){
   });
 }
 
-function startDrag(card,cell,colIdx,view){
+function startDrag(card,cell,view){
   longPressTimer=null;
   haptic('medium');
   suppressClick=true;
-  dragState={card,cell,colIdx,view,target:null,targetCol:null};
+  dragState={card,cell,view,target:null};
   card.classList.add('dragging');
-
   const move=ev=>{
     if(!dragState)return;
     ev.preventDefault();
     $$('.drag-target').forEach(el=>el.classList.remove('drag-target'));
     const el=document.elementFromPoint(ev.clientX,ev.clientY);
     const target=el?.closest('[data-draggable]');
-    if(target&&target!==card){
-      target.classList.add('drag-target');
-      dragState.target=target;
-      const colEl=target.closest('.column');
-      dragState.targetCol=colEl?parseInt(colEl.dataset.colIndex):null;
-    } else {dragState.target=null;dragState.targetCol=null;}
+    if(target&&target!==card){target.classList.add('drag-target');dragState.target=target;}
+    else dragState.target=null;
   };
   const up=()=>{
     document.removeEventListener('pointermove',move);
@@ -788,16 +822,15 @@ function startDrag(card,cell,colIdx,view){
 
 function endDrag(){
   if(!dragState){suppressClick=false;return;}
-  const{cell,colIdx,view,target,targetCol}=dragState;
-  if(target&&targetCol!==null){
-    const sourceCol=view.columns[colIdx];
-    const targetColArr=view.columns[targetCol];
-    const sIdx=sourceCol.indexOf(cell);
-    if(sIdx>=0)sourceCol.splice(sIdx,1);
-    const targetCellId=target.dataset.cellId;
-    const tIdx=targetColArr.findIndex(c=>c.id===targetCellId);
-    if(tIdx>=0)targetColArr.splice(tIdx,0,cell);
-    else targetColArr.push(cell);
+  const{cell,view,target}=dragState;
+  if(target){
+    const targetId=target.dataset.cellId;
+    const cells=view.cells;
+    const sIdx=cells.indexOf(cell);
+    if(sIdx>=0)cells.splice(sIdx,1);
+    const tIdx=cells.findIndex(c=>c.id===targetId);
+    if(tIdx>=0)cells.splice(tIdx,0,cell);
+    else cells.push(cell);
     saveState();haptic('medium');
   }
   dragState?.card?.classList.remove('dragging');
@@ -856,8 +889,7 @@ function refreshCellsInView(cell){
 
 function getCurrentCell(){
   const v=state.views.find(x=>x.id===currentViewId);if(!v)return null;
-  for(const col of v.columns){const c=col.find(x=>x.id===currentCellId);if(c)return c;}
-  return null;
+  return v.cells.find(c=>c.id===currentCellId)||null;
 }
 
 function openCellModal(cell){
@@ -866,7 +898,6 @@ function openCellModal(cell){
   $('#cellNameInput').value=cell.name||'';
   renderCellSwatches(cell);
   $('#cellColorCustom').value=cell.color;
-  $('#heightValue').textContent=cell.height||DEFAULT_HEIGHT;
   const n=cell.notify||DEFAULT_NOTIFY;
   $('#cellNotifyToggle').classList.toggle('on',!!n.enabled);
   $('#cellNotifyFields').style.display=n.enabled?'block':'none';
@@ -938,7 +969,7 @@ function renderSettings(){
       <div class="setting-label">Количество ячеек</div>
       <div class="counter-row">
         <button class="counter-btn" id="cellsMinus">−</button>
-        <div class="num-value" id="cellsValue">${v.columns.flat().length}</div>
+        <div class="num-value" id="cellsValue">${v.cells.length}</div>
         <button class="counter-btn" id="cellsPlus">+</button>
       </div>
     </div>
@@ -946,7 +977,7 @@ function renderSettings(){
       <div class="setting-label">Количество столбцов</div>
       <div class="counter-row">
         <button class="counter-btn" id="colsMinus">−</button>
-        <div class="num-value" id="colsValue">${v.columns.length}</div>
+        <div class="num-value" id="colsValue">${v.columnCount}</div>
         <button class="counter-btn" id="colsPlus">+</button>
       </div>
     </div>
@@ -973,7 +1004,7 @@ function renderSettings(){
   $('#cellsMinus').addEventListener('click',()=>{changeCellCount(v,-1);renderSettings();});
   $('#cellsPlus').addEventListener('click',()=>{changeCellCount(v,1);renderSettings();});
   $('#cellsValue').addEventListener('click',()=>{
-    const n=prompt('Сколько ячеек?',v.columns.flat().length);
+    const n=prompt('Сколько ячеек?',v.cells.length);
     if(n===null)return;
     const num=parseInt(n);if(isNaN(num)||num<1)return;
     setCellCount(v,num);renderSettings();
@@ -981,7 +1012,7 @@ function renderSettings(){
   $('#colsMinus').addEventListener('click',()=>{changeColumns(v,-1);renderSettings();});
   $('#colsPlus').addEventListener('click',()=>{changeColumns(v,1);renderSettings();});
   $('#colsValue').addEventListener('click',()=>{
-    const n=prompt('Сколько столбцов?',v.columns.length);
+    const n=prompt('Сколько столбцов?',v.columnCount);
     if(n===null)return;
     const num=parseInt(n);if(isNaN(num)||num<1)return;
     setColumns(v,num);renderSettings();
@@ -1001,45 +1032,26 @@ function renderSettings(){
   } else del.innerHTML='';
 }
 
-function changeCellCount(v,delta){
-  setCellCount(v,v.columns.flat().length+delta);
-}
+function changeCellCount(v,delta){setCellCount(v,v.cells.length+delta);}
 
 function setCellCount(v,newCount){
   if(newCount<1)newCount=1;
-  const flat=v.columns.flat();
-  if(newCount<flat.length){
-    let count=0;
-    v.columns=v.columns.map(col=>{
-      const keep=[];
-      for(const c of col){if(count<newCount){keep.push(c);count++;}}
-      return keep;
-    }).filter(col=>col.length>0);
-    if(!v.columns.length)v.columns=[[]];
-  } else if(newCount>flat.length){
-    const toAdd=newCount-flat.length;
-    for(let i=0;i<toAdd;i++){
-      const shortest=v.columns.reduce((min,col)=>col.length<min.length?col:min,v.columns[0]);
-      shortest.push(makeCell('',flat.length+i,[]));
+  if(newCount<v.cells.length){
+    v.cells=v.cells.slice(0,newCount);
+  } else if(newCount>v.cells.length){
+    for(let i=v.cells.length;i<newCount;i++){
+      v.cells.push(makeCell('',i,[]));
     }
   }
   saveState();renderContent();
 }
 
-function changeColumns(v,delta){setColumns(v,v.columns.length+delta);}
+function changeColumns(v,delta){setColumns(v,v.columnCount+delta);}
 
 function setColumns(v,newCount){
   if(newCount<1)newCount=1;
-  const flat=v.columns.flat();
-  const newCols=Array.from({length:newCount},()=>[]);
-  if(flat.length){
-    const perCol=Math.ceil(flat.length/newCount);
-    flat.forEach((cell,i)=>{
-      const col=Math.min(newCount-1,Math.floor(i/perCol));
-      newCols[col].push(cell);
-    });
-  }
-  v.columns=newCols;
+  v.columnCount=newCount;
+  v.cells.forEach(c=>{c.colSpan=Math.min(c.colSpan||1,v.columnCount);});
   saveState();renderContent();
 }
 
@@ -1059,15 +1071,17 @@ function createView(){
   const icon=$('#newViewIcon').value.trim()||'📆';
   if(!name){toast('Введите название');return;}
   const names=['Пн','Вт','Ср','Чт','Пт'];
-  const cols=[names.map((n,i)=>makeCell(n,i,[i]))];
+  const cells=names.map((n,i)=>makeCell(n,i,[i]));
   const newView={id:makeId('v'),type:'planner',title:name,icon,removable:true,
-    filter:'all',columns:cols};
+    filter:'all',columnCount:1,cells};
   state.views.push(newView);
   saveState();
   closeModal($('#createViewModal'));
   switchView(newView.id);
   toast('Модуль «'+name+'» создан');haptic();
 }
+
+window.addEventListener('resize',updateDockSize);
 
 $('#searchBtn').addEventListener('click',openSearch);
 $('#searchClose').addEventListener('click',closeSearch);
@@ -1097,31 +1111,6 @@ $('#cellNameInput').addEventListener('input',e=>{
 $('#cellColorCustom').addEventListener('input',e=>{
   const cell=getCurrentCell();if(!cell)return;
   cell.color=e.target.value;saveState();renderCellSwatches(cell);refreshCellsInView(cell);
-});
-$('#cellModal').addEventListener('click',e=>{
-  const t=e.target.closest('[data-size]');if(!t)return;
-  const cell=getCurrentCell();if(!cell)return;
-  const action=t.dataset.size;
-  if(action==='height-minus'){
-    cell.height=Math.max(MIN_HEIGHT,(cell.height||DEFAULT_HEIGHT)-20);
-    $('#heightValue').textContent=cell.height;
-  } else if(action==='height-plus'){
-    cell.height=Math.min(MAX_HEIGHT,(cell.height||DEFAULT_HEIGHT)+20);
-    $('#heightValue').textContent=cell.height;
-  } else if(action==='height-input'){
-    const n=prompt('Высота в пикселях?',cell.height||DEFAULT_HEIGHT);
-    if(n!==null){
-      const num=parseInt(n);
-      if(!isNaN(num)&&num>=MIN_HEIGHT&&num<=MAX_HEIGHT){
-        cell.height=num;$('#heightValue').textContent=cell.height;
-      }
-    }
-  }
-  saveState();
-  $$(`[data-cell-id="${cell.id}"]`).forEach(card=>{
-    card.style.minHeight=cell.height+'px';
-    card.style.maxHeight=cell.height+'px';
-  });
 });
 $('#cellNotifyToggle').addEventListener('click',()=>{
   const cell=getCurrentCell();if(!cell)return;
@@ -1164,15 +1153,17 @@ $('#confirmYes').addEventListener('click',()=>{
     const id=action.slice(6);
     const v=state.views.find(x=>x.id===id);
     if(v){
-      v.columns=makeDefaultColumns();
+      const names=['Пн','Вт','Ср','Чт','Пт'];
+      v.cells=names.map((n,i)=>makeCell(n,i,[i]));
+      v.columnCount=1;
       saveState();renderContent();
     }
     closeModal($('#settingsModal'));
   } else if(action.startsWith('deleteCell:')){
     const id=action.slice(11);
     const v=state.views.find(x=>x.id===currentViewId);if(!v)return;
-    v.columns=v.columns.map(col=>col.filter(c=>c.id!==id)).filter(col=>col.length>0);
-    if(!v.columns.length)v.columns=[[]];
+    v.cells=v.cells.filter(c=>c.id!==id);
+    if(!v.cells.length)v.cells=[makeCell('',0,[])];
     saveState();closeModal($('#cellModal'));renderContent();
   }
 });
