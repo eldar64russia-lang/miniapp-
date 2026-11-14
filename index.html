@@ -10,20 +10,27 @@
 :root{--bg:#f5f5f7;--bg-2:#fff;--bg-3:#ececf0;--text:#1d1d1f;--text-dim:#86868b;
 --text-muted:#c7c7cc;--border:#e0e0e5;--accent:#007aff;--accent-soft:rgba(0,122,255,.12);
 --shadow-sm:0 1px 3px rgba(0,0,0,.06);--shadow-md:0 4px 12px rgba(0,0,0,.08);
---shadow-lg:0 10px 30px rgba(0,0,0,.12);--radius-sm:12px;--radius:18px;--radius-lg:24px;
---tap:44px;--gap:10px;--dock-bg:rgba(255,255,255,.72);--dock-border:rgba(0,0,0,.06)}
+--shadow-lg:0 10px 30px rgba(0,0,0,.12);
+--radius-sm:16px;--radius:26px;--radius-lg:30px;
+--tap:44px;--gap:10px;
+--dock-bg:rgba(255,255,255,.72);--dock-border:rgba(0,0,0,.06);
+--card-bg:rgba(255,255,255,.8);--card-blur:blur(8px)}
 [data-theme=dark]{--bg:#1c1c1e;--bg-2:#2c2c2e;--bg-3:#3a3a3c;--text:#f5f5f7;--text-dim:#98989d;
 --text-muted:#48484a;--border:#38383a;--accent:#0a84ff;--accent-soft:rgba(10,132,255,.18);
 --shadow-sm:0 1px 3px rgba(0,0,0,.2);--shadow-md:0 4px 12px rgba(0,0,0,.3);
---shadow-lg:0 10px 30px rgba(0,0,0,.4);--dock-bg:rgba(44,44,46,.72);--dock-border:rgba(255,255,255,.08)}
+--shadow-lg:0 10px 30px rgba(0,0,0,.4);
+--dock-bg:rgba(44,44,46,.72);--dock-border:rgba(255,255,255,.08);
+--card-bg:rgba(44,44,46,.8)}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;-webkit-touch-callout:none}
 html,body{margin:0;padding:0;background:var(--bg);color:var(--text);
 font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif;
 font-size:15px;line-height:1.35;min-height:100vh;overscroll-behavior-y:contain;
 transition:background .2s,color .2s}
 .day-card,.task-row,.task-text,.icon-btn,.mini-btn,.dock-item,.swatch,.btn,.checkbox,
-.cell-task-text,.day-name,.cell-name,.num-value,.col-nav button,.cell-checkbox{
+.cell-task-text,.day-name,.num-value,.cell-checkbox{
 -webkit-user-select:none;user-select:none;-webkit-user-drag:none}
+mark{background:rgba(255,214,10,.45);color:inherit;padding:0;border-radius:2px}
+[data-theme=dark] mark{background:rgba(255,214,10,.3)}
 .app{max-width:720px;margin:0 auto;padding:12px 16px calc(120px + env(safe-area-inset-bottom));
 padding-top:calc(12px + env(safe-area-inset-top))}
 .app-header{display:flex;align-items:center;justify-content:space-between;gap:12px;
@@ -33,8 +40,9 @@ white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:text}
 .header-actions{display:flex;gap:8px}
 .icon-btn{min-width:var(--tap);min-height:var(--tap);border:none;background:var(--bg-3);
 color:var(--text);border-radius:var(--radius-sm);font-size:18px;display:inline-flex;
-align-items:center;justify-content:center;cursor:pointer;padding:0}
+align-items:center;justify-content:center;cursor:pointer;padding:0;transition:background .15s}
 .icon-btn:active{background:var(--accent-soft);transform:scale(.94)}
+.icon-btn.active{background:var(--accent-soft);color:var(--accent)}
 .search-overlay{max-height:0;overflow:hidden;margin-bottom:0;transition:max-height .2s,margin-bottom .2s}
 .search-overlay.open{max-height:60px;margin-bottom:12px}
 .search-field{display:flex;align-items:center;gap:8px;background:var(--bg-2);
@@ -58,16 +66,21 @@ border-bottom:1px solid var(--border);scrollbar-width:none}
 border:1px solid var(--border);background:var(--bg-2);color:var(--text-dim);
 font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;flex:none}
 .col-nav button.active{background:var(--accent);color:#fff;border-color:var(--accent)}
-.columns-container{display:flex;gap:10px;overflow-x:auto;padding-bottom:12px;
+.columns-container{display:flex;gap:var(--gap);overflow-x:auto;padding-bottom:12px;
 align-items:flex-start;scrollbar-width:thin;-webkit-overflow-scrolling:touch}
-.column{display:flex;flex-direction:column;gap:10px;flex:0 0 auto;min-width:0}
-.day-card{background:var(--bg-2);border-radius:var(--radius);padding:10px 12px;
-display:flex;flex-direction:column;gap:6px;cursor:pointer;box-shadow:var(--shadow-sm);
-position:relative;overflow:hidden;transition:box-shadow .15s}
-.day-card::before{content:'';position:absolute;top:10px;left:0;bottom:10px;width:3px;
+.column{display:flex;flex-direction:column;gap:var(--gap);flex:0 0 auto;min-width:0}
+.day-card{background:var(--card-bg);backdrop-filter:var(--card-blur);
+-webkit-backdrop-filter:var(--card-blur);border-radius:var(--radius);padding:12px 14px;
+display:flex;flex-direction:column;gap:8px;cursor:pointer;box-shadow:var(--shadow-sm);
+position:relative;overflow:hidden;transition:box-shadow .15s,transform .1s}
+.day-card::before{content:'';position:absolute;top:12px;left:0;bottom:12px;width:3px;
 background:var(--card-color,var(--accent));border-radius:0 2px 2px 0}
+.day-card:active{box-shadow:var(--shadow-md)}
 .day-card.dragging{opacity:.45}
 .day-card.drag-target{box-shadow:0 0 0 2px var(--accent)}
+body.edit-mode .day-card{border:2px dashed var(--border);cursor:grab;touch-action:none}
+body.edit-mode .day-card::after{content:'☰';position:absolute;top:6px;right:6px;
+font-size:12px;opacity:.5;pointer-events:none}
 .day-head{display:flex;align-items:flex-start;justify-content:space-between;gap:2px;padding-left:6px}
 .day-name{font-weight:700;font-size:15px;letter-spacing:-.2px;flex:1;
 word-break:break-word;min-width:0;padding:2px 0;line-height:1.25}
@@ -82,7 +95,7 @@ align-items:center;justify-content:center;cursor:pointer;padding:0;font-family:i
 overflow-y:auto;overflow-x:hidden;flex:1;min-height:0;-webkit-overflow-scrolling:touch}
 .cell-task{display:flex;align-items:flex-start;gap:6px;padding:2px 0;
 font-size:12px;line-height:1.3;min-width:0}
-.cell-task-text{flex:1;word-break:break-word;cursor:text;
+.cell-task-text{flex:1;min-width:0;cursor:text;
 white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding:1px 0}
 .cell-task-text.done{text-decoration:line-through;opacity:.55;color:var(--text-dim)}
 .cell-checkbox{width:16px;height:16px;min-width:16px;border-radius:50%;
@@ -99,12 +112,14 @@ border-color:var(--cb-color,var(--accent))}
 transform:translateX(-50%);background:var(--dock-bg);
 backdrop-filter:blur(20px) saturate(180%);-webkit-backdrop-filter:blur(20px) saturate(180%);
 border:1px solid var(--dock-border);border-radius:var(--radius-lg);
-padding:8px;display:inline-flex;gap:6px;align-items:center;
-box-shadow:var(--shadow-lg);z-index:100;max-width:calc(100vw - 24px)}
+padding:8px;display:flex;gap:6px;align-items:center;
+box-shadow:var(--shadow-lg);z-index:100;
+width:fit-content;max-width:calc(100vw - 24px);overflow:hidden}
 .dock-scroll{display:flex;gap:6px;overflow-x:auto;overflow-y:hidden;
-min-width:0;flex:1 1 auto;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+min-width:0;flex:1 1 0;scrollbar-width:none;-webkit-overflow-scrolling:touch;
+max-width:calc(100vw - 24px - 16px - 56px - 6px)}
 .dock-scroll::-webkit-scrollbar{display:none}
-.dock-item{width:56px;height:56px;border:none;background:transparent;border-radius:16px;
+.dock-item{width:56px;height:56px;border:none;background:transparent;border-radius:20px;
 cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:24px;
 flex:0 0 56px;position:relative;padding:0}
 .dock-item:active{transform:scale(.92)}
@@ -112,7 +127,7 @@ flex:0 0 56px;position:relative;padding:0}
 .dock-item.active::after{content:'';position:absolute;bottom:4px;left:50%;
 transform:translateX(-50%);width:4px;height:4px;background:var(--accent);border-radius:50%}
 .dock-add{width:56px;height:56px;border:2px dashed var(--border);background:transparent;
-color:var(--text-dim);border-radius:16px;font-size:26px;cursor:pointer;flex:0 0 56px;
+color:var(--text-dim);border-radius:20px;font-size:26px;cursor:pointer;flex:0 0 56px;
 display:flex;align-items:center;justify-content:center}
 .dock-add:active{background:var(--accent-soft);color:var(--accent);border-color:var(--accent)}
 .modal{position:fixed;inset:0;background:rgba(0,0,0,.4);display:none;
@@ -133,21 +148,21 @@ margin-bottom:14px;gap:12px}
 .swatch:active{transform:scale(.88)}
 .swatch.active{box-shadow:0 0 0 2px var(--bg-2),0 0 0 4px currentColor}
 .color-row{display:flex;align-items:center;gap:10px;margin-bottom:14px}
-.color-input{width:44px;height:44px;border:2px solid var(--border);border-radius:12px;
+.color-input{width:44px;height:44px;border:2px solid var(--border);border-radius:14px;
 cursor:pointer;padding:0;background:transparent;overflow:hidden}
 .color-input::-webkit-color-swatch-wrapper{padding:2px}
-.color-input::-webkit-color-swatch{border:none;border-radius:8px}
+.color-input::-webkit-color-swatch{border:none;border-radius:10px}
 .setting-block{padding:12px 0;border-bottom:1px solid var(--border)}
 .setting-block:last-of-type{border-bottom:none}
 .setting-label{font-size:12px;color:var(--text-dim);text-transform:uppercase;
 letter-spacing:.4px;font-weight:600;margin-bottom:10px}
 .counter-row{display:flex;align-items:center;gap:12px;padding:4px 0}
 .counter-btn{width:44px;height:44px;border:1px solid var(--border);background:var(--bg-3);
-color:var(--text);border-radius:12px;font-size:22px;font-weight:600;cursor:pointer;
+color:var(--text);border-radius:14px;font-size:22px;font-weight:600;cursor:pointer;
 font-family:inherit;display:flex;align-items:center;justify-content:center;padding:0}
 .counter-btn:active{background:var(--accent-soft);color:var(--accent);border-color:var(--accent)}
 .num-value{flex:1;text-align:center;font-size:22px;font-weight:700;
-padding:10px;border-radius:12px;background:var(--bg-3);cursor:pointer;
+padding:10px;border-radius:14px;background:var(--bg-3);cursor:pointer;
 min-height:44px;display:flex;align-items:center;justify-content:center}
 .num-value:active{background:var(--accent-soft);color:var(--accent)}
 .btn{width:100%;min-height:50px;border:none;background:var(--bg-3);color:var(--text);
@@ -189,7 +204,7 @@ border-radius:50%;background:#fff;box-shadow:0 2px 4px rgba(0,0,0,.2);transition
 padding:8px 0 16px;border-bottom:1px solid var(--border);margin-bottom:12px}
 .day-select{display:flex;gap:6px;flex-wrap:wrap}
 .day-select button{min-width:40px;min-height:40px;border:1px solid var(--border);
-background:var(--bg-3);color:var(--text-dim);border-radius:10px;font-size:13px;
+background:var(--bg-3);color:var(--text-dim);border-radius:12px;font-size:13px;
 font-weight:600;cursor:pointer;font-family:inherit;flex:1}
 .day-select button.on{background:var(--accent);color:#fff;border-color:var(--accent)}
 .toast{position:fixed;bottom:calc(100px + env(safe-area-inset-bottom));left:50%;
@@ -210,6 +225,7 @@ margin-top:20px;padding-top:12px;border-top:1px solid var(--border)}
       <button class="icon-btn" id="searchBtn" aria-label="Поиск">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
       </button>
+      <button class="icon-btn" id="editBtn" aria-label="Режим редактирования">✏️</button>
       <button class="icon-btn" id="settingsBtn" aria-label="Настройки">⚙️</button>
     </div>
   </header>
@@ -236,7 +252,7 @@ margin-top:20px;padding-top:12px;border-top:1px solid var(--border)}
 </div>
 <div id="moduleDelete"></div>
 <button class="btn primary" data-close style="margin-top:16px">Готово</button>
-<div class="version-tag">Версия 8.0</div>
+<div class="version-tag">Версия 9.0</div>
 </div></div>
 
 <div class="modal" id="cellModal"><div class="modal-card">
@@ -324,7 +340,7 @@ if (tg) { tg.ready(); tg.expand();
 document.addEventListener('contextmenu', e => e.preventDefault());
 
 const BOT_API = '';
-const STORAGE_KEY = 'miniapp-constructor-v8';
+const STORAGE_KEY = 'miniapp-constructor-v9';
 const CARD_PALETTE = ['#5ac8fa','#af52de','#ff2d55','#ff9500','#34c759','#30b0c7','#5856d6','#ffcc00'];
 const ACCENT_PALETTE = ['#007aff','#5856d6','#af52de','#ff2d55','#ff9500','#34c759','#30b0c7','#8e8e93'];
 const DAY_NAMES = ['Пн','Вт','Ср','Чт','Пт','Сб','Вс'];
@@ -356,15 +372,12 @@ function migrateView(view){
     delete view.cells;
   }
   if(!Array.isArray(view.columns))view.columns=[[]];
-  view.columns.forEach(col=>col.forEach(c=>{delete c.span;}));
   return view;
 }
 
 function makeDefaultColumns(){
-  const cells=DAY_NAMES.map((n,i)=>makeCell(n,i,[i]));
-  const cols=Array.from({length:7},()=>[]);
-  cells.forEach((c,i)=>cols[i].push(c));
-  return cols;
+  const names=['Пн','Вт','Ср','Чт','Пт'];
+  return [names.map((n,i)=>makeCell(n,i,[i]))];
 }
 
 function makeDefaultViews(){
@@ -396,6 +409,7 @@ let dragState=null;
 let longPressTimer=null;
 let suppressClick=false;
 let confirmCallback=null;
+let editMode=false;
 
 const $=(s,r=document)=>r.querySelector(s);
 const $$=(s,r=document)=>[...r.querySelectorAll(s)];
@@ -447,6 +461,22 @@ function applyAccent(){
   document.documentElement.style.setProperty('--accent-soft',`rgba(${r},${g},${b},0.16)`);
 }
 
+function getSearchWords(){
+  if(!searchQuery)return [];
+  return searchQuery.split(/\s+/).filter(Boolean);
+}
+function matchCell(cell,words){
+  if(!words.length)return true;
+  const hay=(cell.name+' '+cell.tasks.map(t=>t.text).join(' ')).toLowerCase();
+  return words.every(w=>hay.includes(w));
+}
+function highlightText(text,words){
+  if(!words.length)return escapeHtml(text);
+  const escaped=words.map(w=>w.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'));
+  const re=new RegExp('('+escaped.join('|')+')','gi');
+  return escapeHtml(text).replace(re,'<mark>$1</mark>');
+}
+
 function renderDock(){
   const dock=$('#dock');dock.innerHTML='';
   const scroll=document.createElement('div');scroll.className='dock-scroll';
@@ -483,6 +513,8 @@ function renderContent(){
   const v=state.views.find(x=>x.id===currentViewId);
   if(!v){switchView(state.views[0].id);return;}
   renderPlanner(c,v);
+  document.body.classList.toggle('edit-mode',editMode);
+  $('#editBtn').classList.toggle('active',editMode);
 }
 
 function renderPlanner(root,view){
@@ -490,7 +522,7 @@ function renderPlanner(root,view){
     <div class="filters" id="plannerFilters"></div>
     <div class="col-nav" id="colNav"></div>
     <div class="columns-container" id="columnsContainer"></div>
-    <p class="hint">Тап на имя — переименовать. Тап на поле — задачи. ⚙️ — настройки и уведомления. Долгий тап на карточке — перетащить.</p>`;
+    <p class="hint">${editMode?'Режим редактирования: тащите карточки пальцем':'Тап на имя — переименовать. Тап на поле — задачи. ⚙️ — настройки. ✏️ — режим перетаскивания.'}</p>`;
   renderFilters(view);
   renderColNav(view);
   renderColumns(view);
@@ -503,7 +535,7 @@ function renderPlanner(root,view){
   $('#colNav').addEventListener('click',e=>{
     const b=e.target.closest('[data-col]');if(!b)return;
     const idx=parseInt(b.dataset.col);
-    scrollToColumn(view,idx);
+    scrollToColumn(idx);
     $$('#colNav button').forEach(x=>x.classList.toggle('active',x===b));
     haptic();
   });
@@ -526,13 +558,12 @@ function renderColNav(view){
   nav.innerHTML='';
   view.columns.forEach((col,i)=>{
     const b=document.createElement('button');
-    b.dataset.col=i;
-    b.textContent=i+1;
+    b.dataset.col=i;b.textContent=i+1;
     nav.appendChild(b);
   });
 }
 
-function scrollToColumn(view,idx){
+function scrollToColumn(idx){
   const container=$('#columnsContainer');if(!container)return;
   const col=container.children[idx];if(!col)return;
   container.scrollTo({left:col.offsetLeft-container.offsetLeft,behavior:'smooth'});
@@ -550,7 +581,7 @@ function renderColumns(view){
   const container=$('#columnsContainer');if(!container)return;
   container.innerHTML='';
   const colWidth=getColumnWidth(view);
-  const q=searchQuery;
+  const words=getSearchWords();
 
   view.columns.forEach((colCells,colIdx)=>{
     const colEl=document.createElement('div');
@@ -559,8 +590,7 @@ function renderColumns(view){
     colEl.dataset.colIndex=colIdx;
 
     const visible=colCells.filter(cell=>{
-      const mq=!q||cell.name.toLowerCase().includes(q)
-        ||cell.tasks.some(t=>t.text.toLowerCase().includes(q));
+      const mq=matchCell(cell,words);
       const f=view.filter||'all';
       const mf=f==='all'?true
         :f==='busy'?cell.tasks.length>0
@@ -577,13 +607,13 @@ function renderColumns(view){
     }
 
     visible.forEach(cell=>{
-      colEl.appendChild(buildCellCard(view,cell,colIdx));
+      colEl.appendChild(buildCellCard(view,cell,colIdx,words));
     });
     container.appendChild(colEl);
   });
 }
 
-function buildCellCard(view,cell,colIdx){
+function buildCellCard(view,cell,colIdx,words){
   const card=document.createElement('div');
   card.className='day-card';
   card.dataset.cellId=cell.id;
@@ -593,9 +623,11 @@ function buildCellCard(view,cell,colIdx){
   card.style.minHeight=(cell.height||DEFAULT_HEIGHT)+'px';
   card.style.maxHeight=(cell.height||DEFAULT_HEIGHT)+'px';
 
+  const nameHtml=cell.name?highlightText(cell.name,words):'Назовите';
+
   card.innerHTML=`
     <div class="day-head">
-      <div class="day-name${cell.name?'':' empty-name'}" data-name>${cell.name?escapeHtml(cell.name):'Назовите'}</div>
+      <div class="day-name${cell.name?'':' empty-name'}" data-name>${nameHtml}</div>
       <div class="day-actions">
         <button class="mini-btn" data-settings>⚙️</button>
       </div>
@@ -606,7 +638,7 @@ function buildCellCard(view,cell,colIdx){
           <button class="cell-checkbox${t.done?' checked':''}" data-toggle="${t.id}" style="--cb-color:${cell.color}">
             ${t.done?'<svg viewBox="0 0 20 20" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M4 10l4 4 8-8"/></svg>':''}
           </button>
-          <span class="cell-task-text${t.done?' done':''}" data-text="${t.id}">${escapeHtml(t.text)}</span>
+          <span class="cell-task-text${t.done?' done':''}" data-text="${t.id}">${highlightText(t.text,words)}</span>
         </div>
       `).join(''):'<div class="cell-empty">Нажмите, чтобы добавить задачи</div>'}
     </div>`;
@@ -615,9 +647,8 @@ function buildCellCard(view,cell,colIdx){
     e.stopPropagation();
     const el=e.currentTarget;
     startInlineEdit(el,cell.name||'',true,n=>{
-      cell.name=n||'';
-      saveState();
-      el.textContent=cell.name||'Назовите';
+      cell.name=n||'';saveState();
+      el.innerHTML=cell.name?highlightText(cell.name,getSearchWords()):'Назовите';
       el.classList.toggle('empty-name',!cell.name);
     });
   });
@@ -646,6 +677,7 @@ function buildCellCard(view,cell,colIdx){
   });
 
   card.addEventListener('click',e=>{
+    if(editMode)return;
     if(suppressClick){suppressClick=false;return;}
     if(e.target.closest('[data-name],[data-settings],[data-toggle],[data-text]'))return;
     openTasksModal(cell);
@@ -654,9 +686,11 @@ function buildCellCard(view,cell,colIdx){
   card.addEventListener('pointerdown',e=>{
     if(e.target.closest('[data-name],[data-settings],[data-toggle],[data-text]'))return;
     if(e.button&&e.button!==0)return;
-    longPressTimer=setTimeout(()=>{
+    if(editMode){
       startDrag(card,cell,colIdx,view);
-    },LONG_PRESS_MS);
+    } else {
+      longPressTimer=setTimeout(()=>startDrag(card,cell,colIdx,view),LONG_PRESS_MS);
+    }
   });
   const cancelPress=()=>{if(longPressTimer){clearTimeout(longPressTimer);longPressTimer=null;}};
   card.addEventListener('pointerup',cancelPress);
@@ -669,6 +703,7 @@ function buildCellCard(view,cell,colIdx){
 function refreshCard(card,cell,view){
   const tasksBox=card.querySelector('[data-tasks]');
   if(!tasksBox)return;
+  const words=getSearchWords();
   if(!cell.tasks.length){
     tasksBox.innerHTML='<div class="cell-empty">Нажмите, чтобы добавить задачи</div>';
     return;
@@ -678,7 +713,7 @@ function refreshCard(card,cell,view){
       <button class="cell-checkbox${t.done?' checked':''}" data-toggle="${t.id}" style="--cb-color:${cell.color}">
         ${t.done?'<svg viewBox="0 0 20 20" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M4 10l4 4 8-8"/></svg>':''}
       </button>
-      <span class="cell-task-text${t.done?' done':''}" data-text="${t.id}">${escapeHtml(t.text)}</span>
+      <span class="cell-task-text${t.done?' done':''}" data-text="${t.id}">${highlightText(t.text,words)}</span>
     </div>
   `).join('');
   tasksBox.querySelectorAll('[data-toggle]').forEach(btn=>{
@@ -738,9 +773,7 @@ function startDrag(card,cell,colIdx,view){
       dragState.target=target;
       const colEl=target.closest('.column');
       dragState.targetCol=colEl?parseInt(colEl.dataset.colIndex):null;
-    } else {
-      dragState.target=null;dragState.targetCol=null;
-    }
+    } else {dragState.target=null;dragState.targetCol=null;}
   };
   const up=()=>{
     document.removeEventListener('pointermove',move);
@@ -756,7 +789,6 @@ function startDrag(card,cell,colIdx,view){
 function endDrag(){
   if(!dragState){suppressClick=false;return;}
   const{cell,colIdx,view,target,targetCol}=dragState;
-
   if(target&&targetCol!==null){
     const sourceCol=view.columns[colIdx];
     const targetColArr=view.columns[targetCol];
@@ -766,10 +798,8 @@ function endDrag(){
     const tIdx=targetColArr.findIndex(c=>c.id===targetCellId);
     if(tIdx>=0)targetColArr.splice(tIdx,0,cell);
     else targetColArr.push(cell);
-    saveState();
-    haptic('medium');
+    saveState();haptic('medium');
   }
-
   dragState?.card?.classList.remove('dragging');
   $$('.drag-target').forEach(el=>el.classList.remove('drag-target'));
   dragState=null;
@@ -788,8 +818,7 @@ function openTasksModal(cell){
 function renderTasksList(cell){
   const list=$('#taskList');list.innerHTML='';
   if(!cell.tasks.length){
-    list.innerHTML='<p class="empty">Задач нет. Добавьте первую ↓</p>';
-    return;
+    list.innerHTML='<p class="empty">Задач нет. Добавьте первую ↓</p>';return;
   }
   cell.tasks.forEach(task=>{
     const row=document.createElement('div');row.className='task-row';
@@ -798,13 +827,11 @@ function renderTasksList(cell){
     cb.style.setProperty('--cb-color',cell.color);
     cb.innerHTML=task.done?'<svg viewBox="0 0 20 20" fill="none" stroke="#fff" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 10l4 4 8-8"/></svg>':'';
     cb.addEventListener('click',()=>{
-      task.done=!task.done;saveState();renderTasksList(cell);
-      refreshCellsInView(cell);
+      task.done=!task.done;saveState();renderTasksList(cell);refreshCellsInView(cell);
     });
     row.appendChild(cb);
     const txt=document.createElement('span');
-    txt.className='task-text'+(task.done?' done':'');
-    txt.textContent=task.text;
+    txt.className='task-text'+(task.done?' done':'');txt.textContent=task.text;
     txt.addEventListener('click',()=>{
       startInlineEdit(txt,task.text,false,n=>{
         task.text=n||task.text;saveState();renderTasksList(cell);refreshCellsInView(cell);
@@ -817,8 +844,7 @@ function renderTasksList(cell){
       const i=cell.tasks.indexOf(task);if(i>=0)cell.tasks.splice(i,1);
       saveState();renderTasksList(cell);refreshCellsInView(cell);
     });
-    row.appendChild(del);
-    list.appendChild(row);
+    row.appendChild(del);list.appendChild(row);
   });
 }
 
@@ -829,12 +855,8 @@ function refreshCellsInView(cell){
 }
 
 function getCurrentCell(){
-  const v=state.views.find(x=>x.id===currentViewId);
-  if(!v)return null;
-  for(const col of v.columns){
-    const c=col.find(x=>x.id===currentCellId);
-    if(c)return c;
-  }
+  const v=state.views.find(x=>x.id===currentViewId);if(!v)return null;
+  for(const col of v.columns){const c=col.find(x=>x.id===currentCellId);if(c)return c;}
   return null;
 }
 
@@ -860,9 +882,8 @@ function renderCellSwatches(cell){
     b.className='swatch'+(c===cell.color?' active':'');
     b.style.background=c;b.style.color=c;
     b.addEventListener('click',()=>{
-      cell.color=c;saveState();
-      renderCellSwatches(cell);$('#cellColorCustom').value=c;
-      refreshCellsInView(cell);
+      cell.color=c;saveState();renderCellSwatches(cell);
+      $('#cellColorCustom').value=c;refreshCellsInView(cell);
     });
     wrap.appendChild(b);
   }
@@ -941,16 +962,13 @@ function renderSettings(){
     b.addEventListener('click',()=>{state.accent=c;saveState();applyAccent();renderSettings();});
     sw.appendChild(b);
   }
-  $('#accentCustom').addEventListener('input',e=>{
-    state.accent=e.target.value;saveState();applyAccent();
-  });
+  $('#accentCustom').addEventListener('input',e=>{state.accent=e.target.value;saveState();applyAccent();});
   $('#moduleTitleInput').addEventListener('change',e=>{
     const t=e.target.value.trim();if(!t)return;
     v.title=t;saveState();$('#pageTitle').textContent=t;renderDock();
   });
   $('#moduleIconInput').addEventListener('change',e=>{
-    const t=e.target.value.trim()||'📆';
-    v.icon=t;saveState();renderDock();
+    const t=e.target.value.trim()||'📆';v.icon=t;saveState();renderDock();
   });
   $('#cellsMinus').addEventListener('click',()=>{changeCellCount(v,-1);renderSettings();});
   $('#cellsPlus').addEventListener('click',()=>{changeCellCount(v,1);renderSettings();});
@@ -991,27 +1009,24 @@ function setCellCount(v,newCount){
   if(newCount<1)newCount=1;
   const flat=v.columns.flat();
   if(newCount<flat.length){
+    let count=0;
     v.columns=v.columns.map(col=>{
       const keep=[];
-      for(const c of col){
-        if(flat.indexOf(c)<newCount)keep.push(c);
-      }
+      for(const c of col){if(count<newCount){keep.push(c);count++;}}
       return keep;
     }).filter(col=>col.length>0);
     if(!v.columns.length)v.columns=[[]];
   } else if(newCount>flat.length){
     const toAdd=newCount-flat.length;
-    const lastCol=v.columns[v.columns.length-1];
     for(let i=0;i<toAdd;i++){
-      lastCol.push(makeCell('',flat.length+i,[]));
+      const shortest=v.columns.reduce((min,col)=>col.length<min.length?col:min,v.columns[0]);
+      shortest.push(makeCell('',flat.length+i,[]));
     }
   }
   saveState();renderContent();
 }
 
-function changeColumns(v,delta){
-  setColumns(v,v.columns.length+delta);
-}
+function changeColumns(v,delta){setColumns(v,v.columns.length+delta);}
 
 function setColumns(v,newCount){
   if(newCount<1)newCount=1;
@@ -1043,8 +1058,8 @@ function createView(){
   const name=$('#newViewName').value.trim();
   const icon=$('#newViewIcon').value.trim()||'📆';
   if(!name){toast('Введите название');return;}
-  const cols=Array.from({length:7},()=>[]);
-  DAY_NAMES.forEach((n,i)=>cols[i].push(makeCell(n,i,[i])));
+  const names=['Пн','Вт','Ср','Чт','Пт'];
+  const cols=[names.map((n,i)=>makeCell(n,i,[i]))];
   const newView={id:makeId('v'),type:'planner',title:name,icon,removable:true,
     filter:'all',columns:cols};
   state.views.push(newView);
@@ -1059,6 +1074,12 @@ $('#searchClose').addEventListener('click',closeSearch);
 $('#globalSearch').addEventListener('input',e=>{
   searchQuery=e.target.value.trim().toLowerCase();renderContent();
 });
+$('#editBtn').addEventListener('click',()=>{
+  editMode=!editMode;haptic();
+  document.body.classList.toggle('edit-mode',editMode);
+  $('#editBtn').classList.toggle('active',editMode);
+  renderContent();
+});
 $('#settingsBtn').addEventListener('click',()=>{renderSettings();openModal($('#settingsModal'));});
 $('#settingsModal').addEventListener('click',e=>{
   const t=e.target.closest('[data-theme-set]');
@@ -1068,7 +1089,6 @@ $('#cellNameInput').addEventListener('input',e=>{
   const cell=getCurrentCell();if(!cell)return;
   cell.name=e.target.value;saveState();
   $('#cellTitle').textContent=cell.name||'Ячейка';
-  refreshCellsInView(cell);
   $$(`[data-cell-id="${cell.id}"] [data-name]`).forEach(el=>{
     el.textContent=cell.name||'Назовите';
     el.classList.toggle('empty-name',!cell.name);
@@ -1079,8 +1099,7 @@ $('#cellColorCustom').addEventListener('input',e=>{
   cell.color=e.target.value;saveState();renderCellSwatches(cell);refreshCellsInView(cell);
 });
 $('#cellModal').addEventListener('click',e=>{
-  const t=e.target.closest('[data-size]');
-  if(!t)return;
+  const t=e.target.closest('[data-size]');if(!t)return;
   const cell=getCurrentCell();if(!cell)return;
   const action=t.dataset.size;
   if(action==='height-minus'){
@@ -1099,8 +1118,7 @@ $('#cellModal').addEventListener('click',e=>{
     }
   }
   saveState();
-  const cards=$$(`[data-cell-id="${cell.id}"]`);
-  cards.forEach(card=>{
+  $$(`[data-cell-id="${cell.id}"]`).forEach(card=>{
     card.style.minHeight=cell.height+'px';
     card.style.maxHeight=cell.height+'px';
   });
@@ -1146,9 +1164,7 @@ $('#confirmYes').addEventListener('click',()=>{
     const id=action.slice(6);
     const v=state.views.find(x=>x.id===id);
     if(v){
-      const cols=Array.from({length:7},()=>[]);
-      DAY_NAMES.forEach((n,i)=>cols[i].push(makeCell(n,i,[i])));
-      v.columns=cols;
+      v.columns=makeDefaultColumns();
       saveState();renderContent();
     }
     closeModal($('#settingsModal'));
@@ -1160,19 +1176,14 @@ $('#confirmYes').addEventListener('click',()=>{
     saveState();closeModal($('#cellModal'));renderContent();
   }
 });
-
 $$('[data-close]').forEach(b=>b.addEventListener('click',()=>closeModal(b.closest('.modal'))));
 $$('.modal').forEach(m=>m.addEventListener('click',e=>{if(e.target===m)closeModal(m);}));
-
 $('#pageTitle').addEventListener('click',function(){
   const v=state.views.find(x=>x.id===currentViewId);if(!v)return;
   startInlineEdit(this,v.title,true,n=>{
-    v.title=n||v.title;
-    this.textContent=v.title;
-    saveState();renderDock();
+    v.title=n||v.title;this.textContent=v.title;saveState();renderDock();
   });
 });
-
 if(tg?.BackButton){
   tg.BackButton.onClick(()=>{
     const o=$$('.modal.open');
@@ -1180,12 +1191,9 @@ if(tg?.BackButton){
     if(searchQuery)closeSearch();
   });
 }
-
 (function init(){
   applyTheme();applyAccent();
-  if(!state.views.find(v=>v.id===currentViewId)){
-    currentViewId=state.views[0].id;
-  }
+  if(!state.views.find(v=>v.id===currentViewId)){currentViewId=state.views[0].id;}
   renderDock();
   switchView(currentViewId);
   updateBack();
