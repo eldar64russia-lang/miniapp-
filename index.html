@@ -7,82 +7,72 @@
 <title>Конструктор</title>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <style>
-:root {
-  --bg:#f5f5f7;--bg-2:#fff;--bg-3:#ececf0;
-  --text:#1d1d1f;--text-dim:#86868b;--text-muted:#c7c7cc;
-  --border:#e0e0e5;--accent:#007aff;--accent-soft:rgba(0,122,255,.12);
-  --shadow-sm:0 1px 3px rgba(0,0,0,.06);--shadow-md:0 4px 12px rgba(0,0,0,.08);
-  --shadow-lg:0 10px 30px rgba(0,0,0,.12);
-  --radius-sm:12px;--radius:18px;--radius-lg:24px;
-  --tap:44px;--gap:10px;
-  --dock-bg:rgba(255,255,255,.72);--dock-border:rgba(0,0,0,.06);
-}
-[data-theme=dark]{
-  --bg:#1c1c1e;--bg-2:#2c2c2e;--bg-3:#3a3a3c;
-  --text:#f5f5f7;--text-dim:#98989d;--text-muted:#48484a;
-  --border:#38383a;--accent:#0a84ff;--accent-soft:rgba(10,132,255,.18);
-  --shadow-sm:0 1px 3px rgba(0,0,0,.2);--shadow-md:0 4px 12px rgba(0,0,0,.3);
-  --shadow-lg:0 10px 30px rgba(0,0,0,.4);
-  --dock-bg:rgba(44,44,46,.72);--dock-border:rgba(255,255,255,.08);
-}
+:root{--bg:#f5f5f7;--bg-2:#fff;--bg-3:#ececf0;--text:#1d1d1f;--text-dim:#86868b;
+--text-muted:#c7c7cc;--border:#e0e0e5;--accent:#007aff;--accent-soft:rgba(0,122,255,.12);
+--shadow-sm:0 1px 3px rgba(0,0,0,.06);--shadow-md:0 4px 12px rgba(0,0,0,.08);
+--shadow-lg:0 10px 30px rgba(0,0,0,.12);--radius-sm:12px;--radius:18px;--radius-lg:24px;
+--tap:44px;--gap:10px;--dock-bg:rgba(255,255,255,.72);--dock-border:rgba(0,0,0,.06)}
+[data-theme=dark]{--bg:#1c1c1e;--bg-2:#2c2c2e;--bg-3:#3a3a3c;--text:#f5f5f7;--text-dim:#98989d;
+--text-muted:#48484a;--border:#38383a;--accent:#0a84ff;--accent-soft:rgba(10,132,255,.18);
+--shadow-sm:0 1px 3px rgba(0,0,0,.2);--shadow-md:0 4px 12px rgba(0,0,0,.3);
+--shadow-lg:0 10px 30px rgba(0,0,0,.4);--dock-bg:rgba(44,44,46,.72);--dock-border:rgba(255,255,255,.08)}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;-webkit-touch-callout:none}
 html,body{margin:0;padding:0;background:var(--bg);color:var(--text);
-  font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif;
-  font-size:15px;line-height:1.35;min-height:100vh;
-  overscroll-behavior-y:contain;transition:background .2s,color .2s}
-.day-card,.task-row,.task-text,.icon-btn,.mini-btn,.dock-item,.swatch,
-.filters button,.setting-options button,.btn,.checkbox,.check-item,.check-text,
-.tpl-tile,.category-header,.category-name,.day-name,.day-body{
-  -webkit-user-select:none;user-select:none;-webkit-user-drag:none}
-.app{max-width:720px;margin:0 auto;
-  padding:12px 16px calc(120px + env(safe-area-inset-bottom));
-  padding-top:calc(12px + env(safe-area-inset-top))}
-.app-header{display:flex;align-items:center;justify-content:space-between;
-  gap:12px;margin-bottom:16px;min-height:44px}
-.app-header h1{margin:0;font-size:28px;font-weight:700;letter-spacing:-.5px;flex:1;
-  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif;
+font-size:15px;line-height:1.35;min-height:100vh;overscroll-behavior-y:contain;
+transition:background .2s,color .2s}
+.day-card,.task-row,.task-text,.icon-btn,.mini-btn,.dock-item,.swatch,.btn,.checkbox,
+.check-item,.check-text,.category-name,.day-name,.day-body,.picker-item,.notify-check{
+-webkit-user-select:none;user-select:none;-webkit-user-drag:none}
+.app{max-width:720px;margin:0 auto;padding:12px 16px calc(120px + env(safe-area-inset-bottom));
+padding-top:calc(12px + env(safe-area-inset-top))}
+.app-header{display:flex;align-items:center;justify-content:space-between;gap:12px;
+margin-bottom:16px;min-height:44px}
+.app-header h1{margin:0;font-size:26px;font-weight:700;letter-spacing:-.5px;flex:1;
+white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:text}
 .header-actions{display:flex;gap:8px}
-.icon-btn{min-width:var(--tap);min-height:var(--tap);border:none;
-  background:var(--bg-3);color:var(--text);border-radius:var(--radius-sm);
-  font-size:18px;display:inline-flex;align-items:center;justify-content:center;
-  cursor:pointer;padding:0;transition:background .15s,transform .1s}
+.icon-btn{min-width:var(--tap);min-height:var(--tap);border:none;background:var(--bg-3);
+color:var(--text);border-radius:var(--radius-sm);font-size:18px;display:inline-flex;
+align-items:center;justify-content:center;cursor:pointer;padding:0;transition:background .15s}
 .icon-btn:active{background:var(--accent-soft);transform:scale(.94)}
-.search-overlay{max-height:0;overflow:hidden;margin-bottom:0;
-  transition:max-height .2s,margin-bottom .2s}
+.search-overlay{max-height:0;overflow:hidden;margin-bottom:0;transition:max-height .2s,margin-bottom .2s}
 .search-overlay.open{max-height:60px;margin-bottom:12px}
 .search-field{display:flex;align-items:center;gap:8px;background:var(--bg-2);
-  border:1px solid var(--border);border-radius:var(--radius-sm);
-  padding:0 12px;min-height:var(--tap);box-shadow:var(--shadow-sm)}
+border:1px solid var(--border);border-radius:var(--radius-sm);padding:0 12px;
+min-height:var(--tap);box-shadow:var(--shadow-sm)}
 .search-field input{flex:1;background:transparent;border:none;color:var(--text);
-  font-size:15px;outline:none;padding:10px 0;font-family:inherit}
+font-size:15px;outline:none;padding:10px 0;font-family:inherit}
 .search-field input::-webkit-search-cancel-button{-webkit-appearance:none}
-.close-search{background:transparent;border:none;color:var(--text-dim);
-  font-size:16px;cursor:pointer;padding:4px;min-width:32px;min-height:32px}
-.filters{display:flex;gap:8px;overflow-x:auto;padding-bottom:10px;
-  margin-bottom:10px;scrollbar-width:none}
+.close-search{background:transparent;border:none;color:var(--text-dim);font-size:16px;
+cursor:pointer;padding:4px;min-width:32px;min-height:32px}
+.filters{display:flex;gap:8px;overflow-x:auto;padding-bottom:10px;margin-bottom:10px;scrollbar-width:none}
 .filters::-webkit-scrollbar{display:none}
 .filters button{min-height:36px;padding:0 14px;border-radius:18px;border:none;
-  background:var(--bg-3);color:var(--text-dim);font-size:13px;font-weight:500;
-  white-space:nowrap;cursor:pointer;font-family:inherit}
+background:var(--bg-3);color:var(--text-dim);font-size:13px;font-weight:500;
+white-space:nowrap;cursor:pointer;font-family:inherit}
 .filters button.active{background:var(--accent);color:#fff}
 .week-grid{display:grid;gap:var(--gap)}
+.week-grid.calendar .day-card{padding:8px;min-height:70px}
+.week-grid.calendar .day-name{font-size:13px}
+.week-grid.calendar .day-body{display:none}
+.week-grid.calendar .task-preview{display:none}
 .day-card{background:var(--bg-2);border-radius:var(--radius);padding:12px 14px;
-  min-height:96px;display:flex;flex-direction:column;gap:6px;cursor:pointer;
-  box-shadow:var(--shadow-sm);position:relative;overflow:hidden;
-  transition:transform .12s,box-shadow .15s}
-.day-card::before{content:'';position:absolute;top:12px;left:0;bottom:12px;
-  width:3px;background:var(--card-color,var(--accent));border-radius:0 2px 2px 0}
+min-height:96px;display:flex;flex-direction:column;gap:6px;cursor:pointer;
+box-shadow:var(--shadow-sm);position:relative;overflow:hidden;
+transition:transform .12s,box-shadow .15s}
+.day-card::before{content:'';position:absolute;top:12px;left:0;bottom:12px;width:3px;
+background:var(--card-color,var(--accent));border-radius:0 2px 2px 0}
 .day-card:active{transform:scale(.98);box-shadow:var(--shadow-md)}
 .day-card.dragging{opacity:.45;transform:scale(.96)}
 .day-card.drag-target{box-shadow:0 0 0 2px var(--accent)}
-.day-head{display:flex;align-items:center;justify-content:space-between;
-  gap:4px;padding-left:8px}
-.day-name{font-weight:700;font-size:17px;letter-spacing:-.3px}
-.day-actions{display:flex;gap:0}
-.mini-btn{position:relative;width:30px;height:30px;border:none;background:transparent;
-  color:var(--text-dim);border-radius:8px;font-size:15px;display:inline-flex;
-  align-items:center;justify-content:center;cursor:pointer;padding:0;font-family:inherit}
-.mini-btn::before{content:'';position:absolute;inset:-7px}
+.day-head{display:flex;align-items:center;justify-content:space-between;gap:2px;padding-left:8px}
+.day-name{font-weight:700;font-size:17px;letter-spacing:-.3px;flex:1;
+white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+.day-actions{display:flex;gap:0;flex:none}
+.mini-btn{position:relative;width:26px;height:26px;border:none;background:transparent;
+color:var(--text-dim);border-radius:8px;font-size:14px;display:inline-flex;
+align-items:center;justify-content:center;cursor:pointer;padding:0;font-family:inherit}
+.mini-btn::before{content:'';position:absolute;inset:-9px}
 .mini-btn:active{background:var(--accent-soft);color:var(--accent)}
 .mini-btn.bell-active{color:var(--accent);opacity:1}
 .drag-handle{cursor:grab;touch-action:none}
@@ -90,42 +80,36 @@ html,body{margin:0;padding:0;background:var(--bg);color:var(--text);
 .task-count{color:var(--text);font-size:13px;font-weight:500}
 .task-preview{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:2px}
 .empty{text-align:center;color:var(--text-dim);padding:40px 20px;font-size:14px;
-  grid-column:1/-1;margin:0}
-.dock{position:fixed;bottom:calc(12px + env(safe-area-inset-bottom));
-  left:50%;transform:translateX(-50%);
-  background:var(--dock-bg);backdrop-filter:blur(20px) saturate(180%);
-  -webkit-backdrop-filter:blur(20px) saturate(180%);
-  border:1px solid var(--dock-border);border-radius:var(--radius-lg);
-  padding:8px;display:flex;gap:6px;align-items:center;
-  box-shadow:var(--shadow-lg);z-index:100}
-.dock-scroll{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;
-  max-width:180px;min-width:0}
+grid-column:1/-1;margin:0}
+.dock{position:fixed;bottom:calc(12px + env(safe-area-inset-bottom));left:50%;
+transform:translateX(-50%);background:var(--dock-bg);backdrop-filter:blur(20px) saturate(180%);
+-webkit-backdrop-filter:blur(20px) saturate(180%);border:1px solid var(--dock-border);
+border-radius:var(--radius-lg);padding:8px;display:flex;gap:6px;align-items:center;
+box-shadow:var(--shadow-lg);z-index:100}
+.dock-scroll{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;max-width:180px;min-width:0}
 .dock-scroll::-webkit-scrollbar{display:none}
-.dock-item{width:56px;height:56px;border:none;background:transparent;
-  border-radius:16px;cursor:pointer;display:flex;align-items:center;
-  justify-content:center;font-size:24px;flex:none;
-  transition:background .15s,transform .1s;position:relative;padding:0}
+.dock-item{width:56px;height:56px;border:none;background:transparent;border-radius:16px;
+cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:24px;
+flex:none;transition:background .15s;position:relative;padding:0}
 .dock-item:active{transform:scale(.92)}
 .dock-item.active{background:var(--accent-soft)}
 .dock-item.active::after{content:'';position:absolute;bottom:4px;left:50%;
-  transform:translateX(-50%);width:4px;height:4px;background:var(--accent);border-radius:50%}
+transform:translateX(-50%);width:4px;height:4px;background:var(--accent);border-radius:50%}
 .dock-add{width:56px;height:56px;border:2px dashed var(--border);background:transparent;
-  color:var(--text-dim);border-radius:16px;font-size:26px;cursor:pointer;
-  flex:none;display:flex;align-items:center;justify-content:center}
+color:var(--text-dim);border-radius:16px;font-size:26px;cursor:pointer;flex:none;
+display:flex;align-items:center;justify-content:center}
 .dock-add:active{background:var(--accent-soft);color:var(--accent);border-color:var(--accent)}
 .modal{position:fixed;inset:0;background:rgba(0,0,0,.4);display:none;
-  align-items:flex-end;justify-content:center;z-index:200;
-  backdrop-filter:blur(2px);-webkit-backdrop-filter:blur(2px)}
+align-items:flex-end;justify-content:center;z-index:200;
+backdrop-filter:blur(2px);-webkit-backdrop-filter:blur(2px)}
 .modal.open{display:flex}
 .modal-card{background:var(--bg-2);border-radius:var(--radius-lg) var(--radius-lg) 0 0;
-  padding:20px;width:100%;max-width:500px;
-  padding-bottom:calc(20px + env(safe-area-inset-bottom));
-  max-height:88vh;display:flex;flex-direction:column;overflow-y:auto;
-  animation:up .2s ease}
+padding:20px;width:100%;max-width:500px;padding-bottom:calc(20px + env(safe-area-inset-bottom));
+max-height:88vh;display:flex;flex-direction:column;overflow-y:auto;animation:up .2s ease}
 @keyframes up{from{transform:translateY(20px);opacity:.5}to{transform:translateY(0);opacity:1}}
 .modal h2{margin:0 0 16px;font-size:20px;font-weight:700;letter-spacing:-.4px}
 .modal-head{display:flex;align-items:center;justify-content:space-between;
-  margin-bottom:14px;gap:12px}
+margin-bottom:14px;gap:12px}
 .modal-head h2{margin:0}
 .swatches{display:grid;grid-template-columns:repeat(8,1fr);gap:8px;margin-bottom:18px}
 @media (max-width:340px){.swatches{grid-template-columns:repeat(4,1fr)}}
@@ -135,109 +119,96 @@ html,body{margin:0;padding:0;background:var(--bg);color:var(--text);
 .setting-block{padding:12px 0;border-bottom:1px solid var(--border)}
 .setting-block:last-of-type{border-bottom:none}
 .setting-label{font-size:12px;color:var(--text-dim);text-transform:uppercase;
-  letter-spacing:.4px;font-weight:600;margin-bottom:10px}
+letter-spacing:.4px;font-weight:600;margin-bottom:10px}
 .setting-options{display:flex;gap:8px;flex-wrap:wrap}
-.setting-options button{flex:1;min-width:60px;min-height:44px;
-  border:1px solid var(--border);background:var(--bg-3);color:var(--text);
-  border-radius:var(--radius-sm);font-size:14px;font-weight:500;
-  cursor:pointer;font-family:inherit}
+.setting-options button{flex:1;min-width:60px;min-height:44px;border:1px solid var(--border);
+background:var(--bg-3);color:var(--text);border-radius:var(--radius-sm);font-size:14px;
+font-weight:500;cursor:pointer;font-family:inherit}
 .setting-options button.active{background:var(--accent);color:#fff;border-color:var(--accent)}
 .btn{width:100%;min-height:50px;border:none;background:var(--bg-3);color:var(--text);
-  border-radius:var(--radius-sm);font-size:16px;font-weight:600;cursor:pointer;font-family:inherit}
+border-radius:var(--radius-sm);font-size:16px;font-weight:600;cursor:pointer;font-family:inherit}
 .btn.primary{background:var(--accent);color:#fff}
 .btn.danger{background:rgba(255,59,48,.12);color:#ff3b30}
 .btn:active{opacity:.8}
 .btn+.btn{margin-top:8px}
-.task-list{max-height:50vh;overflow-y:auto;overscroll-behavior:contain;
-  margin-bottom:12px;display:flex;flex-direction:column;gap:8px}
+.task-list{max-height:50vh;overflow-y:auto;overscroll-behavior:contain;margin-bottom:12px;
+display:flex;flex-direction:column;gap:8px}
 .task-row,.check-item{display:flex;align-items:center;gap:8px;background:var(--bg-3);
-  border-radius:var(--radius-sm);padding:4px 4px 4px 8px;min-height:52px}
-.task-text,.check-text{flex:1;font-size:15px;word-break:break-word;
-  padding:8px 4px;cursor:text;transition:opacity .15s}
+border-radius:var(--radius-sm);padding:4px 4px 4px 8px;min-height:52px}
+.task-text,.check-text{flex:1;font-size:15px;word-break:break-word;padding:8px 4px;
+cursor:text;transition:opacity .15s}
 .task-text.done,.check-text.done{text-decoration:line-through;opacity:.55;color:var(--text-dim)}
-.task-edit-input,.name-edit-input{flex:1;background:transparent;border:none;
-  color:var(--text);font-size:15px;font-family:inherit;outline:none;padding:8px 0;
-  border-bottom:2px solid var(--accent)}
+.task-edit-input,.name-edit-input{flex:1;background:transparent;border:none;color:var(--text);
+font-size:15px;font-family:inherit;outline:none;padding:8px 0;border-bottom:2px solid var(--accent)}
 .name-edit-input{font-weight:700;font-size:16px;letter-spacing:-.2px}
 .checkbox{width:26px;height:26px;min-width:26px;border-radius:50%;
-  border:2px solid var(--text-muted);background:transparent;cursor:pointer;padding:0;
-  display:inline-flex;align-items:center;justify-content:center;position:relative;
-  color:var(--cb-color,var(--accent))}
+border:2px solid var(--text-muted);background:transparent;cursor:pointer;padding:0;
+display:inline-flex;align-items:center;justify-content:center;position:relative;
+color:var(--cb-color,var(--accent))}
 .checkbox::before{content:'';position:absolute;inset:-9px}
 .checkbox svg{width:15px;height:15px;display:block}
 .checkbox.checked{background:var(--cb-color,var(--accent));border-color:var(--cb-color,var(--accent))}
 .add-row{display:flex;gap:8px}
 .add-row input,.modal-input{flex:1;background:var(--bg-3);border:1px solid var(--border);
-  color:var(--text);font-size:15px;font-family:inherit;padding:12px 14px;
-  border-radius:var(--radius-sm);min-height:var(--tap);outline:none;width:100%}
+color:var(--text);font-size:15px;font-family:inherit;padding:12px 14px;
+border-radius:var(--radius-sm);min-height:var(--tap);outline:none;width:100%}
 .add-row input:focus,.modal-input:focus{border-color:var(--accent)}
 .training-tabs{display:flex;gap:6px;background:var(--bg-3);padding:4px;
-  border-radius:var(--radius-sm);margin-bottom:14px}
+border-radius:var(--radius-sm);margin-bottom:14px}
 .training-tabs button{flex:1;min-height:40px;border:none;background:transparent;
-  color:var(--text-dim);border-radius:8px;font-size:14px;font-weight:600;
-  cursor:pointer;font-family:inherit}
+color:var(--text-dim);border-radius:8px;font-size:14px;font-weight:600;
+cursor:pointer;font-family:inherit}
 .training-tabs button.active{background:var(--bg-2);color:var(--text)}
 .category-card{background:var(--bg-2);border-radius:var(--radius);padding:14px;
-  margin-bottom:10px;box-shadow:var(--shadow-sm)}
+margin-bottom:10px;box-shadow:var(--shadow-sm)}
 .category-header{display:flex;align-items:center;gap:8px;margin-bottom:10px}
-.category-name{font-weight:700;font-size:16px;letter-spacing:-.2px;flex:1;
-  padding:4px 0;cursor:text}
+.category-name{font-weight:700;font-size:16px;letter-spacing:-.2px;flex:1;padding:4px 0;cursor:text}
 .category-meta{font-size:12px;color:var(--text-dim)}
 .category-items{display:flex;flex-direction:column;gap:6px}
 .check-item{background:var(--bg-3);padding:4px 4px 4px 8px;min-height:46px}
-.check-meta{font-size:12px;color:var(--text-dim);white-space:nowrap;padding:0 6px}
 .add-item-row{display:flex;gap:6px;margin-top:8px}
 .add-item-row input{flex:1;background:var(--bg-3);border:1px solid var(--border);
-  color:var(--text);font-size:14px;font-family:inherit;padding:10px 12px;
-  border-radius:var(--radius-sm);min-height:42px;outline:none}
+color:var(--text);font-size:14px;font-family:inherit;padding:10px 12px;
+border-radius:var(--radius-sm);min-height:42px;outline:none}
 .add-category-btn{width:100%;min-height:44px;border:2px dashed var(--border);
-  background:transparent;color:var(--text-dim);border-radius:var(--radius);
-  font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;margin-bottom:10px}
-.placeholder{display:flex;flex-direction:column;align-items:center;
-  justify-content:center;text-align:center;padding:80px 20px;color:var(--text-dim);gap:16px}
-.placeholder-icon{font-size:64px;opacity:.5}
-.placeholder-title{font-size:20px;font-weight:700;color:var(--text);letter-spacing:-.4px}
-.placeholder-sub{font-size:14px;max-width:280px;line-height:1.5}
+background:transparent;color:var(--text-dim);border-radius:var(--radius);font-size:14px;
+font-weight:600;cursor:pointer;font-family:inherit;margin-bottom:10px}
 .toggle{width:51px;height:31px;border-radius:16px;background:var(--bg-3);border:none;
-  cursor:pointer;position:relative;padding:0;transition:background .2s;flex:none}
+cursor:pointer;position:relative;padding:0;transition:background .2s;flex:none}
 .toggle::after{content:'';position:absolute;top:2px;left:2px;width:27px;height:27px;
-  border-radius:50%;background:#fff;box-shadow:0 2px 4px rgba(0,0,0,.2);transition:transform .2s}
+border-radius:50%;background:#fff;box-shadow:0 2px 4px rgba(0,0,0,.2);transition:transform .2s}
 .toggle.on{background:var(--accent)}
 .toggle.on::after{transform:translateX(20px)}
 .notify-toggle-row{display:flex;justify-content:space-between;align-items:center;
-  padding:8px 0 16px;border-bottom:1px solid var(--border);margin-bottom:12px}
-.check-row{display:flex;align-items:center;gap:10px;padding:10px 0;
-  min-height:44px;cursor:pointer;font-size:15px}
-.check-row input{width:22px;height:22px;accent-color:var(--accent);cursor:pointer}
-.day-select{display:flex;gap:4px;flex-wrap:wrap}
+padding:8px 0 16px;border-bottom:1px solid var(--border);margin-bottom:12px}
+.day-select{display:flex;gap:6px;flex-wrap:wrap}
 .day-select button{min-width:40px;min-height:40px;border:1px solid var(--border);
-  background:var(--bg-3);color:var(--text-dim);border-radius:8px;
-  font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;flex:1}
+background:var(--bg-3);color:var(--text-dim);border-radius:10px;font-size:13px;
+font-weight:600;cursor:pointer;font-family:inherit;flex:1}
 .day-select button.on{background:var(--accent);color:#fff;border-color:var(--accent)}
 .notify-info{background:var(--accent-soft);color:var(--accent);padding:10px 12px;
-  border-radius:var(--radius-sm);font-size:12px;line-height:1.4;margin:12px 0}
-.template-library{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:12px}
-.tpl-tile{background:var(--bg-3);border:2px solid transparent;border-radius:var(--radius-sm);
-  padding:12px;cursor:pointer;display:flex;align-items:center;gap:10px;
-  font-family:inherit;color:var(--text);font-size:14px;font-weight:500;text-align:left}
-.tpl-tile.enabled{border-color:var(--accent);background:var(--accent-soft)}
-.tpl-tile-icon{font-size:22px}
-.custom-template-form{display:flex;gap:8px;margin-bottom:10px}
-.tpl-icon-input{width:60px;text-align:center;font-size:20px;background:var(--bg-3);
-  border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text);
-  font-family:inherit;padding:8px}
-.tpl-name-input{flex:1;background:var(--bg-3);border:1px solid var(--border);
-  border-radius:var(--radius-sm);color:var(--text);font-family:inherit;
-  font-size:15px;padding:8px 12px}
+border-radius:var(--radius-sm);font-size:12px;line-height:1.4;margin:12px 0}
+.picker-wheel{position:relative;height:200px;overflow-y:scroll;scroll-snap-type:y mandatory;
+scrollbar-width:none;margin:8px 0 16px;
+mask-image:linear-gradient(transparent 0,black 30%,black 70%,transparent 100%);
+-webkit-mask-image:linear-gradient(transparent 0,black 30%,black 70%,transparent 100%)}
+.picker-wheel::-webkit-scrollbar{display:none}
+.picker-item{height:40px;line-height:40px;text-align:center;scroll-snap-align:center;
+font-size:20px;font-weight:500;color:var(--text-dim);transition:color .15s,font-weight .15s}
+.picker-item.active{color:var(--text);font-weight:700}
+.picker-spacer{height:80px}
+.picker-indicator{position:absolute;top:50%;left:16px;right:16px;height:40px;
+margin-top:-20px;border-top:1.5px solid var(--accent);border-bottom:1.5px solid var(--accent);
+border-radius:4px;pointer-events:none;z-index:2}
+.picker-hint{text-align:center;color:var(--text-dim);font-size:12px;margin-bottom:8px}
 .toast{position:fixed;bottom:calc(100px + env(safe-area-inset-bottom));left:50%;
-  transform:translate(-50%,20px);background:rgba(0,0,0,.85);color:#fff;
-  padding:10px 18px;border-radius:20px;font-size:13px;font-weight:500;
-  opacity:0;pointer-events:none;transition:opacity .2s,transform .2s;
-  z-index:300;max-width:90vw}
+transform:translate(-50%,20px);background:rgba(0,0,0,.85);color:#fff;padding:10px 18px;
+border-radius:20px;font-size:13px;font-weight:500;opacity:0;pointer-events:none;
+transition:opacity .2s,transform .2s;z-index:300;max-width:90vw}
 .toast.show{opacity:1;transform:translate(-50%,0)}
 .hint{color:var(--text-dim);font-size:12px;margin:16px 0 0;text-align:center;line-height:1.5}
 .version-tag{text-align:center;color:var(--text-dim);font-size:11px;
-  margin-top:20px;padding-top:12px;border-top:1px solid var(--border)}
+margin-top:20px;padding-top:12px;border-top:1px solid var(--border)}
 .sync-status{font-size:13px;padding:8px 0;color:var(--text-dim)}
 .sync-status.ok{color:#34c759}
 .sync-status.err{color:#ff3b30}
@@ -265,227 +236,183 @@ html,body{margin:0;padding:0;background:var(--bg);color:var(--text);
 </div>
 <nav class="dock" id="dock"></nav>
 
-<div class="modal" id="colorModal">
-  <div class="modal-card">
-    <h2>Цвет карточки</h2>
-    <div class="swatches" id="swatches"></div>
-    <button class="btn" data-close>Отмена</button>
-  </div>
-</div>
+<div class="modal" id="colorModal"><div class="modal-card">
+<h2>Цвет карточки</h2><div class="swatches" id="swatches"></div>
+<button class="btn" data-close>Отмена</button></div></div>
 
-<div class="modal" id="accentModal">
-  <div class="modal-card">
-    <h2>Акцентный цвет</h2>
-    <div class="swatches" id="accentSwatches"></div>
-    <button class="btn" data-close>Готово</button>
-  </div>
-</div>
+<div class="modal" id="accentModal"><div class="modal-card">
+<h2>Акцентный цвет</h2><div class="swatches" id="accentSwatches"></div>
+<button class="btn" data-close>Готово</button></div></div>
 
-<div class="modal" id="settingsModal">
-  <div class="modal-card">
-    <h2>Настройки</h2>
-    <div class="setting-block">
-      <div class="setting-label">Тема</div>
-      <div class="setting-options" data-setting="theme">
-        <button data-value="light">☀️ Светлая</button>
-        <button data-value="dark">🌙 Тёмная</button>
-      </div>
-    </div>
-    <div class="setting-block">
-      <div class="setting-label">Колонок в неделе</div>
-      <div class="setting-options" data-setting="weekColumns">
-        <button data-value="1">1</button>
-        <button data-value="2">2</button>
-        <button data-value="3">3</button>
-      </div>
-    </div>
-    <div class="setting-block">
-      <div class="setting-label">Выходные</div>
-      <div class="setting-options" data-setting="showWeekend">
-        <button data-value="true">Показывать</button>
-        <button data-value="false">Скрыть</button>
-      </div>
-    </div>
-    <div class="setting-block">
-      <div class="setting-label">Акцентный цвет</div>
-      <div class="setting-options">
-        <button id="openAccentPicker">🎨 Выбрать</button>
-      </div>
-    </div>
-    <div class="setting-block">
-      <div class="setting-label">Telegram-бот (опционально)</div>
-      <input type="url" id="backendUrl" class="modal-input" placeholder="https://ваш-бот.up.railway.app" style="margin-bottom:8px">
-      <input type="text" id="userId" class="modal-input" placeholder="Ваш ID из бота (цифры)" style="margin-bottom:8px">
-      <button class="btn" id="syncNowBtn">Синхронизировать</button>
-      <div class="sync-status" id="syncStatus">Не подключён</div>
-    </div>
-    <div class="setting-block">
-      <div class="setting-label">Данные</div>
-      <div class="setting-options" style="flex-direction:column">
-        <button id="resetOrderBtn">↺ Сбросить порядок</button>
-        <button id="resetAllBtn" class="btn danger" style="margin-top:8px">Сбросить всё</button>
-      </div>
-    </div>
-    <button class="btn primary" data-close style="margin-top:16px">Готово</button>
-    <div class="version-tag">Версия 5.0</div>
+<div class="modal" id="settingsModal"><div class="modal-card">
+<h2>Настройки</h2>
+<div id="viewSettingsSection"></div>
+<div class="setting-block">
+  <div class="setting-label">Тема</div>
+  <div class="setting-options" data-setting="theme">
+    <button data-value="light">☀️ Светлая</button>
+    <button data-value="dark">🌙 Тёмная</button>
   </div>
 </div>
+<div class="setting-block">
+  <div class="setting-label">Акцент</div>
+  <div class="setting-options"><button id="openAccentPicker">🎨 Выбрать цвет</button></div>
+</div>
+<div class="setting-block">
+  <div class="setting-label">Telegram-бот (опционально)</div>
+  <input type="url" id="backendUrl" class="modal-input" placeholder="https://ваш-бот.up.railway.app" style="margin-bottom:8px">
+  <input type="text" id="userId" class="modal-input" placeholder="Ваш ID из бота" style="margin-bottom:8px">
+  <button class="btn" id="syncNowBtn">Синхронизировать</button>
+  <div class="sync-status" id="syncStatus">Не подключён</div>
+</div>
+<div class="setting-block">
+  <div class="setting-label">Данные</div>
+  <div class="setting-options" style="flex-direction:column">
+    <button id="resetAllBtn" class="btn danger">Сбросить всё</button>
+  </div>
+</div>
+<div id="deleteViewSection"></div>
+<button class="btn primary" data-close style="margin-top:16px">Готово</button>
+<div class="version-tag">Версия 6.0</div>
+</div></div>
 
-<div class="modal" id="dayModal">
-  <div class="modal-card">
-    <div class="modal-head">
-      <h2 id="dayTitle">День</h2>
-      <button class="icon-btn" id="dayClose">✕</button>
-    </div>
-    <div class="task-list" id="taskList"></div>
-    <div class="add-row">
-      <input type="text" id="newTask" placeholder="Новая задача..." autocomplete="off">
-      <button class="icon-btn" id="addTaskBtn">+</button>
-    </div>
-  </div>
-</div>
+<div class="modal" id="dayModal"><div class="modal-card">
+<div class="modal-head"><h2 id="dayTitle">Ячейка</h2>
+<button class="icon-btn" id="dayClose">✕</button></div>
+<div class="task-list" id="taskList"></div>
+<div class="add-row">
+  <input type="text" id="newTask" placeholder="Новая задача..." autocomplete="off">
+  <button class="icon-btn" id="addTaskBtn">+</button>
+</div></div></div>
 
-<div class="modal" id="notifyModal">
-  <div class="modal-card">
-    <h2 id="notifyTitle">Напоминание</h2>
-    <div class="notify-toggle-row">
-      <span style="font-weight:500">Включить напоминание</span>
-      <button class="toggle" id="notifyToggle"></button>
-    </div>
-    <div id="notifyWhen" style="display:none">
-      <div class="setting-block">
-        <div class="setting-label">Когда</div>
-        <label class="check-row"><input type="checkbox" id="notifyOnDay"><span>В день события</span></label>
-        <label class="check-row"><input type="checkbox" id="notifyDayBefore"><span>За день до</span></label>
-      </div>
-      <div class="setting-block">
-        <div class="setting-label">Время отправки</div>
-        <input type="time" id="notifyTime" class="modal-input">
-      </div>
-      <div class="setting-block" id="notifyDaysBlock" style="display:none">
-        <div class="setting-label">Повторять по дням</div>
-        <div class="day-select" id="daySelect"></div>
-      </div>
-    </div>
-    <div class="notify-info">
-      Бот присылает сводку со всеми пунктами этой колонки. Нажмите ✅ в боте — отметится и в приложении.
-    </div>
-    <button class="btn primary" data-close>Готово</button>
+<div class="modal" id="notifyModal"><div class="modal-card">
+<h2 id="notifyTitle">Напоминание</h2>
+<div class="notify-toggle-row"><span style="font-weight:500">Включить</span>
+<button class="toggle" id="notifyToggle"></button></div>
+<div id="notifyWhen" style="display:none">
+  <div class="setting-block">
+    <div class="setting-label">Время отправки</div>
+    <input type="time" id="notifyTime" class="modal-input">
+  </div>
+  <div class="setting-block">
+    <div class="setting-label">Повторять по дням недели</div>
+    <div class="day-select" id="daySelect"></div>
   </div>
 </div>
+<div class="notify-info">Бот присылает сводку со всеми пунктами этой ячейки.
+Нажмите ✅ в боте — отметится и в приложении.</div>
+<button class="btn primary" data-close>Готово</button></div></div>
 
-<div class="modal" id="addTemplateModal">
-  <div class="modal-card">
-    <h2>Добавить шаблон</h2>
-    <div class="template-library" id="templateLibrary"></div>
-    <div class="setting-block">
-      <div class="setting-label">Свой шаблон</div>
-      <div class="custom-template-form">
-        <input type="text" id="customTplIcon" maxlength="2" value="✨" class="tpl-icon-input">
-        <input type="text" id="customTplName" placeholder="Название..." class="tpl-name-input">
-      </div>
-      <button class="btn primary" id="createCustomTpl">Создать и добавить</button>
-    </div>
-    <button class="btn" data-close style="margin-top:12px">Готово</button>
-  </div>
+<div class="modal" id="createViewModal"><div class="modal-card">
+<h2>Назовите шаблон</h2>
+<div class="setting-block">
+  <div class="setting-label">Название</div>
+  <input type="text" id="newViewName" class="modal-input" placeholder="Например: Календарь, Учёба…" autocomplete="off">
 </div>
+<div class="setting-block">
+  <div class="setting-label">Иконка (эмодзи)</div>
+  <input type="text" id="newViewIcon" class="modal-input" value="📆" maxlength="2" style="text-align:center;font-size:24px">
+</div>
+<button class="btn primary" id="createViewBtn">Создать шаблон</button>
+<button class="btn" data-close style="margin-top:8px">Отмена</button>
+</div></div>
 
-<div class="modal" id="confirmModal">
-  <div class="modal-card">
-    <h2>Удалить?</h2>
-    <p id="confirmText" style="color:var(--text-dim);margin:0 0 16px;font-size:14px"></p>
-    <button class="btn danger" id="confirmYes">Удалить</button>
-    <button class="btn" data-close style="margin-top:8px">Отмена</button>
-  </div>
+<div class="modal" id="pickerModal"><div class="modal-card">
+<h2>Сколько ячеек?</h2>
+<div class="picker-hint" id="pickerHint"></div>
+<div style="position:relative;margin:8px 0 16px">
+  <div class="picker-wheel" id="pickerWheel"></div>
+  <div class="picker-indicator"></div>
 </div>
+<button class="btn primary" id="pickerApply">Готово</button>
+<button class="btn" data-close>Отмена</button>
+</div></div>
+
+<div class="modal" id="confirmModal"><div class="modal-card">
+<h2>Удалить?</h2>
+<p id="confirmText" style="color:var(--text-dim);margin:0 0 16px;font-size:14px"></p>
+<button class="btn danger" id="confirmYes">Удалить</button>
+<button class="btn" data-close style="margin-top:8px">Отмена</button>
+</div></div>
 
 <div class="toast" id="toast"></div>
 
 <script>
 'use strict';
 const tg = window.Telegram?.WebApp;
-if (tg) { tg.ready(); tg.expand();
-  if (typeof tg.disableVerticalSwipes === 'function') { try { tg.disableVerticalSwipes(); } catch(e){} } }
+if (tg) {
+  tg.ready(); tg.expand();
+  if (typeof tg.disableVerticalSwipes === 'function') { try { tg.disableVerticalSwipes(); } catch(e){} }
+}
 document.addEventListener('contextmenu', e => e.preventDefault());
 
-const STORAGE_KEY = 'miniapp-constructor-v5';
+/* ---------- Константы ---------- */
+const STORAGE_KEY = 'miniapp-constructor-v6';
 const CARD_PALETTE = ['#5ac8fa','#af52de','#ff2d55','#ff9500','#34c759','#30b0c7','#5856d6','#ffcc00'];
 const ACCENT_PALETTE = ['#007aff','#5856d6','#af52de','#ff2d55','#ff9500','#34c759','#30b0c7','#8e8e93'];
-const BASE_VIEWS = {
-  planner:{title:'Планировщик',icon:'📅',removable:false},
-  training:{title:'Тренировки',icon:'💪',removable:true},
-  notes:{title:'Заметки',icon:'📝',removable:true},
-  reminders:{title:'Напоминания',icon:'⏰',removable:true},
-  words:{title:'Слова',icon:'📚',removable:true},
-};
-const WEEK_ORDER = [
-  {id:'mon',day:'Пн',full:'Понедельник',color:'#5ac8fa'},
-  {id:'tue',day:'Вт',full:'Вторник',color:'#af52de'},
-  {id:'wed',day:'Ср',full:'Среда',color:'#ff2d55'},
-  {id:'thu',day:'Чт',full:'Четверг',color:'#ff9500'},
-  {id:'fri',day:'Пт',full:'Пятница',color:'#34c759'},
-  {id:'sat',day:'Сб',full:'Суббота',color:'#30b0c7'},
-  {id:'sun',day:'Вс',full:'Воскресенье',color:'#5856d6'},
-];
-const DEFAULT_NOTIFY_DAY = {enabled:false,time:'08:00',onDay:true,dayBefore:false};
-const DEFAULT_NOTIFY_CAT = {enabled:false,time:'08:00',onDay:true,dayBefore:false};
+const DAY_NAMES = ['Пн','Вт','Ср','Чт','Пт','Сб','Вс'];
+const DEFAULT_NOTIFY = {enabled:false,time:'08:00',days:[]};
 
 function makeId(p='id'){return p+'_'+Date.now().toString(36)+Math.random().toString(36).slice(2,6);}
 function makeTask(text){return {id:makeId('t'),text,done:false};}
+function makeCell(name,idx,notifyDays){
+  return {id:makeId('c'),name,color:CARD_PALETTE[idx % CARD_PALETTE.length],
+    tasks:[],notify:{...DEFAULT_NOTIFY,days:notifyDays||[]}};
+}
+function makeWeekCells(){
+  return DAY_NAMES.map((n,i)=>makeCell(n,i,[i]));
+}
 
-const DEFAULT_STATE = {
-  userId:null,
-  backendUrl:'',
-  theme:'light',
-  accent:'#007aff',
-  weekColumns:2,
-  showWeekend:true,
-  plannerFilter:'all',
-  enabledViews:['planner','training','notes'],
-  customViews:[],
-  week: WEEK_ORDER.map(d => ({...d,tasks:[],notify:{...DEFAULT_NOTIFY_DAY}})),
-  training:{
-    activeTab:'workouts',
-    workouts:[
-      {id:'w1',name:'Утро',days:[0,1,2,3,4],notify:{...DEFAULT_NOTIFY_CAT},items:[
-        {id:'wi1',text:'Отжимания 3×15',done:false},
-        {id:'wi2',text:'Приседания 3×20',done:false},
-      ]},
-      {id:'w2',name:'Вечер',days:[0,1,2,3,4],notify:{...DEFAULT_NOTIFY_CAT},items:[
-        {id:'wi3',text:'Растяжка 10 мин',done:false},
-      ]},
-    ],
-    nutrition:[
-      {id:'n1',name:'Завтрак',days:[0,1,2,3,4,5,6],notify:{...DEFAULT_NOTIFY_CAT},items:[
-        {id:'ni1',text:'Овсянка с ягодами',meta:'350 ккал',done:false},
-        {id:'ni2',text:'Кофе',meta:'50 ккал',done:false},
-      ]},
-      {id:'n2',name:'Обед',days:[0,1,2,3,4,5,6],notify:{...DEFAULT_NOTIFY_CAT},items:[
-        {id:'ni3',text:'Курица с рисом',meta:'550 ккал',done:false},
-      ]},
-      {id:'n3',name:'Ужин',days:[0,1,2,3,4,5,6],notify:{...DEFAULT_NOTIFY_CAT},items:[
-        {id:'ni4',text:'Салат с рыбой',meta:'400 ккал',done:false},
-      ]},
-    ],
-  },
-};
-const SEED_TASKS = {mon:['Встреча с командой'],wed:['Отчёт за неделю'],fri:['Звонок клиенту']};
+function makeDefaultViews(){
+  return [
+    {id:'v_planner',type:'planner',title:'Планировщик',icon:'📅',removable:false,
+      columns:7,showWeekend:true,cells:makeWeekCells()},
+    {id:'v_training',type:'training',title:'Тренировки',icon:'💪',removable:false,
+      training:{
+        activeTab:'workouts',
+        workouts:[
+          {id:'w1',name:'Утро',days:[0,1,2,3,4],notify:{...DEFAULT_NOTIFY,days:[0,1,2,3,4]},
+            items:[{id:'wi1',text:'Отжимания 3×15',done:false},{id:'wi2',text:'Приседания 3×20',done:false}]},
+          {id:'w2',name:'Вечер',days:[0,1,2,3,4],notify:{...DEFAULT_NOTIFY,days:[0,1,2,3,4]},
+            items:[{id:'wi3',text:'Растяжка 10 мин',done:false}]},
+        ],
+        nutrition:[
+          {id:'n1',name:'Завтрак',days:[0,1,2,3,4,5,6],notify:{...DEFAULT_NOTIFY},
+            items:[{id:'ni1',text:'Овсянка с ягодами',meta:'350 ккал',done:false},
+                   {id:'ni2',text:'Кофе',meta:'50 ккал',done:false}]},
+          {id:'n2',name:'Обед',days:[0,1,2,3,4,5,6],notify:{...DEFAULT_NOTIFY},
+            items:[{id:'ni3',text:'Курица с рисом',meta:'550 ккал',done:false}]},
+          {id:'n3',name:'Ужин',days:[0,1,2,3,4,5,6],notify:{...DEFAULT_NOTIFY},
+            items:[{id:'ni4',text:'Салат с рыбой',meta:'400 ккал',done:false}]},
+        ],
+      }},
+  ];
+}
+
+function makeDefaultState(){
+  return {theme:'light',accent:'#007aff',backendUrl:'',userId:null,views:makeDefaultViews()};
+}
 
 function loadState(){
   try{const s=JSON.parse(localStorage.getItem(STORAGE_KEY));
-    if(s&&typeof s==='object')return{...DEFAULT_STATE,...s};}catch(e){}
-  const f=JSON.parse(JSON.stringify(DEFAULT_STATE));
-  f.week.forEach(d=>{if(SEED_TASKS[d.id])d.tasks=SEED_TASKS[d.id].map(makeTask);});
-  return f;
+    if(s&&typeof s==='object'&&Array.isArray(s.views))return s;}catch(e){}
+  return makeDefaultState();
 }
-let state=loadState();
+let state = loadState();
 function saveState(){
   try{localStorage.setItem(STORAGE_KEY,JSON.stringify(state));}catch(e){}
   pushToBackend();
 }
-let currentView='planner',searchQuery='',currentDayId=null,dragState=null;
-let currentNotifyTarget=null,confirmCallback=null;
-let lastSyncTime=0;
+let currentViewId = 'v_planner';
+let searchQuery = '';
+let currentCellId = null;
+let currentView = null;
+let dragState = null;
+let currentNotifyTarget = null;
+let confirmCallback = null;
+let lastSyncTime = 0;
+let pickerValue = 7;
+let pickerScrollTimer = null;
 
 const $=(s,r=document)=>r.querySelector(s);
 const $$=(s,r=document)=>[...r.querySelectorAll(s)];
@@ -494,9 +421,11 @@ let toastTimer=null;
 function toast(msg){const el=$('#toast');el.textContent=msg;el.classList.add('show');
   clearTimeout(toastTimer);toastTimer=setTimeout(()=>el.classList.remove('show'),2000);}
 function haptic(t='light'){try{tg?.HapticFeedback?.impactOccurred(t);}catch(e){}}
-function hasAnyNotify(n){return n&&n.enabled&&(n.onDay||n.dayBefore);}
+function hasAnyNotify(n){return n&&n.enabled&&(n.days?.length||true);}
+function getView(id){return state.views.find(v=>v.id===id);}
+function getCurrentView(){return getView(currentViewId);}
 
-/* ---------- Backend sync ---------- */
+/* ---------- Backend ---------- */
 async function pushToBackend(){
   if(!state.backendUrl||!state.userId)return;
   try{
@@ -521,20 +450,24 @@ async function pullFromBackend(){
 }
 function mergeDoneFlags(local,remote){
   const lookup={};
-  const walk=(arr,key)=>{arr?.forEach(cat=>{(cat.items||cat.tasks||[]).forEach(it=>{lookup[it.id]=it;});});};
-  walk(remote.training?.workouts);walk(remote.training?.nutrition);
-  (remote.week||[]).forEach(d=>{(d.tasks||[]).forEach(it=>{lookup[it.id]=it;});});
-  (remote.customViews||[]).forEach(v=>{(v.items||[]).forEach(it=>{lookup[it.id]=it;});});
-  const apply=(arr)=>{arr?.forEach(cat=>{(cat.items||cat.tasks||[]).forEach(it=>{
-    if(lookup[it.id]&&typeof lookup[it.id].done==='boolean')it.done=lookup[it.id].done;
-  });});};
-  apply(local.training?.workouts);apply(local.training?.nutrition);
-  (local.week||[]).forEach(d=>{(d.tasks||[]).forEach(it=>{
-    if(lookup[it.id]&&typeof lookup[it.id].done==='boolean')it.done=lookup[it.id].done;
-  });});
-  (local.customViews||[]).forEach(v=>(v.items||[]).forEach(it=>{
-    if(lookup[it.id]&&typeof lookup[it.id].done==='boolean')it.done=lookup[it.id].done;
-  }));
+  (remote.views||[]).forEach(v=>{
+    (v.cells||[]).forEach(c=>(c.tasks||[]).forEach(t=>{lookup[t.id]=t;}));
+    if(v.training){
+      ['workouts','nutrition'].forEach(k=>(v.training[k]||[]).forEach(cat=>
+        (cat.items||[]).forEach(it=>{lookup[it.id]=it;})));
+    }
+  });
+  (local.views||[]).forEach(v=>{
+    (v.cells||[]).forEach(c=>(c.tasks||[]).forEach(t=>{
+      if(lookup[t.id]&&typeof lookup[t.id].done==='boolean')t.done=lookup[t.id].done;
+    }));
+    if(v.training){
+      ['workouts','nutrition'].forEach(k=>(v.training[k]||[]).forEach(cat=>
+        (cat.items||[]).forEach(it=>{
+          if(lookup[it.id]&&typeof lookup[it.id].done==='boolean')it.done=lookup[it.id].done;
+        })));
+    }
+  });
 }
 setInterval(async()=>{if(await pullFromBackend()){renderContent();}},30000);
 
@@ -554,195 +487,166 @@ function applyAccent(){
 function renderDock(){
   const dock=$('#dock');dock.innerHTML='';
   const scroll=document.createElement('div');scroll.className='dock-scroll';
-  const ids=[...state.enabledViews.filter(id=>BASE_VIEWS[id]),...state.customViews.map(v=>v.id)];
-  for(const id of ids){
-    const meta=BASE_VIEWS[id]||state.customViews.find(v=>v.id===id);
-    if(!meta)continue;
+  for(const v of state.views){
     const btn=document.createElement('button');
-    btn.className='dock-item'+(id===currentView?' active':'');
-    btn.dataset.view=id;btn.setAttribute('aria-label',meta.title);
-    btn.innerHTML=`<span aria-hidden="true">${meta.icon}</span>`;
-    btn.addEventListener('click',()=>{if(id===currentView)return;haptic();switchView(id);});
+    btn.className='dock-item'+(v.id===currentViewId?' active':'');
+    btn.dataset.view=v.id;
+    btn.innerHTML=`<span aria-hidden="true">${v.icon}</span>`;
+    btn.addEventListener('click',()=>{if(v.id===currentViewId)return;haptic();switchView(v.id);});
     scroll.appendChild(btn);
   }
   dock.appendChild(scroll);
   const addBtn=document.createElement('button');
   addBtn.className='dock-add';addBtn.textContent='+';
-  addBtn.addEventListener('click',()=>{haptic();renderTemplateLibrary();openModal($('#addTemplateModal'));});
+  addBtn.addEventListener('click',()=>{
+    haptic();
+    $('#newViewName').value='';$('#newViewIcon').value='📆';
+    openModal($('#createViewModal'));
+    setTimeout(()=>$('#newViewName').focus(),150);
+  });
   dock.appendChild(addBtn);
 }
 
 /* ---------- Router ---------- */
-function switchView(view){
-  currentView=view;
-  const meta=BASE_VIEWS[view]||state.customViews.find(v=>v.id===view);
-  $('#pageTitle').textContent=meta?.title||'Модуль';
+function switchView(viewId){
+  currentViewId=viewId;
+  const v=getCurrentView();
+  $('#pageTitle').textContent=v?.title||'';
   renderDock();renderContent();closeSearch();
   window.scrollTo({top:0,behavior:'instant'});
 }
 function renderContent(){
   const c=$('#content');c.innerHTML='';
-  if(currentView==='planner')return renderPlanner(c);
-  if(currentView==='training')return renderTraining(c);
-  if(currentView==='notes')return renderPlaceholder(c,'notes');
-  if(currentView==='reminders')return renderPlaceholder(c,'reminders');
-  if(currentView==='words')return renderPlaceholder(c,'words');
-  const custom=state.customViews.find(v=>v.id===currentView);
-  if(custom)return renderCustomView(c,custom);
-  switchView('planner');
+  const v=getCurrentView();
+  if(!v){switchView(state.views[0].id);return;}
+  if(v.type==='planner')renderPlannerView(c,v);
+  else if(v.type==='training')renderTrainingView(c,v);
 }
-
-/* ---------- Checkbox ---------- */
-function makeCheckbox(checked,onToggle,color){
-  const btn=document.createElement('button');
-  btn.type='button';
-  btn.className='checkbox'+(checked?' checked':'');
-  if(color)btn.style.setProperty('--cb-color',color);
-  btn.setAttribute('aria-label',checked?'Снять':'Отметить');
-  btn.innerHTML=checked?'<svg viewBox="0 0 20 20" fill="none" stroke="#fff" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 10l4 4 8-8"/></svg>':'';
-  btn.addEventListener('click',e=>{e.stopPropagation();haptic();onToggle();});
-  return btn;
-}
-
-/* ---------- Planner ---------- */
-function renderPlanner(root){
+function renderPlannerView(root,view){
   root.innerHTML=`
-    <div class="filters" id="plannerFilters">
-      <button data-filter="all" class="${state.plannerFilter==='all'?'active':''}">Все</button>
-      <button data-filter="busy" class="${state.plannerFilter==='busy'?'active':''}">С задачами</button>
-      <button data-filter="empty" class="${state.plannerFilter==='empty'?'active':''}">Свободные</button>
-      <button data-filter="today" class="${state.plannerFilter==='today'?'active':''}">Сегодня</button>
-    </div>
+    <div class="filters" id="plannerFilters"></div>
     <div class="week-grid" id="weekGrid"></div>
-    <p class="hint">Удерживайте ☰ — перетащить. 🎨 — цвет. 🔔 — уведомления. Тап по карточке — задачи.</p>
+    <p class="hint">Удерживайте ☰ — перетащить. 🎨 — цвет. 🔔 — напоминания. Тап на карточку — задачи.</p>
   `;
+  renderFilters(view);
   $('#plannerFilters').addEventListener('click',e=>{
     const b=e.target.closest('[data-filter]');if(!b)return;
-    state.plannerFilter=b.dataset.filter;saveState();
-    $$('#plannerFilters button').forEach(x=>x.classList.toggle('active',x.dataset.filter===state.plannerFilter));
-    renderWeekGrid();haptic();
+    view.filter=b.dataset.filter;saveState();
+    renderFilters(view);renderWeekGrid(view);haptic();
   });
-  renderWeekGrid();
+  renderWeekGrid(view);
 }
-function renderWeekGrid(){
-  const grid=$('#weekGrid');if(!grid)return;
+function renderFilters(view){
+  const filters=$('#plannerFilters');
+  if(!filters)return;
+  const isWeek=view.columns===7;
+  const items=[
+    {k:'all',t:'Все'},
+    {k:'busy',t:'С задачами'},
+    {k:'empty',t:'Свободные'},
+  ];
+  if(isWeek)items.push({k:'today',t:'Сегодня'});
+  filters.innerHTML='';
+  for(const f of items){
+    const b=document.createElement('button');
+    b.dataset.filter=f.k;b.textContent=f.t;
+    b.className=(view.filter||'all')===f.k?'active':'';
+    filters.appendChild(b);
+  }
+}
+function renderWeekGrid(view){
+  const grid=$('#weekGrid');
+  if(!grid)return;
   grid.innerHTML='';
-  grid.style.gridTemplateColumns=`repeat(${state.weekColumns}, minmax(0,1fr))`;
+  const isCalendar=view.columns>7;
+  grid.style.gridTemplateColumns=`repeat(${isCalendar?7:view.columns}, minmax(0,1fr))`;
+  grid.classList.toggle('calendar',isCalendar);
+
   const q=searchQuery;
-  const todayIdx=new Date().getDay();
-  const todayId=['sun','mon','tue','wed','thu','fri','sat'][todayIdx];
-  const visible=state.week.filter(d=>{
-    if(!state.showWeekend&&(d.id==='sat'||d.id==='sun'))return false;
-    const mq=!q||d.day.toLowerCase().includes(q)||d.full.toLowerCase().includes(q)
-      ||d.tasks.some(t=>t.text.toLowerCase().includes(q));
-    const mf=state.plannerFilter==='all'?true
-      :state.plannerFilter==='busy'?d.tasks.length>0
-      :state.plannerFilter==='empty'?d.tasks.length===0
-      :state.plannerFilter==='today'?d.id===todayId:true;
+  const todayIdx=(new Date().getDay()+6)%7;
+  let visible=view.cells.filter(c=>{
+    const mq=!q||c.name.toLowerCase().includes(q)
+      ||c.tasks.some(t=>t.text.toLowerCase().includes(q));
+    const f=view.filter||'all';
+    const mf=f==='all'?true
+      :f==='busy'?c.tasks.length>0
+      :f==='empty'?c.tasks.length===0
+      :f==='today'?(view.columns===7&&view.cells.indexOf(c)===todayIdx)
+      :true;
     return mq&&mf;
   });
-  if(!visible.length){grid.innerHTML='<p class="empty">Нет подходящих дней</p>';return;}
-  for(const d of visible){
+  if(!visible.length){grid.innerHTML='<p class="empty">Нет подходящих</p>';return;}
+  for(const cell of visible){
     const card=document.createElement('div');
-    card.className='day-card';card.dataset.dayId=d.id;card.dataset.draggable='true';
-    card.draggable=false;card.style.setProperty('--card-color',d.color);
-    const done=d.tasks.filter(t=>t.done).length,total=d.tasks.length;
+    card.className='day-card';card.dataset.cellId=cell.id;card.dataset.draggable='true';
+    card.draggable=false;card.style.setProperty('--card-color',cell.color);
+    const done=cell.tasks.filter(t=>t.done).length,total=cell.tasks.length;
     const word=total===1?'задача':(total>=2&&total<=4)?'задачи':'задач';
     card.innerHTML=`
       <div class="day-head">
-        <div class="day-name">${escapeHtml(d.day)}</div>
+        <div class="day-name">${escapeHtml(cell.name)}</div>
         <div class="day-actions">
-          <button class="mini-btn bell-btn ${hasAnyNotify(d.notify)?'bell-active':''}" data-bell="1" aria-label="Уведомления">🔔</button>
-          <button class="mini-btn palette-btn" aria-label="Цвет">🎨</button>
-          <button class="mini-btn drag-handle" aria-label="Перетащить">☰</button>
+          <button class="mini-btn ${hasAnyNotify(cell.notify)?'bell-active':''}" data-bell="1">🔔</button>
+          <button class="mini-btn palette-btn">🎨</button>
+          <button class="mini-btn drag-handle">☰</button>
         </div>
       </div>
       <div class="day-body">
         <div class="task-count">${total?`${done}/${total} ${word}`:'Свободно'}</div>
-        ${total?`<div class="task-preview">${escapeHtml(d.tasks[0].text)}${total>1?'…':''}</div>`:''}
+        ${total?`<div class="task-preview">${escapeHtml(cell.tasks[0].text)}${total>1?'…':''}</div>`:''}
       </div>`;
     card.addEventListener('click',e=>{
       if(e.target.closest('.palette-btn,.drag-handle,[data-bell]'))return;
-      openDay(d.id);
+      openCell(view,cell);
     });
     card.querySelector('[data-bell]').addEventListener('click',e=>{
-      e.stopPropagation();openNotifyModal({type:'day',ref:d});
+      e.stopPropagation();openNotifyModal(cell,cell.name);
     });
     card.querySelector('.palette-btn').addEventListener('click',e=>{
       e.stopPropagation();
-      openCardColorPicker(d.color,c=>{d.color=c;saveState();renderWeekGrid();});
+      openCardColorPicker(cell.color,c=>{cell.color=c;saveState();renderWeekGrid(view);});
     });
-    card.querySelector('.drag-handle').addEventListener('pointerdown',e=>startDrag(e,card));
+    card.querySelector('.drag-handle').addEventListener('pointerdown',e=>startDrag(e,card,view));
     grid.appendChild(card);
   }
 }
-
-/* ---------- Drag ---------- */
-function startDrag(e,card){
-  if(e.button&&e.button!==0)return;
-  e.preventDefault();e.stopPropagation();haptic();
-  dragState={card,target:null};card.classList.add('dragging');
-  document.addEventListener('pointermove',onDragMove);
-  document.addEventListener('pointerup',endDrag);
-  document.addEventListener('pointercancel',endDrag);
-  document.addEventListener('touchmove',preventDrag,{passive:false});
+function openCell(view,cell){
+  currentCellId=cell.id;
+  $('#dayTitle').textContent=cell.name;
+  $('#newTask').value='';
+  renderCellTasks(view,cell);
+  openModal($('#dayModal'));
 }
-function preventDrag(e){if(dragState)e.preventDefault();}
-function onDragMove(e){
-  if(!dragState)return;
-  $$('.drag-target').forEach(el=>el.classList.remove('drag-target'));
-  const el=document.elementFromPoint(e.clientX,e.clientY);
-  const t=el?.closest('[data-draggable]');
-  if(t&&t!==dragState.card){t.classList.add('drag-target');dragState.target=t;}
-  else dragState.target=null;
-}
-function endDrag(){
-  if(dragState?.target){
-    const sId=dragState.card.dataset.dayId,tId=dragState.target.dataset.dayId;
-    const f=state.week.findIndex(d=>d.id===sId),t=state.week.findIndex(d=>d.id===tId);
-    if(f>=0&&t>=0){const[m]=state.week.splice(f,1);state.week.splice(t,0,m);saveState();haptic('medium');}
-  }
-  dragState?.card?.classList.remove('dragging');
-  $$('.drag-target').forEach(el=>el.classList.remove('drag-target'));
-  dragState=null;
-  document.removeEventListener('pointermove',onDragMove);
-  document.removeEventListener('pointerup',endDrag);
-  document.removeEventListener('pointercancel',endDrag);
-  document.removeEventListener('touchmove',preventDrag);
-  renderWeekGrid();
-}
-
-/* ---------- Day ---------- */
-function openDay(dayId){
-  currentDayId=dayId;
-  const day=state.week.find(d=>d.id===dayId);if(!day)return;
-  $('#dayTitle').textContent=day.full;$('#newTask').value='';
-  renderTasks();openModal($('#dayModal'));
-}
-function renderTasks(){
-  const day=state.week.find(d=>d.id===currentDayId);if(!day)return;
+function renderCellTasks(view,cell){
   const list=$('#taskList');list.innerHTML='';
-  if(!day.tasks.length){list.innerHTML='<p class="empty">Задач нет. Добавьте первую ↓</p>';return;}
-  day.tasks.forEach(task=>{
+  if(!cell.tasks.length){list.innerHTML='<p class="empty">Задач нет</p>';return;}
+  cell.tasks.forEach(task=>{
     const row=document.createElement('div');row.className='task-row';
     row.appendChild(makeCheckbox(task.done,()=>{
-      task.done=!task.done;saveState();renderTasks();renderWeekGrid();
-    },day.color));
+      task.done=!task.done;saveState();renderCellTasks(view,cell);renderWeekGrid(view);
+    },cell.color));
     const txt=document.createElement('span');
     txt.className='task-text'+(task.done?' done':'');txt.textContent=task.text;
     txt.addEventListener('click',()=>editInline(txt,task.text,false,n=>{
-      task.text=n;saveState();renderTasks();renderWeekGrid();
+      task.text=n;saveState();renderCellTasks(view,cell);renderWeekGrid(view);
     }));
     row.appendChild(txt);
     const del=document.createElement('button');
     del.className='mini-btn';del.textContent='✕';
     del.addEventListener('click',()=>{
-      const i=day.tasks.indexOf(task);if(i>=0)day.tasks.splice(i,1);
-      saveState();renderTasks();renderWeekGrid();
+      const i=cell.tasks.indexOf(task);if(i>=0)cell.tasks.splice(i,1);
+      saveState();renderCellTasks(view,cell);renderWeekGrid(view);
     });
-    row.appendChild(del);
-    list.appendChild(row);
+    row.appendChild(del);list.appendChild(row);
   });
+}
+function makeCheckbox(checked,onToggle,color){
+  const btn=document.createElement('button');btn.type='button';
+  btn.className='checkbox'+(checked?' checked':'');
+  if(color)btn.style.setProperty('--cb-color',color);
+  btn.innerHTML=checked?'<svg viewBox="0 0 20 20" fill="none" stroke="#fff" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 10l4 4 8-8"/></svg>':'';
+  btn.addEventListener('click',e=>{e.stopPropagation();haptic();onToggle();});
+  return btn;
 }
 function editInline(el,oldText,isName,onSave){
   const input=document.createElement('input');
@@ -760,24 +664,61 @@ function editInline(el,oldText,isName,onSave){
   });
 }
 
+/* ---------- Drag ---------- */
+function startDrag(e,card,view){
+  if(e.button&&e.button!==0)return;
+  e.preventDefault();e.stopPropagation();haptic();
+  dragState={card,target:null,view};card.classList.add('dragging');
+  document.addEventListener('pointermove',onDragMove);
+  document.addEventListener('pointerup',endDrag);
+  document.addEventListener('pointercancel',endDrag);
+  document.addEventListener('touchmove',preventDrag,{passive:false});
+}
+function preventDrag(e){if(dragState)e.preventDefault();}
+function onDragMove(e){
+  if(!dragState)return;
+  $$('.drag-target').forEach(el=>el.classList.remove('drag-target'));
+  const el=document.elementFromPoint(e.clientX,e.clientY);
+  const t=el?.closest('[data-draggable]');
+  if(t&&t!==dragState.card){t.classList.add('drag-target');dragState.target=t;}
+  else dragState.target=null;
+}
+function endDrag(){
+  if(dragState?.target){
+    const sId=dragState.card.dataset.cellId;
+    const tId=dragState.target.dataset.cellId;
+    const cells=dragState.view.cells;
+    const f=cells.findIndex(c=>c.id===sId);
+    const t=cells.findIndex(c=>c.id===tId);
+    if(f>=0&&t>=0){const[m]=cells.splice(f,1);cells.splice(t,0,m);saveState();haptic('medium');}
+    renderWeekGrid(dragState.view);
+  }
+  dragState?.card?.classList.remove('dragging');
+  $$('.drag-target').forEach(el=>el.classList.remove('drag-target'));
+  dragState=null;
+  document.removeEventListener('pointermove',onDragMove);
+  document.removeEventListener('pointerup',endDrag);
+  document.removeEventListener('pointercancel',endDrag);
+  document.removeEventListener('touchmove',preventDrag);
+}
+
 /* ---------- Training ---------- */
-function renderTraining(root){
-  const t=state.training;
+function renderTrainingView(root,view){
+  const t=view.training;
   root.innerHTML=`
     <div class="training-tabs">
       <button data-tab="workouts" class="${t.activeTab==='workouts'?'active':''}">💪 Тренировки</button>
       <button data-tab="nutrition" class="${t.activeTab==='nutrition'?'active':''}">🥗 Питание</button>
     </div>
-    <div id="trainingBody"></div>
-  `;
+    <div id="trainingBody"></div>`;
   $$('.training-tabs button').forEach(b=>b.addEventListener('click',()=>{
-    t.activeTab=b.dataset.tab;saveState();renderTraining(root);
+    t.activeTab=b.dataset.tab;saveState();renderTrainingView(root,view);
   }));
-  renderTrainingBody();
+  renderTrainingBody(view);
 }
-function renderTrainingBody(){
+function renderTrainingBody(view){
   const body=$('#trainingBody');if(!body)return;
-  const t=state.training;
+  const t=view.training;
   const cats=t.activeTab==='workouts'?t.workouts:t.nutrition;
   body.innerHTML='';
   for(const cat of cats){
@@ -788,8 +729,8 @@ function renderTrainingBody(){
       <span class="category-meta">${done}/${cat.items.length}</span>`;
     const bell=document.createElement('button');
     bell.className='mini-btn'+(hasAnyNotify(cat.notify)?' bell-active':'');
-    bell.textContent='🔔';bell.setAttribute('aria-label','Уведомления');
-    bell.addEventListener('click',()=>openNotifyModal({type:'category',ref:cat}));
+    bell.textContent='🔔';
+    bell.addEventListener('click',()=>openNotifyModal(cat,cat.name,cat.days));
     head.appendChild(bell);
     const delCat=document.createElement('button');
     delCat.className='mini-btn';delCat.textContent='✕';
@@ -797,35 +738,31 @@ function renderTrainingBody(){
       askConfirm(`Удалить «${cat.name}»?`,()=>{
         const arr=t.activeTab==='workouts'?t.workouts:t.nutrition;
         const i=arr.indexOf(cat);if(i>=0)arr.splice(i,1);
-        saveState();renderTrainingBody();
+        saveState();renderTrainingBody(view);
       });
     });
     head.appendChild(delCat);
     head.querySelector('.category-name').addEventListener('click',function(){
-      editInline(this,cat.name,true,n=>{
-        cat.name=n;saveState();renderTrainingBody();
-      });
+      editInline(this,cat.name,true,n=>{cat.name=n;saveState();renderTrainingBody(view);});
     });
     card.appendChild(head);
     const itemsBox=document.createElement('div');itemsBox.className='category-items';
     for(const item of cat.items){
       const row=document.createElement('div');row.className='check-item';
       row.appendChild(makeCheckbox(item.done,()=>{
-        item.done=!item.done;saveState();renderTrainingBody();
+        item.done=!item.done;saveState();renderTrainingBody(view);
       }));
       const txt=document.createElement('span');
       txt.className='check-text'+(item.done?' done':'');txt.textContent=item.text;
       txt.addEventListener('click',()=>editInline(txt,item.text,false,n=>{
-        item.text=n;saveState();renderTrainingBody();
+        item.text=n;saveState();renderTrainingBody(view);
       }));
       row.appendChild(txt);
-      if(item.meta){const m=document.createElement('span');
-        m.className='check-meta';m.textContent=item.meta;row.appendChild(m);}
       const del=document.createElement('button');
       del.className='mini-btn';del.textContent='✕';
       del.addEventListener('click',()=>{
         const i=cat.items.indexOf(item);if(i>=0)cat.items.splice(i,1);
-        saveState();renderTrainingBody();
+        saveState();renderTrainingBody(view);
       });
       row.appendChild(del);itemsBox.appendChild(row);
     }
@@ -834,11 +771,9 @@ function renderTrainingBody(){
     const inp=document.createElement('input');inp.type='text';
     inp.placeholder=t.activeTab==='workouts'?'Упражнение…':'Блюдо…';
     const addB=document.createElement('button');addB.className='icon-btn';addB.textContent='+';
-    const add=()=>{
-      const v=inp.value.trim();if(!v)return;
+    const add=()=>{const v=inp.value.trim();if(!v)return;
       cat.items.push({id:makeId('i'),text:v,meta:'',done:false});
-      inp.value='';saveState();renderTrainingBody();haptic();
-    };
+      inp.value='';saveState();renderTrainingBody(view);haptic();};
     addB.addEventListener('click',add);
     inp.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();add();}});
     addRow.appendChild(inp);addRow.appendChild(addB);card.appendChild(addRow);
@@ -847,90 +782,23 @@ function renderTrainingBody(){
   const addCat=document.createElement('button');
   addCat.className='add-category-btn';addCat.textContent='+ Добавить категорию';
   addCat.addEventListener('click',()=>{
-    const n=prompt('Название категории:');if(!n||!n.trim())return;
+    const n=prompt('Название:');if(!n||!n.trim())return;
     const arr=t.activeTab==='workouts'?t.workouts:t.nutrition;
     arr.push({id:makeId('c'),name:n.trim(),days:[0,1,2,3,4,5,6],
-      notify:{...DEFAULT_NOTIFY_CAT},items:[]});
-    saveState();renderTrainingBody();
+      notify:{...DEFAULT_NOTIFY,days:[0,1,2,3,4,5,6]},items:[]});
+    saveState();renderTrainingBody(view);
   });
   body.appendChild(addCat);
-  body.insertAdjacentHTML('beforeend','<p class="hint">Тап по имени — переименовать. 🔔 — напоминания. Кружок — отметить.</p>');
 }
 
-/* ---------- Custom views ---------- */
-function renderCustomView(root,view){
-  root.innerHTML='<div id="customBody"></div>';
-  const body=$('#customBody');
-  if(!view.items)view.items=[];
-  const card=document.createElement('div');card.className='category-card';
-  const head=document.createElement('div');head.className='category-header';
-  head.innerHTML=`<span class="category-name">${escapeHtml(view.title)}</span>
-    <span class="category-meta">${view.items.filter(i=>i.done).length}/${view.items.length}</span>`;
-  const bell=document.createElement('button');
-  bell.className='mini-btn'+(hasAnyNotify(view.notify)?' bell-active':'');
-  bell.textContent='🔔';
-  bell.addEventListener('click',()=>openNotifyModal({type:'category',ref:view}));
-  head.appendChild(bell);
-  head.querySelector('.category-name').addEventListener('click',function(){
-    editInline(this,view.title,true,n=>{
-      view.title=n;saveState();renderCustomView(body,view);
-    });
-  });
-  card.appendChild(head);
-  const itemsBox=document.createElement('div');itemsBox.className='category-items';
-  for(const item of view.items){
-    const row=document.createElement('div');row.className='check-item';
-    row.appendChild(makeCheckbox(item.done,()=>{
-      item.done=!item.done;saveState();renderCustomView(body,view);
-    }));
-    const txt=document.createElement('span');
-    txt.className='check-text'+(item.done?' done':'');txt.textContent=item.text;
-    txt.addEventListener('click',()=>editInline(txt,item.text,false,n=>{
-      item.text=n;saveState();renderCustomView(body,view);
-    }));
-    row.appendChild(txt);
-    const del=document.createElement('button');
-    del.className='mini-btn';del.textContent='✕';
-    del.addEventListener('click',()=>{
-      const i=view.items.indexOf(item);if(i>=0)view.items.splice(i,1);
-      saveState();renderCustomView(body,view);
-    });
-    row.appendChild(del);itemsBox.appendChild(row);
-  }
-  card.appendChild(itemsBox);
-  const addRow=document.createElement('div');addRow.className='add-item-row';
-  const inp=document.createElement('input');inp.type='text';inp.placeholder='Новый пункт…';
-  const addB=document.createElement('button');addB.className='icon-btn';addB.textContent='+';
-  const add=()=>{const v=inp.value.trim();if(!v)return;
-    view.items.push({id:makeId('ci'),text:v,done:false});
-    inp.value='';saveState();renderCustomView(body,view);haptic();};
-  addB.addEventListener('click',add);
-  inp.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();add();}});
-  addRow.appendChild(inp);addRow.appendChild(addB);card.appendChild(addRow);
-  body.appendChild(card);
-  body.insertAdjacentHTML('beforeend','<p class="hint">Тап по тексту — редактировать. 🔔 — напоминания.</p>');
-}
-
-/* ---------- Placeholder ---------- */
-function renderPlaceholder(root,id){
-  const meta=BASE_VIEWS[id];
-  const msgs={notes:'Заметки с папками и поиском — скоро.',reminders:'Напоминания с повтором — скоро.',words:'Карточки слов по системе Лейтнера — скоро.'};
-  root.innerHTML=`
-    <div class="placeholder">
-      <div class="placeholder-icon">${meta.icon}</div>
-      <div class="placeholder-title">${meta.title}</div>
-      <div class="placeholder-sub">${msgs[id]||'Скоро'}</div>
-    </div>`;
-}
-
-/* ---------- Modals ---------- */
+/* ---------- Модалки ---------- */
 function openModal(m){m.classList.add('open');document.body.style.overflow='hidden';updateBack();}
 function closeModal(m){m.classList.remove('open');
   if(!$$('.modal.open').length)document.body.style.overflow='';updateBack();}
 function updateBack(){if(!tg?.BackButton)return;
   if($$('.modal.open').length)tg.BackButton.show();else tg.BackButton.hide();}
 
-/* ---------- Palettes ---------- */
+/* ---------- Палитры ---------- */
 function openCardColorPicker(current,onPick){
   const m=$('#colorModal'),w=$('#swatches');w.innerHTML='';
   for(const c of CARD_PALETTE){
@@ -952,94 +820,223 @@ function openAccentPicker(){
   openModal(m);
 }
 
-/* ---------- Notify modal ---------- */
-const DAY_LABELS=['Пн','Вт','Ср','Чт','Пт','Сб','Вс'];
-function openNotifyModal(target){
-  currentNotifyTarget=target;
-  const n=target.ref.notify||(target.ref.notify={...DEFAULT_NOTIFY_CAT});
-  $('#notifyTitle').textContent=target.type==='day'
-    ?'Уведомления «'+target.ref.full+'»'
-    :'Уведомления «'+target.ref.name+'"';
+/* ---------- Notify ---------- */
+function openNotifyModal(ref,name,defaultDays){
+  currentNotifyTarget={ref,name};
+  const n=ref.notify||(ref.notify={...DEFAULT_NOTIFY});
+  $('#notifyTitle').textContent='🔔 '+name;
   $('#notifyToggle').classList.toggle('on',!!n.enabled);
   $('#notifyWhen').style.display=n.enabled?'block':'none';
-  $('#notifyOnDay').checked=!!n.onDay;
-  $('#notifyDayBefore').checked=!!n.dayBefore;
   $('#notifyTime').value=n.time||'08:00';
-  // Days block — только для категорий
-  const isCat=target.type==='category';
-  $('#notifyDaysBlock').style.display=isCat?'block':'none';
-  if(isCat){
-    const sel=$('#daySelect');sel.innerHTML='';
-    const days=n.days||target.ref.days||[0,1,2,3,4,5,6];
-    if(!target.ref.days)target.ref.days=days;
-    DAY_LABELS.forEach((lbl,i)=>{
-      const b=document.createElement('button');
-      b.textContent=lbl;b.dataset.day=i;
-      b.className=days.includes(i)?'on':'';
-      b.addEventListener('click',()=>{
-        const arr=target.ref.days;
-        const idx=arr.indexOf(i);
-        if(idx>=0)arr.splice(idx,1);else arr.push(i);
-        b.classList.toggle('on',arr.includes(i));
-        saveState();
-      });
-      sel.appendChild(b);
+  const sel=$('#daySelect');sel.innerHTML='';
+  const days=n.days||[];
+  DAY_NAMES.forEach((lbl,i)=>{
+    const b=document.createElement('button');
+    b.textContent=lbl;b.className=days.includes(i)?'on':'';
+    b.addEventListener('click',()=>{
+      if(!n.days)n.days=[];
+      const idx=n.days.indexOf(i);
+      if(idx>=0)n.days.splice(idx,1);else n.days.push(i);
+      b.classList.toggle('on',n.days.includes(i));
+      saveState();
     });
-  }
+    sel.appendChild(b);
+  });
   openModal($('#notifyModal'));
 }
 function saveNotifyFromModal(){
   if(!currentNotifyTarget)return;
   const n=currentNotifyTarget.ref.notify;
-  n.onDay=$('#notifyOnDay').checked;
-  n.dayBefore=$('#notifyDayBefore').checked;
   n.time=$('#notifyTime').value||'08:00';
-  saveState();renderContent();
+  saveState();
+  renderContent();
 }
 
-/* ---------- Templates ---------- */
-function renderTemplateLibrary(){
-  const w=$('#templateLibrary');w.innerHTML='';
-  for(const[id,meta]of Object.entries(BASE_VIEWS)){
-    if(!meta.removable)continue;
-    const enabled=state.enabledViews.includes(id);
-    const t=document.createElement('button');
-    t.className='tpl-tile'+(enabled?' enabled':'');
-    t.innerHTML=`<span class="tpl-tile-icon">${meta.icon}</span><span>${meta.title}</span>`;
-    t.addEventListener('click',()=>{
-      if(enabled){if(currentView===id){toast('Сначала переключитесь');return;}
-        state.enabledViews=state.enabledViews.filter(v=>v!==id);}
-      else state.enabledViews.push(id);
-      saveState();renderTemplateLibrary();renderDock();haptic();
-    });
-    w.appendChild(t);
-  }
-  state.customViews.forEach(v=>{
-    const t=document.createElement('button');
-    t.className='tpl-tile enabled';
-    t.innerHTML=`<span class="tpl-tile-icon">${v.icon}</span><span>${escapeHtml(v.title)}</span>`;
-    t.addEventListener('click',()=>{
-      if(currentView===v.id){toast('Сначала переключитесь');return;}
-      askConfirm(`Удалить «${v.title}»?`,()=>{
-        state.customViews=state.customViews.filter(x=>x.id!==v.id);
-        state.enabledViews=state.enabledViews.filter(x=>x!==v.id);
-        saveState();renderTemplateLibrary();renderDock();
-      });
-    });
-    w.appendChild(t);
-  });
-}
-function createCustomTemplate(){
-  const name=$('#customTplName').value.trim();
-  const icon=$('#customTplIcon').value.trim()||'✨';
+/* ---------- Создание шаблона ---------- */
+function createView(){
+  const name=$('#newViewName').value.trim();
+  const icon=$('#newViewIcon').value.trim()||'📆';
   if(!name){toast('Введите название');return;}
-  const id=makeId('view');
-  state.customViews.push({id,title:name,icon,items:[],
-    days:[0,1,2,3,4,5,6],notify:{...DEFAULT_NOTIFY_CAT}});
-  state.enabledViews.push(id);
-  $('#customTplName').value='';$('#customTplIcon').value='✨';
-  saveState();renderTemplateLibrary();renderDock();
-  toast('Шаблон «'+name+'» добавлен');haptic();
+  const newView={
+    id:makeId('v'),type:'planner',title:name,icon,removable:true,
+    columns:7,showWeekend:false,filter:'all',cells:makeWeekCells(),
+  };
+  state.views.push(newView);
+  saveState();
+  closeModal($('#createViewModal'));
+  switchView(newView.id);
+  toast('Шаблон «'+name+'» создан');haptic();
+}
+
+/* ---------- Удаление шаблона ---------- */
+function deleteView(viewId){
+  const v=getView(viewId);
+  if(!v||!v.removable)return;
+  state.views=state.views.filter(x=>x.id!==viewId);
+  saveState();
+  if(currentViewId===viewId)switchView(state.views[0].id);
+  else{renderDock();renderContent();}
+  closeModal($('#settingsModal'));
+  toast('Удалено');
+}
+
+/* ---------- Picker (iOS-крутилка) ---------- */
+function openPicker(view){
+  currentView=view;
+  pickerValue=view.columns;
+  const wheel=$('#pickerWheel');
+  wheel.innerHTML='';
+  const topSpacer=document.createElement('div');topSpacer.className='picker-spacer';
+  wheel.appendChild(topSpacer);
+  for(let i=1;i<=31;i++){
+    const d=document.createElement('div');
+    d.className='picker-item';d.textContent=i;d.dataset.value=i;
+    wheel.appendChild(d);
+  }
+  const botSpacer=document.createElement('div');botSpacer.className='picker-spacer';
+  wheel.appendChild(botSpacer);
+  updatePickerHint(view.columns);
+  // прокрутить к текущему
+  requestAnimationFrame(()=>{
+    const el=wheel.querySelector(`[data-value="${view.columns}"]`);
+    if(el)el.scrollIntoView({block:'center',behavior:'instant'});
+    setTimeout(()=>{
+      wheel.querySelectorAll('.picker-item').forEach(e=>{
+        e.classList.toggle('active',parseInt(e.dataset.value)===view.columns);
+      });
+    },50);
+  });
+  wheel.onscroll=()=>{
+    clearTimeout(pickerScrollTimer);
+    pickerScrollTimer=setTimeout(()=>{
+      const wheelRect=wheel.getBoundingClientRect();
+      const wheelCenter=wheelRect.top+wheelRect.height/2;
+      let closest=null,minDist=Infinity;
+      wheel.querySelectorAll('.picker-item').forEach(el=>{
+        const r=el.getBoundingClientRect();
+        const ec=r.top+r.height/2;
+        const d=Math.abs(ec-wheelCenter);
+        if(d<minDist){minDist=d;closest=el;}
+      });
+      if(closest){
+        wheel.querySelectorAll('.picker-item').forEach(e=>e.classList.remove('active'));
+        closest.classList.add('active');
+        pickerValue=parseInt(closest.dataset.value);
+        updatePickerHint(pickerValue);
+      }
+    },80);
+  };
+  openModal($('#pickerModal'));
+}
+function updatePickerHint(v){
+  let hint='';
+  if(v===1)hint='Список';
+  else if(v===7)hint='Неделя (Пн-Вс)';
+  else if(v===31)hint='Месяц (календарь)';
+  else if(v<=7)hint=v+' ячеек';
+  else if(v<=14)hint=v+' ячеек · 2 недели';
+  else if(v<=21)hint=v+' ячеек · 3 недели';
+  else if(v<=28)hint=v+' ячеек · 4 недели';
+  else hint=v+' ячеек · календарь';
+  $('#pickerHint').textContent=hint;
+}
+function applyPicker(){
+  if(!currentView)return;
+  const oldN=currentView.cells.length;
+  const newN=pickerValue;
+  if(newN<oldN){
+    // урезаем с конца
+    currentView.cells=currentView.cells.slice(0,newN);
+  } else if(newN>oldN){
+    for(let i=oldN;i<newN;i++){
+      const isWeek=newN===7;
+      const name=isWeek?DAY_NAMES[i]:String(i+1);
+      currentView.cells.push(makeCell(name,i,isWeek?[i]:[]));
+    }
+  }
+  currentView.columns=newN;
+  saveState();
+  closeModal($('#pickerModal'));
+  renderContent();
+  haptic();
+}
+
+/* ---------- Настройки ---------- */
+function renderSettings(){
+  const v=getCurrentView();
+  $$('[data-setting="theme"] button').forEach(b=>b.classList.toggle('active',b.dataset.value===state.theme));
+  $('#backendUrl').value=state.backendUrl||'';
+  $('#userId').value=state.userId||'';
+  updateSyncStatus();
+
+  const vs=$('#viewSettingsSection');
+  if(v&&v.type==='planner'){
+    vs.innerHTML=`
+      <div class="setting-block">
+        <div class="setting-label">Название шаблона</div>
+        <input type="text" class="modal-input" id="viewTitleInput" value="${escapeHtml(v.title)}" style="margin-bottom:8px">
+        <div class="setting-label">Иконка (эмодзи)</div>
+        <input type="text" class="modal-input" id="viewIconInput" value="${escapeHtml(v.icon)}" maxlength="2" style="text-align:center;font-size:20px">
+      </div>
+      <div class="setting-block">
+        <div class="setting-label">Ячеек: ${v.columns} ${v.columns===7?'(неделя)':v.columns===31?'(месяц)':''}</div>
+        <div class="setting-options"><button id="openPickerBtn">📅 Изменить количество</button></div>
+      </div>
+    `;
+    $('#openPickerBtn').addEventListener('click',()=>{
+      closeModal($('#settingsModal'));
+      setTimeout(()=>openPicker(v),150);
+    });
+    $('#viewTitleInput').addEventListener('change',e=>{
+      const t=e.target.value.trim();if(!t)return;
+      v.title=t;saveState();$('#pageTitle').textContent=t;renderDock();
+    });
+    $('#viewIconInput').addEventListener('change',e=>{
+      const t=e.target.value.trim()||'📆';
+      v.icon=t;saveState();renderDock();
+    });
+  } else if(v&&v.type==='training'){
+    vs.innerHTML=`
+      <div class="setting-block">
+        <div class="setting-label">Название</div>
+        <input type="text" class="modal-input" id="viewTitleInput" value="${escapeHtml(v.title)}" style="margin-bottom:8px">
+        <div class="setting-label">Иконка</div>
+        <input type="text" class="modal-input" id="viewIconInput" value="${escapeHtml(v.icon)}" maxlength="2" style="text-align:center;font-size:20px">
+      </div>
+    `;
+    $('#viewTitleInput').addEventListener('change',e=>{
+      const t=e.target.value.trim();if(!t)return;
+      v.title=t;saveState();$('#pageTitle').textContent=t;renderDock();
+    });
+    $('#viewIconInput').addEventListener('change',e=>{
+      const t=e.target.value.trim()||'💪';
+      v.icon=t;saveState();renderDock();
+    });
+  } else vs.innerHTML='';
+
+  const delSection=$('#deleteViewSection');
+  if(v&&v.removable){
+    delSection.innerHTML=`
+      <div class="setting-block">
+        <div class="setting-label">Удалить шаблон</div>
+        <button class="btn danger" id="deleteViewBtn">Удалить «${escapeHtml(v.title)}»</button>
+      </div>`;
+    $('#deleteViewBtn').addEventListener('click',()=>{
+      askConfirm(`Удалить «${v.title}»?`,()=>deleteView(v.id));
+    });
+  } else delSection.innerHTML='';
+}
+function updateSyncStatus(){
+  const el=$('#syncStatus');if(!el)return;
+  if(!state.backendUrl||!state.userId){el.className='sync-status';el.textContent='Не подключён (опционально)';return;}
+  el.className='sync-status ok';
+  el.textContent='✓ Подключён · '+(lastSyncTime?new Date(lastSyncTime).toLocaleTimeString('ru'):'—');
+}
+function handleSettingClick(e){
+  const btn=e.target.closest('[data-value]');if(!btn)return;
+  const grp=btn.closest('[data-setting]');if(!grp)return;
+  if(grp.dataset.setting==='theme'){state.theme=btn.dataset.value;applyTheme();}
+  saveState();renderSettings();haptic();
 }
 
 /* ---------- Confirm ---------- */
@@ -1049,46 +1046,18 @@ function askConfirm(text,cb){$('#confirmText').textContent=text;confirmCallback=
 function openSearch(){$('#searchOverlay').classList.add('open');
   setTimeout(()=>$('#globalSearch').focus(),100);}
 function closeSearch(){$('#searchOverlay').classList.remove('open');
-  $('#globalSearch').value='';if(searchQuery){searchQuery='';if(currentView==='planner')renderWeekGrid();}}
+  $('#globalSearch').value='';if(searchQuery){searchQuery='';renderContent();}}
 
-/* ---------- Settings ---------- */
-function renderSettings(){
-  $$('[data-setting="theme"] button').forEach(b=>b.classList.toggle('active',b.dataset.value===state.theme));
-  $$('[data-setting="weekColumns"] button').forEach(b=>b.classList.toggle('active',Number(b.dataset.value)===state.weekColumns));
-  $$('[data-setting="showWeekend"] button').forEach(b=>b.classList.toggle('active',(b.dataset.value==='true')===state.showWeekend));
-  $('#backendUrl').value=state.backendUrl||'';
-  $('#userId').value=state.userId||'';
-  updateSyncStatus();
-}
-function updateSyncStatus(){
-  const el=$('#syncStatus');
-  if(!state.backendUrl||!state.userId){el.className='sync-status';el.textContent='Не подключён (опционально)';return;}
-  el.className='sync-status ok';
-  el.textContent='✓ Подключён · '+(lastSyncTime?new Date(lastSyncTime).toLocaleTimeString('ru'):'—');
-}
-function handleSettingClick(e){
-  const btn=e.target.closest('[data-value]');if(!btn)return;
-  const grp=btn.closest('[data-setting]');if(!grp)return;
-  const s=grp.dataset.setting,v=btn.dataset.value;
-  if(s==='theme'){state.theme=v;applyTheme();}
-  else if(s==='weekColumns'){state.weekColumns=Number(v);if(currentView==='planner')renderWeekGrid();}
-  else if(s==='showWeekend'){state.showWeekend=v==='true';if(currentView==='planner')renderWeekGrid();}
-  saveState();renderSettings();haptic();
-}
-
-/* ---------- Events ---------- */
+/* ---------- События ---------- */
 $('#searchBtn').addEventListener('click',openSearch);
 $('#searchClose').addEventListener('click',closeSearch);
 $('#globalSearch').addEventListener('input',e=>{
-  searchQuery=e.target.value.trim().toLowerCase();
-  if(currentView==='planner')renderWeekGrid();
+  searchQuery=e.target.value.trim().toLowerCase();renderContent();
 });
 $('#settingsBtn').addEventListener('click',()=>{renderSettings();openModal($('#settingsModal'));});
 $('#settingsModal').addEventListener('click',handleSettingClick);
 $('#openAccentPicker').addEventListener('click',()=>{closeModal($('#settingsModal'));setTimeout(openAccentPicker,150);});
-$('#backendUrl').addEventListener('change',e=>{
-  state.backendUrl=e.target.value.trim();saveState();updateSyncStatus();
-});
+$('#backendUrl').addEventListener('change',e=>{state.backendUrl=e.target.value.trim();saveState();updateSyncStatus();});
 $('#userId').addEventListener('change',e=>{
   const v=parseInt(e.target.value.trim());state.userId=isNaN(v)?null:v;
   saveState();updateSyncStatus();
@@ -1101,25 +1070,18 @@ $('#syncNowBtn').addEventListener('click',async()=>{
   if(ok){toast('✓ Синхронизировано');renderContent();}
   else toast('Сервер не ответил');
 });
-$('#resetOrderBtn').addEventListener('click',()=>{
-  const byId=Object.fromEntries(state.week.map(d=>[d.id,d]));
-  state.week=WEEK_ORDER.map(b=>{
-    const o=byId[b.id];return o?{...b,color:o.color,tasks:o.tasks,notify:o.notify||{...DEFAULT_NOTIFY_DAY}}:{...b,tasks:[],notify:{...DEFAULT_NOTIFY_DAY}};
-  });
-  saveState();if(currentView==='planner')renderWeekGrid();
-  toast('Порядок восстановлен');
-});
 $('#resetAllBtn').addEventListener('click',()=>{
-  askConfirm('Сбросить все настройки и задачи?',()=>{localStorage.removeItem(STORAGE_KEY);location.reload();});
+  askConfirm('Сбросить все данные?',()=>{localStorage.removeItem(STORAGE_KEY);location.reload();});
 });
 $$('[data-close]').forEach(b=>b.addEventListener('click',()=>closeModal(b.closest('.modal'))));
 $$('.modal').forEach(m=>m.addEventListener('click',e=>{if(e.target===m)closeModal(m);}));
 $('#dayClose').addEventListener('click',()=>closeModal($('#dayModal')));
 $('#addTaskBtn').addEventListener('click',()=>{
   const inp=$('#newTask');const text=inp.value.trim();if(!text)return;
-  const day=state.week.find(d=>d.id===currentDayId);if(!day)return;
-  day.tasks.push(makeTask(text));inp.value='';
-  saveState();renderTasks();renderWeekGrid();haptic();
+  const v=getCurrentView();
+  const cell=v?.cells.find(c=>c.id===currentCellId);if(!cell)return;
+  cell.tasks.push(makeTask(text));inp.value='';
+  saveState();renderCellTasks(v,cell);renderWeekGrid(v);haptic();
 });
 $('#newTask').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();$('#addTaskBtn').click();}});
 $('#notifyToggle').addEventListener('click',()=>{
@@ -1129,10 +1091,9 @@ $('#notifyToggle').addEventListener('click',()=>{
   if(currentNotifyTarget){currentNotifyTarget.ref.notify.enabled=on;saveState();}
   haptic();
 });
-$('#notifyOnDay').addEventListener('change',saveNotifyFromModal);
-$('#notifyDayBefore').addEventListener('change',saveNotifyFromModal);
 $('#notifyTime').addEventListener('change',saveNotifyFromModal);
-$('#createCustomTpl').addEventListener('click',createCustomTemplate);
+$('#createViewBtn').addEventListener('click',createView);
+$('#pickerApply').addEventListener('click',applyPicker);
 $('#confirmYes').addEventListener('click',()=>{
   const cb=confirmCallback;confirmCallback=null;closeModal($('#confirmModal'));
   if(typeof cb==='function')cb();
@@ -1144,13 +1105,37 @@ if(tg?.BackButton){
     if(searchQuery)closeSearch();
   });
 }
+// Редактирование заголовка
+$('#pageTitle').addEventListener('click',function(){
+  const v=getCurrentView();if(!v)return;
+  const h1=this;
+  const old=h1.textContent;
+  const input=document.createElement('input');
+  input.type='text';input.value=old;input.className='name-edit-input';
+  h1.replaceWith(input);input.focus();
+  input.setSelectionRange(input.value.length,input.value.length);
+  let done=false;
+  const finish=save=>{
+    if(done)return;done=true;
+    const val=save?input.value.trim():old;
+    if(val&&val!==old){v.title=val;saveState();}
+    h1.textContent=v.title||old;
+    input.replaceWith(h1);
+    renderDock();
+  };
+  input.addEventListener('blur',()=>finish(true));
+  input.addEventListener('keydown',e=>{
+    if(e.key==='Enter'){e.preventDefault();input.blur();}
+    else if(e.key==='Escape'){e.preventDefault();finish(false);}
+  });
+});
 
 /* ---------- Init ---------- */
 (async function init(){
-  console.log('MiniApp v5.0');
+  console.log('MiniApp v6.0');
   applyTheme();applyAccent();renderDock();
-  if(await pullFromBackend()){/* синхронизировали состояние при загрузке */}
-  switchView('planner');
+  try{await pullFromBackend();}catch(e){}
+  switchView(currentViewId);
   updateBack();
 })();
 </script>
