@@ -960,4 +960,199 @@ function openNotifyModal(target){
   $('#notifyTitle').textContent=target.type==='day'
     ?'Уведомления «'+target.ref.full+'»'
     :'Уведомления «'+target.ref.name+'"';
-  $('#not
+  $('#notifyToggle').classList.toggle('on',!!n.enabled);
+  $('#notifyWhen').style.display=n.enabled?'block':'none';
+  $('#notifyOnDay').checked=!!n.onDay;
+  $('#notifyDayBefore').checked=!!n.dayBefore;
+  $('#notifyTime').value=n.time||'08:00';
+  // Days block — только для категорий
+  const isCat=target.type==='category';
+  $('#notifyDaysBlock').style.display=isCat?'block':'none';
+  if(isCat){
+    const sel=$('#daySelect');sel.innerHTML='';
+    const days=n.days||target.ref.days||[0,1,2,3,4,5,6];
+    if(!target.ref.days)target.ref.days=days;
+    DAY_LABELS.forEach((lbl,i)=>{
+      const b=document.createElement('button');
+      b.textContent=lbl;b.dataset.day=i;
+      b.className=days.includes(i)?'on':'';
+      b.addEventListener('click',()=>{
+        const arr=target.ref.days;
+        const idx=arr.indexOf(i);
+        if(idx>=0)arr.splice(idx,1);else arr.push(i);
+        b.classList.toggle('on',arr.includes(i));
+        saveState();
+      });
+      sel.appendChild(b);
+    });
+  }
+  openModal($('#notifyModal'));
+}
+function saveNotifyFromModal(){
+  if(!currentNotifyTarget)return;
+  const n=currentNotifyTarget.ref.notify;
+  n.onDay=$('#notifyOnDay').checked;
+  n.dayBefore=$('#notifyDayBefore').checked;
+  n.time=$('#notifyTime').value||'08:00';
+  saveState();renderContent();
+}
+
+/* ---------- Templates ---------- */
+function renderTemplateLibrary(){
+  const w=$('#templateLibrary');w.innerHTML='';
+  for(const[id,meta]of Object.entries(BASE_VIEWS)){
+    if(!meta.removable)continue;
+    const enabled=state.enabledViews.includes(id);
+    const t=document.createElement('button');
+    t.className='tpl-tile'+(enabled?' enabled':'');
+    t.innerHTML=`<span class="tpl-tile-icon">${meta.icon}</span><span>${meta.title}</span>`;
+    t.addEventListener('click',()=>{
+      if(enabled){if(currentView===id){toast('Сначала переключитесь');return;}
+        state.enabledViews=state.enabledViews.filter(v=>v!==id);}
+      else state.enabledViews.push(id);
+      saveState();renderTemplateLibrary();renderDock();haptic();
+    });
+    w.appendChild(t);
+  }
+  state.customViews.forEach(v=>{
+    const t=document.createElement('button');
+    t.className='tpl-tile enabled';
+    t.innerHTML=`<span class="tpl-tile-icon">${v.icon}</span><span>${escapeHtml(v.title)}</span>`;
+    t.addEventListener('click',()=>{
+      if(currentView===v.id){toast('Сначала переключитесь');return;}
+      askConfirm(`Удалить «${v.title}»?`,()=>{
+        state.customViews=state.customViews.filter(x=>x.id!==v.id);
+        state.enabledViews=state.enabledViews.filter(x=>x!==v.id);
+        saveState();renderTemplateLibrary();renderDock();
+      });
+    });
+    w.appendChild(t);
+  });
+}
+function createCustomTemplate(){
+  const name=$('#customTplName').value.trim();
+  const icon=$('#customTplIcon').value.trim()||'✨';
+  if(!name){toast('Введите название');return;}
+  const id=makeId('view');
+  state.customViews.push({id,title:name,icon,items:[],
+    days:[0,1,2,3,4,5,6],notify:{...DEFAULT_NOTIFY_CAT}});
+  state.enabledViews.push(id);
+  $('#customTplName').value='';$('#customTplIcon').value='✨';
+  saveState();renderTemplateLibrary();renderDock();
+  toast('Шаблон «'+name+'» добавлен');haptic();
+}
+
+/* ---------- Confirm ---------- */
+function askConfirm(text,cb){$('#confirmText').textContent=text;confirmCallback=cb;openModal($('#confirmModal'));}
+
+/* ---------- Search ---------- */
+function openSearch(){$('#searchOverlay').classList.add('open');
+  setTimeout(()=>$('#globalSearch').focus(),100);}
+function closeSearch(){$('#searchOverlay').classList.remove('open');
+  $('#globalSearch').value='';if(searchQuery){searchQuery='';if(currentView==='planner')renderWeekGrid();}}
+
+/* ---------- Settings ---------- */
+function renderSettings(){
+  $$('[data-setting="theme"] button').forEach(b=>b.classList.toggle('active',b.dataset.value===state.theme));
+  $$('[data-setting="weekColumns"] button').forEach(b=>b.classList.toggle('active',Number(b.dataset.value)===state.weekColumns));
+  $$('[data-setting="showWeekend"] button').forEach(b=>b.classList.toggle('active',(b.dataset.value==='true')===state.showWeekend));
+  $('#backendUrl').value=state.backendUrl||'';
+  $('#userId').value=state.userId||'';
+  updateSyncStatus();
+}
+function updateSyncStatus(){
+  const el=$('#syncStatus');
+  if(!state.backendUrl||!state.userId){el.className='sync-status';el.textContent='Не подключён (опционально)';return;}
+  el.className='sync-status ok';
+  el.textContent='✓ Подключён · '+(lastSyncTime?new Date(lastSyncTime).toLocaleTimeString('ru'):'—');
+}
+function handleSettingClick(e){
+  const btn=e.target.closest('[data-value]');if(!btn)return;
+  const grp=btn.closest('[data-setting]');if(!grp)return;
+  const s=grp.dataset.setting,v=btn.dataset.value;
+  if(s==='theme'){state.theme=v;applyTheme();}
+  else if(s==='weekColumns'){state.weekColumns=Number(v);if(currentView==='planner')renderWeekGrid();}
+  else if(s==='showWeekend'){state.showWeekend=v==='true';if(currentView==='planner')renderWeekGrid();}
+  saveState();renderSettings();haptic();
+}
+
+/* ---------- Events ---------- */
+$('#searchBtn').addEventListener('click',openSearch);
+$('#searchClose').addEventListener('click',closeSearch);
+$('#globalSearch').addEventListener('input',e=>{
+  searchQuery=e.target.value.trim().toLowerCase();
+  if(currentView==='planner')renderWeekGrid();
+});
+$('#settingsBtn').addEventListener('click',()=>{renderSettings();openModal($('#settingsModal'));});
+$('#settingsModal').addEventListener('click',handleSettingClick);
+$('#openAccentPicker').addEventListener('click',()=>{closeModal($('#settingsModal'));setTimeout(openAccentPicker,150);});
+$('#backendUrl').addEventListener('change',e=>{
+  state.backendUrl=e.target.value.trim();saveState();updateSyncStatus();
+});
+$('#userId').addEventListener('change',e=>{
+  const v=parseInt(e.target.value.trim());state.userId=isNaN(v)?null:v;
+  saveState();updateSyncStatus();
+});
+$('#syncNowBtn').addEventListener('click',async()=>{
+  if(!state.backendUrl||!state.userId){toast('Заполните URL и ID');return;}
+  await pushToBackend();
+  const ok=await pullFromBackend();
+  updateSyncStatus();
+  if(ok){toast('✓ Синхронизировано');renderContent();}
+  else toast('Сервер не ответил');
+});
+$('#resetOrderBtn').addEventListener('click',()=>{
+  const byId=Object.fromEntries(state.week.map(d=>[d.id,d]));
+  state.week=WEEK_ORDER.map(b=>{
+    const o=byId[b.id];return o?{...b,color:o.color,tasks:o.tasks,notify:o.notify||{...DEFAULT_NOTIFY_DAY}}:{...b,tasks:[],notify:{...DEFAULT_NOTIFY_DAY}};
+  });
+  saveState();if(currentView==='planner')renderWeekGrid();
+  toast('Порядок восстановлен');
+});
+$('#resetAllBtn').addEventListener('click',()=>{
+  askConfirm('Сбросить все настройки и задачи?',()=>{localStorage.removeItem(STORAGE_KEY);location.reload();});
+});
+$$('[data-close]').forEach(b=>b.addEventListener('click',()=>closeModal(b.closest('.modal'))));
+$$('.modal').forEach(m=>m.addEventListener('click',e=>{if(e.target===m)closeModal(m);}));
+$('#dayClose').addEventListener('click',()=>closeModal($('#dayModal')));
+$('#addTaskBtn').addEventListener('click',()=>{
+  const inp=$('#newTask');const text=inp.value.trim();if(!text)return;
+  const day=state.week.find(d=>d.id===currentDayId);if(!day)return;
+  day.tasks.push(makeTask(text));inp.value='';
+  saveState();renderTasks();renderWeekGrid();haptic();
+});
+$('#newTask').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();$('#addTaskBtn').click();}});
+$('#notifyToggle').addEventListener('click',()=>{
+  const on=!$('#notifyToggle').classList.contains('on');
+  $('#notifyToggle').classList.toggle('on',on);
+  $('#notifyWhen').style.display=on?'block':'none';
+  if(currentNotifyTarget){currentNotifyTarget.ref.notify.enabled=on;saveState();}
+  haptic();
+});
+$('#notifyOnDay').addEventListener('change',saveNotifyFromModal);
+$('#notifyDayBefore').addEventListener('change',saveNotifyFromModal);
+$('#notifyTime').addEventListener('change',saveNotifyFromModal);
+$('#createCustomTpl').addEventListener('click',createCustomTemplate);
+$('#confirmYes').addEventListener('click',()=>{
+  const cb=confirmCallback;confirmCallback=null;closeModal($('#confirmModal'));
+  if(typeof cb==='function')cb();
+});
+if(tg?.BackButton){
+  tg.BackButton.onClick(()=>{
+    const o=$$('.modal.open');
+    if(o.length){o.forEach(closeModal);return;}
+    if(searchQuery)closeSearch();
+  });
+}
+
+/* ---------- Init ---------- */
+(async function init(){
+  console.log('MiniApp v5.0');
+  applyTheme();applyAccent();renderDock();
+  if(await pullFromBackend()){/* синхронизировали состояние при загрузке */}
+  switchView('planner');
+  updateBack();
+})();
+</script>
+</body>
+</html>
