@@ -158,6 +158,7 @@ cursor:pointer;padding:0;background:transparent;overflow:hidden}
 .setting-block:last-of-type{border-bottom:none}
 .setting-label{font-size:12px;color:var(--text-dim);text-transform:uppercase;
 letter-spacing:.4px;font-weight:600;margin-bottom:10px}
+.setting-hint{font-size:11px;color:var(--text-dim);margin-top:6px;line-height:1.4}
 .counter-row{display:flex;align-items:center;gap:12px;padding:4px 0}
 .counter-btn{width:44px;height:44px;border:1px solid var(--border);background:var(--bg-3);
 color:var(--text);border-radius:14px;font-size:22px;font-weight:600;cursor:pointer;
@@ -263,7 +264,7 @@ margin-top:20px;padding-top:12px;border-top:1px solid var(--border)}
 </div>
 <div id="moduleDelete"></div>
 <button class="btn primary" data-close style="margin-top:16px">Готово</button>
-<div class="version-tag">Версия 12.0</div>
+<div class="version-tag">Версия 13.0</div>
 </div></div>
 
 <div class="modal" id="cellModal"><div class="modal-card">
@@ -364,7 +365,7 @@ if (tg) { tg.ready(); tg.expand();
 document.addEventListener('contextmenu', e => e.preventDefault());
 
 const BOT_API = '';
-const STORAGE_KEY = 'miniapp-constructor-v12';
+const STORAGE_KEY = 'miniapp-constructor-v13';
 const CARD_PALETTE = ['#5ac8fa','#af52de','#ff2d55','#ff9500','#34c759','#30b0c7','#5856d6','#ffcc00'];
 const ACCENT_PALETTE = ['#007aff','#5856d6','#af52de','#ff2d55','#ff9500','#34c759','#30b0c7','#8e8e93'];
 const DAY_NAMES = ['Пн','Вт','Ср','Чт','Пт','Сб','Вс'];
@@ -410,6 +411,11 @@ function parseGridCol(s){
   const m=String(s||'').match(/^(\d+)/);
   return m?parseInt(m[1])-1:0;
 }
+function computeRowsPerColumn(v){
+  if(typeof v.rowsPerColumn==='number'&&v.rowsPerColumn>=1)return v.rowsPerColumn;
+  if(!v.cells||!v.cells.length)return 1;
+  return Math.max(1,Math.ceil(v.cells.length/Math.max(1,v.columnCount)));
+}
 
 function migrateView(view){
   if(Array.isArray(view.columns)){
@@ -424,13 +430,14 @@ function migrateView(view){
     if(typeof c.height!=='number')c.height=DEFAULT_HEIGHT;
   });
   if(view.columnCount>view.cells.length)view.columnCount=Math.max(1,view.cells.length);
+  view.rowsPerColumn=computeRowsPerColumn(view);
   return view;
 }
 
 function makeDefaultView(){
   const cells=DAY_NAMES.map((n,i)=>makeCell(n,i,[i]));
   return {id:'v_planner',type:'planner',title:'Планировщик',icon:'📅',removable:false,
-    columnCount:1,cells,filter:'all'};
+    columnCount:1,rowsPerColumn:7,cells,filter:'all'};
 }
 function makeDefaultState(){
   return {theme:'light',accent:'#007aff',currentViewId:'v_planner',views:[makeDefaultView()]};
@@ -814,6 +821,11 @@ function buildCellCard(view,cell,words){
 }
 
 function startResize(e,card,cell,view){
+  if(view.columnCount<=1){
+    haptic('rigid');
+    toast('Для растягивания вбок нужно ≥2 столбцов (⚙️)');
+    return;
+  }
   const startX=e.clientX,startY=e.clientY;
   const startSpan=cell.colSpan||1;
   const startHeight=cell.height||DEFAULT_HEIGHT;
@@ -1062,6 +1074,7 @@ function renderSettings(){
     b.style.background=b.dataset.themeSet===state.theme?'var(--accent)':'var(--bg-3)';
     b.style.color=b.dataset.themeSet===state.theme?'#fff':'var(--text)';
   });
+  const rows=computeRowsPerColumn(v);
   const ms=$('#moduleSettings');
   ms.innerHTML=`
     <div class="setting-block">
@@ -1087,12 +1100,22 @@ function renderSettings(){
       </div>
     </div>
     <div class="setting-block">
+      <div class="setting-label">Ячеек в столбце</div>
+      <div class="counter-row">
+        <button class="counter-btn" id="rowsMinus">−</button>
+        <div class="num-value" id="rowsValue">${rows}</div>
+        <button class="counter-btn" id="rowsPlus">+</button>
+      </div>
+      <div class="setting-hint">Сколько ячеек идёт в один столбец. Остальные переходят в следующий.</div>
+    </div>
+    <div class="setting-block">
       <div class="setting-label">Количество столбцов</div>
       <div class="counter-row">
         <button class="counter-btn" id="colsMinus">−</button>
         <div class="num-value" id="colsValue">${v.columnCount}</div>
         <button class="counter-btn" id="colsPlus">+</button>
       </div>
+      <div class="setting-hint">Ширина сетки. Минимум 2 — чтобы можно было растягивать карточки вбок.</div>
     </div>
     <div class="setting-block">
       <div class="setting-label">Сброс модуля</div>
@@ -1121,6 +1144,14 @@ function renderSettings(){
     if(n===null)return;
     const num=parseInt(n);if(isNaN(num)||num<1)return;
     setCellCount(v,num);renderSettings();
+  });
+  $('#rowsMinus').addEventListener('click',()=>{changeRowsPerColumn(v,-1);renderSettings();});
+  $('#rowsPlus').addEventListener('click',()=>{changeRowsPerColumn(v,1);renderSettings();});
+  $('#rowsValue').addEventListener('click',()=>{
+    const n=prompt('Сколько ячеек в столбце?',rows);
+    if(n===null)return;
+    const num=parseInt(n);if(isNaN(num)||num<1)return;
+    setRowsPerColumn(v,num);renderSettings();
   });
   $('#colsMinus').addEventListener('click',()=>{changeColumns(v,-1);renderSettings();});
   $('#colsPlus').addEventListener('click',()=>{changeColumns(v,1);renderSettings();});
@@ -1157,6 +1188,8 @@ function setCellCount(v,newCount){
     }
   }
   if(v.columnCount>v.cells.length)v.columnCount=Math.max(1,v.cells.length);
+  v.columnCount=Math.max(1,v.columnCount);
+  v.rowsPerColumn=Math.max(1,Math.ceil(v.cells.length/v.columnCount));
   v.cells.forEach(c=>{c.colSpan=Math.min(c.colSpan||1,v.columnCount);});
   saveState();renderContent();
 }
@@ -1167,6 +1200,21 @@ function setColumns(v,newCount){
   if(newCount<1)newCount=1;
   if(newCount>v.cells.length)newCount=Math.max(1,v.cells.length);
   v.columnCount=newCount;
+  v.rowsPerColumn=Math.max(1,Math.ceil(v.cells.length/v.columnCount));
+  v.cells.forEach(c=>{c.colSpan=Math.min(c.colSpan||1,v.columnCount);});
+  saveState();renderContent();
+}
+
+function changeRowsPerColumn(v,delta){
+  const cur=computeRowsPerColumn(v);
+  setRowsPerColumn(v,cur+delta);
+}
+
+function setRowsPerColumn(v,newRows){
+  if(newRows<1)newRows=1;
+  if(newRows>v.cells.length)newRows=v.cells.length;
+  v.rowsPerColumn=newRows;
+  v.columnCount=Math.max(1,Math.ceil(v.cells.length/newRows));
   v.cells.forEach(c=>{c.colSpan=Math.min(c.colSpan||1,v.columnCount);});
   saveState();renderContent();
 }
@@ -1224,8 +1272,9 @@ function createView(){
   if(!name){toast('Введите название');return;}
   const cells=generatePresetCells(selectedPreset);
   const columnCount=(selectedPreset==='month'||selectedPreset==='week-dates')?7:1;
+  const rowsPerColumn=Math.max(1,Math.ceil(cells.length/columnCount));
   const newView={id:makeId('v'),type:'planner',title:name,icon,removable:true,
-    filter:'all',columnCount,cells};
+    filter:'all',columnCount,rowsPerColumn,cells};
   state.views.push(newView);
   saveState();
   closeModal($('#createViewModal'));
@@ -1305,6 +1354,7 @@ $('#confirmYes').addEventListener('click',()=>{
     if(v){
       v.cells=generatePresetCells('week');
       v.columnCount=1;
+      v.rowsPerColumn=7;
       saveState();renderContent();
     }
     closeModal($('#settingsModal'));
@@ -1314,6 +1364,7 @@ $('#confirmYes').addEventListener('click',()=>{
     v.cells=v.cells.filter(c=>c.id!==id);
     if(!v.cells.length)v.cells=[makeCell('',0,[])];
     if(v.columnCount>v.cells.length)v.columnCount=Math.max(1,v.cells.length);
+    v.rowsPerColumn=Math.max(1,Math.ceil(v.cells.length/v.columnCount));
     v.cells.forEach(c=>{c.colSpan=Math.min(c.colSpan||1,v.columnCount);});
     saveState();closeModal($('#cellModal'));renderContent();
   }
