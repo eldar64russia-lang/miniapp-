@@ -71,7 +71,7 @@ align-items:start;scrollbar-width:thin;-webkit-overflow-scrolling:touch}
 .day-card{background:var(--card-bg);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
 border-radius:var(--radius);padding:12px 14px;display:flex;flex-direction:column;gap:8px;
 cursor:pointer;box-shadow:var(--shadow-sm);position:relative;overflow:hidden;
-transition:box-shadow .15s;min-width:0}
+transition:box-shadow .15s;min-width:0;align-self:start}
 .day-card::before{content:'';position:absolute;top:12px;left:0;bottom:12px;width:3px;
 background:var(--card-color,var(--accent));border-radius:0 2px 2px 0}
 .day-card:active{box-shadow:var(--shadow-md)}
@@ -209,6 +209,15 @@ padding:8px 0 16px;border-bottom:1px solid var(--border);margin-bottom:12px}
 background:var(--bg-3);color:var(--text-dim);border-radius:12px;font-size:13px;
 font-weight:600;cursor:pointer;font-family:inherit;flex:1}
 .day-select button.on{background:var(--accent);color:#fff;border-color:var(--accent)}
+.preset-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
+.preset-tile{padding:16px 12px;border:2px solid var(--border);background:var(--bg-3);
+color:var(--text);border-radius:var(--radius-sm);font-size:14px;font-weight:600;
+cursor:pointer;font-family:inherit;text-align:center;display:flex;flex-direction:column;
+align-items:center;gap:6px;min-height:80px;justify-content:center}
+.preset-tile.active{border-color:var(--accent);background:var(--accent-soft);color:var(--accent)}
+.preset-tile-icon{font-size:24px;line-height:1}
+.preset-tile-label{font-size:13px}
+.preset-tile-sub{font-size:11px;font-weight:500;opacity:.7}
 .toast{position:fixed;bottom:calc(100px + env(safe-area-inset-bottom));left:50%;
 transform:translate(-50%,20px);background:rgba(0,0,0,.85);color:#fff;padding:10px 18px;
 border-radius:20px;font-size:13px;font-weight:500;opacity:0;pointer-events:none;
@@ -254,17 +263,13 @@ margin-top:20px;padding-top:12px;border-top:1px solid var(--border)}
 </div>
 <div id="moduleDelete"></div>
 <button class="btn primary" data-close style="margin-top:16px">Готово</button>
-<div class="version-tag">Версия 10.0</div>
+<div class="version-tag">Версия 11.0</div>
 </div></div>
 
 <div class="modal" id="cellModal"><div class="modal-card">
 <div class="modal-head">
   <h2 id="cellTitle">Ячейка</h2>
   <button class="icon-btn" data-close>✕</button>
-</div>
-<div class="setting-block">
-  <div class="setting-label">Название</div>
-  <input type="text" id="cellNameInput" class="modal-input" placeholder="Назовите ячейку">
 </div>
 <div class="setting-block">
   <div class="setting-label">Цвет</div>
@@ -304,7 +309,7 @@ margin-top:20px;padding-top:12px;border-top:1px solid var(--border)}
 </div></div>
 
 <div class="modal" id="createViewModal"><div class="modal-card">
-<h2>Назовите шаблон</h2>
+<h2>Новый модуль</h2>
 <div class="setting-block">
   <div class="setting-label">Название</div>
   <input type="text" id="newViewName" class="modal-input" placeholder="Календарь, Дневник…" autocomplete="off">
@@ -312,6 +317,31 @@ margin-top:20px;padding-top:12px;border-top:1px solid var(--border)}
 <div class="setting-block">
   <div class="setting-label">Иконка</div>
   <input type="text" id="newViewIcon" class="modal-input" value="📆" maxlength="2" style="text-align:center;font-size:24px">
+</div>
+<div class="setting-block">
+  <div class="setting-label">Шаблон</div>
+  <div class="preset-grid" id="presetGrid">
+    <button class="preset-tile" data-preset="empty">
+      <span class="preset-tile-icon">📋</span>
+      <span class="preset-tile-label">Пустой</span>
+      <span class="preset-tile-sub">Пн-Пт</span>
+    </button>
+    <button class="preset-tile active" data-preset="week">
+      <span class="preset-tile-icon">🗓</span>
+      <span class="preset-tile-label">Неделя</span>
+      <span class="preset-tile-sub">Пн-Вс</span>
+    </button>
+    <button class="preset-tile" data-preset="week-dates">
+      <span class="preset-tile-icon">📅</span>
+      <span class="preset-tile-label">Неделя</span>
+      <span class="preset-tile-sub">с датами</span>
+    </button>
+    <button class="preset-tile" data-preset="month">
+      <span class="preset-tile-icon">📆</span>
+      <span class="preset-tile-label">Месяц</span>
+      <span class="preset-tile-sub">с датами</span>
+    </button>
+  </div>
 </div>
 <button class="btn primary" id="createViewBtn">Создать</button>
 <button class="btn" data-close style="margin-top:8px">Отмена</button>
@@ -334,10 +364,12 @@ if (tg) { tg.ready(); tg.expand();
 document.addEventListener('contextmenu', e => e.preventDefault());
 
 const BOT_API = '';
-const STORAGE_KEY = 'miniapp-constructor-v10';
+const STORAGE_KEY = 'miniapp-constructor-v11';
 const CARD_PALETTE = ['#5ac8fa','#af52de','#ff2d55','#ff9500','#34c759','#30b0c7','#5856d6','#ffcc00'];
 const ACCENT_PALETTE = ['#007aff','#5856d6','#af52de','#ff2d55','#ff9500','#34c759','#30b0c7','#8e8e93'];
 const DAY_NAMES = ['Пн','Вт','Ср','Чт','Пт','Сб','Вс'];
+const DAY_NAMES_FULL = ['Понедельник','Вторник','Среда','Четверг','Пятница','Суббота','Воскресенье'];
+const MONTH_SHORT = ['янв','фев','мар','апр','мая','июн','июл','авг','сен','окт','ноя','дек'];
 const DEFAULT_NOTIFY = {enabled:false,time:'08:00',days:[]};
 const DEFAULT_HEIGHT = 96;
 const MIN_HEIGHT = 60;
@@ -367,6 +399,11 @@ function hexToRgba(hex,alpha){
   const b=parseInt(h.substring(4,6),16)||0;
   return `rgba(${r},${g},${b},${alpha})`;
 }
+function formatDate(d){
+  const day=d.getDate();
+  const month=(d.getMonth()+1).toString().padStart(2,'0');
+  return day+'.'+month;
+}
 
 function migrateView(view){
   if(Array.isArray(view.columns)){
@@ -384,8 +421,7 @@ function migrateView(view){
 }
 
 function makeDefaultView(){
-  const names=['Пн','Вт','Ср','Чт','Пт'];
-  const cells=names.map((n,i)=>makeCell(n,i,[i]));
+  const cells=DAY_NAMES.map((n,i)=>makeCell(n,i,[i]));
   return {id:'v_planner',type:'planner',title:'Планировщик',icon:'📅',removable:false,
     columnCount:1,cells,filter:'all'};
 }
@@ -415,6 +451,7 @@ let longPressTimer=null;
 let suppressClick=false;
 let confirmCallback=null;
 let editMode=false;
+let selectedPreset='week';
 
 const $=(s,r=document)=>r.querySelector(s);
 const $$=(s,r=document)=>[...r.querySelectorAll(s)];
@@ -517,9 +554,17 @@ function renderDock(){
   const addBtn=document.createElement('button');
   addBtn.className='dock-add';addBtn.textContent='+';
   addBtn.addEventListener('click',()=>{
-    haptic();$('#newViewName').value='';$('#newViewIcon').value='📆';
+    haptic();
+    $('#newViewName').value='';$('#newViewIcon').value='📆';
+    selectedPreset='week';
+    $$('#presetGrid .preset-tile').forEach(t=>t.classList.toggle('active',t.dataset.preset==='week'));
     openModal($('#createViewModal'));
-    setTimeout(()=>$('#newViewName').focus(),150);
+    const inp=$('#newViewName');
+    if(inp){
+      inp.focus();
+      setTimeout(()=>{try{inp.focus();inp.click();}catch(e){}},80);
+      setTimeout(()=>{try{inp.focus();}catch(e){}},350);
+    }
   });
   dock.appendChild(addBtn);
   updateDockSize();
@@ -602,10 +647,39 @@ function currentViewColumnCount(){
   return v?v.columnCount:1;
 }
 
+function computeLayout(cells, N){
+  const occupied=new Set();
+  const result=[];
+  const isFree=(r,c,span)=>{
+    if(c+span>N)return false;
+    for(let i=c;i<c+span;i++)if(occupied.has(r+','+i))return false;
+    return true;
+  };
+  const mark=(r,c,span)=>{
+    for(let i=c;i<c+span;i++)occupied.add(r+','+i);
+  };
+  for(const cell of cells){
+    const span=Math.min(Math.max(1,cell.colSpan||1),N);
+    let found=false;
+    for(let r=0;r<5000&&!found;r++){
+      for(let c=0;c+span<=N;c++){
+        if(isFree(r,c,span)){
+          result.push({cell,row:r,col:c,span});
+          mark(r,c,span);
+          found=true;
+          break;
+        }
+      }
+    }
+  }
+  return result;
+}
+
 function renderGrid(view){
   const container=$('#columnsContainer');if(!container)return;
   container.innerHTML='';
-  container.style.gridTemplateColumns=`repeat(${view.columnCount}, minmax(80px, 1fr))`;
+  const N=Math.max(1,view.columnCount);
+  container.style.gridTemplateColumns=`repeat(${N}, minmax(120px, 1fr))`;
   const words=getSearchWords();
   const visible=view.cells.filter(cell=>{
     const mq=matchCell(cell,words);
@@ -617,8 +691,12 @@ function renderGrid(view){
     container.innerHTML='<p class="empty">Нет подходящих</p>';
     return;
   }
-  visible.forEach(cell=>{
-    container.appendChild(buildCellCard(view,cell,words));
+  const layout=computeLayout(visible,N);
+  layout.forEach(({cell,row,col,span})=>{
+    const card=buildCellCard(view,cell,words);
+    card.style.gridRow=(row+1)+' / span 1';
+    card.style.gridColumn=(col+1)+' / span '+span;
+    container.appendChild(card);
   });
 }
 
@@ -629,7 +707,6 @@ function buildCellCard(view,cell,words){
   card.dataset.draggable='true';
   card.draggable=false;
   card.style.setProperty('--card-color',cell.color);
-  card.style.gridColumn=`span ${Math.min(cell.colSpan||1,view.columnCount)}`;
   card.style.minHeight=(cell.height||DEFAULT_HEIGHT)+'px';
   card.style.maxHeight=(cell.height||DEFAULT_HEIGHT)+'px';
   const nameHtml=cell.name?highlightText(cell.name,words):'Назовите';
@@ -702,8 +779,7 @@ function buildCellCard(view,cell,words){
   const handle=card.querySelector('[data-resize]');
   if(handle){
     handle.addEventListener('pointerdown',e=>{
-      e.stopPropagation();
-      e.preventDefault();
+      e.stopPropagation();e.preventDefault();
       startResize(e,card,cell,view);
     });
   }
@@ -714,13 +790,15 @@ function startResize(e,card,cell,view){
   const startX=e.clientX,startY=e.clientY;
   const startSpan=cell.colSpan||1;
   const startHeight=cell.height||DEFAULT_HEIGHT;
-  const rect=card.getBoundingClientRect();
-  const colWidth=rect.width/startSpan+10;
+  const grid=$('#columnsContainer');
+  const containerRect=grid.getBoundingClientRect();
+  const gapPx=10;
+  const colWidth=(containerRect.width-gapPx*(view.columnCount-1))/view.columnCount;
   haptic();
   const move=ev=>{
     const dx=ev.clientX-startX;
     const dy=ev.clientY-startY;
-    const spanDelta=Math.round(dx/colWidth);
+    const spanDelta=Math.round(dx/(colWidth+gapPx));
     cell.colSpan=Math.max(1,Math.min(view.columnCount,startSpan+spanDelta));
     cell.height=Math.max(MIN_HEIGHT,Math.min(MAX_HEIGHT,startHeight+dy));
     card.style.gridColumn=`span ${cell.colSpan}`;
@@ -732,6 +810,7 @@ function startResize(e,card,cell,view){
     document.removeEventListener('pointerup',up);
     document.removeEventListener('pointercancel',up);
     saveState();haptic('medium');
+    renderGrid(view);
   };
   document.addEventListener('pointermove',move,{passive:false});
   document.addEventListener('pointerup',up);
@@ -895,7 +974,6 @@ function getCurrentCell(){
 function openCellModal(cell){
   currentCellId=cell.id;
   $('#cellTitle').textContent=cell.name||'Ячейка';
-  $('#cellNameInput').value=cell.name||'';
   renderCellSwatches(cell);
   $('#cellColorCustom').value=cell.color;
   const n=cell.notify||DEFAULT_NOTIFY;
@@ -1066,14 +1144,51 @@ function openSearch(){$('#searchOverlay').classList.add('open');
 function closeSearch(){$('#searchOverlay').classList.remove('open');
   $('#globalSearch').value='';if(searchQuery){searchQuery='';renderContent();}}
 
+function generatePresetCells(preset){
+  if(preset==='empty'){
+    return DAY_NAMES.slice(0,5).map((n,i)=>makeCell(n,i,[i]));
+  }
+  if(preset==='week'){
+    return DAY_NAMES.map((n,i)=>makeCell(n,i,[i]));
+  }
+  if(preset==='week-dates'){
+    const cells=[];
+    const today=new Date();
+    const dow=(today.getDay()+6)%7;
+    const monday=new Date(today);
+    monday.setDate(today.getDate()-dow);
+    for(let i=0;i<7;i++){
+      const d=new Date(monday);
+      d.setDate(monday.getDate()+i);
+      cells.push(makeCell(DAY_NAMES[i]+' '+formatDate(d),i,[i]));
+    }
+    return cells;
+  }
+  if(preset==='month'){
+    const cells=[];
+    const now=new Date();
+    const year=now.getFullYear();
+    const month=now.getMonth();
+    const daysInMonth=new Date(year,month+1,0).getDate();
+    for(let i=1;i<=daysInMonth;i++){
+      const d=new Date(year,month,i);
+      const name=formatDate(d);
+      const dayIdx=(d.getDay()+6)%7;
+      cells.push(makeCell(name,i-1,[dayIdx]));
+    }
+    return cells;
+  }
+  return DAY_NAMES.map((n,i)=>makeCell(n,i,[i]));
+}
+
 function createView(){
   const name=$('#newViewName').value.trim();
   const icon=$('#newViewIcon').value.trim()||'📆';
   if(!name){toast('Введите название');return;}
-  const names=['Пн','Вт','Ср','Чт','Пт'];
-  const cells=names.map((n,i)=>makeCell(n,i,[i]));
+  const cells=generatePresetCells(selectedPreset);
+  const columnCount=(selectedPreset==='month'||selectedPreset==='week-dates')?7:1;
   const newView={id:makeId('v'),type:'planner',title:name,icon,removable:true,
-    filter:'all',columnCount:1,cells};
+    filter:'all',columnCount,cells};
   state.views.push(newView);
   saveState();
   closeModal($('#createViewModal'));
@@ -1099,14 +1214,12 @@ $('#settingsModal').addEventListener('click',e=>{
   const t=e.target.closest('[data-theme-set]');
   if(t){state.theme=t.dataset.themeSet;applyTheme();saveState();renderSettings();}
 });
-$('#cellNameInput').addEventListener('input',e=>{
-  const cell=getCurrentCell();if(!cell)return;
-  cell.name=e.target.value;saveState();
-  $('#cellTitle').textContent=cell.name||'Ячейка';
-  $$(`[data-cell-id="${cell.id}"] [data-name]`).forEach(el=>{
-    el.textContent=cell.name||'Назовите';
-    el.classList.toggle('empty-name',!cell.name);
-  });
+$('#presetGrid').addEventListener('click',e=>{
+  const t=e.target.closest('[data-preset]');
+  if(!t)return;
+  selectedPreset=t.dataset.preset;
+  $$('#presetGrid .preset-tile').forEach(x=>x.classList.toggle('active',x===t));
+  haptic();
 });
 $('#cellColorCustom').addEventListener('input',e=>{
   const cell=getCurrentCell();if(!cell)return;
@@ -1153,8 +1266,7 @@ $('#confirmYes').addEventListener('click',()=>{
     const id=action.slice(6);
     const v=state.views.find(x=>x.id===id);
     if(v){
-      const names=['Пн','Вт','Ср','Чт','Пт'];
-      v.cells=names.map((n,i)=>makeCell(n,i,[i]));
+      v.cells=generatePresetCells('week');
       v.columnCount=1;
       saveState();renderContent();
     }
