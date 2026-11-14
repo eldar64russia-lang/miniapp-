@@ -263,7 +263,7 @@ margin-top:20px;padding-top:12px;border-top:1px solid var(--border)}
 </div>
 <div id="moduleDelete"></div>
 <button class="btn primary" data-close style="margin-top:16px">Готово</button>
-<div class="version-tag">Версия 11.0</div>
+<div class="version-tag">Версия 12.0</div>
 </div></div>
 
 <div class="modal" id="cellModal"><div class="modal-card">
@@ -364,12 +364,10 @@ if (tg) { tg.ready(); tg.expand();
 document.addEventListener('contextmenu', e => e.preventDefault());
 
 const BOT_API = '';
-const STORAGE_KEY = 'miniapp-constructor-v11';
+const STORAGE_KEY = 'miniapp-constructor-v12';
 const CARD_PALETTE = ['#5ac8fa','#af52de','#ff2d55','#ff9500','#34c759','#30b0c7','#5856d6','#ffcc00'];
 const ACCENT_PALETTE = ['#007aff','#5856d6','#af52de','#ff2d55','#ff9500','#34c759','#30b0c7','#8e8e93'];
 const DAY_NAMES = ['Пн','Вт','Ср','Чт','Пт','Сб','Вс'];
-const DAY_NAMES_FULL = ['Понедельник','Вторник','Среда','Четверг','Пятница','Суббота','Воскресенье'];
-const MONTH_SHORT = ['янв','фев','мар','апр','мая','июн','июл','авг','сен','окт','ноя','дек'];
 const DEFAULT_NOTIFY = {enabled:false,time:'08:00',days:[]};
 const DEFAULT_HEIGHT = 96;
 const MIN_HEIGHT = 60;
@@ -404,6 +402,14 @@ function formatDate(d){
   const month=(d.getMonth()+1).toString().padStart(2,'0');
   return day+'.'+month;
 }
+function parseGridRow(s){
+  const m=String(s||'').match(/^(\d+)/);
+  return m?parseInt(m[1])-1:0;
+}
+function parseGridCol(s){
+  const m=String(s||'').match(/^(\d+)/);
+  return m?parseInt(m[1])-1:0;
+}
 
 function migrateView(view){
   if(Array.isArray(view.columns)){
@@ -417,6 +423,7 @@ function migrateView(view){
     if(typeof c.colSpan!=='number')c.colSpan=1;
     if(typeof c.height!=='number')c.height=DEFAULT_HEIGHT;
   });
+  if(view.columnCount>view.cells.length)view.columnCount=Math.max(1,view.cells.length);
   return view;
 }
 
@@ -452,6 +459,7 @@ let suppressClick=false;
 let confirmCallback=null;
 let editMode=false;
 let selectedPreset='week';
+let layoutPriority=null;
 
 const $=(s,r=document)=>r.querySelector(s);
 const $$=(s,r=document)=>[...r.querySelectorAll(s)];
@@ -586,6 +594,7 @@ function renderContent(){
   const v=state.views.find(x=>x.id===currentViewId);
   if(!v){switchView(state.views[0].id);return;}
   renderPlanner(c,v);
+  layoutPriority=null;
   document.body.classList.toggle('edit-mode',editMode);
   $('#editBtn').classList.toggle('active',editMode);
 }
@@ -598,7 +607,7 @@ function renderPlanner(root,view){
     <p class="hint">${editMode?'Режим редактирования: тащите карточку — переставить, тяните уголок вниз-вправо — размер':'Тап на имя — переименовать. Тап на поле — задачи. ⚙️ — настройки. ✏️ — редактирование.'}</p>`;
   renderFilters(view);
   renderColNav(view);
-  renderGrid(view);
+  renderGrid(view,layoutPriority);
   $('#plannerFilters').addEventListener('click',e=>{
     const b=e.target.closest('[data-filter]');if(!b)return;
     view.filter=b.dataset.filter;saveState();
@@ -647,7 +656,7 @@ function currentViewColumnCount(){
   return v?v.columnCount:1;
 }
 
-function computeLayout(cells, N){
+function computeLayout(cells, N, priority){
   const occupied=new Set();
   const result=[];
   const isFree=(r,c,span)=>{
@@ -658,16 +667,34 @@ function computeLayout(cells, N){
   const mark=(r,c,span)=>{
     for(let i=c;i<c+span;i++)occupied.add(r+','+i);
   };
-  for(const cell of cells){
+  let ordered=[...cells];
+  if(priority){
+    const idx=ordered.findIndex(c=>c.id===priority.cellId);
+    if(idx>0){
+      const[p]=ordered.splice(idx,1);
+      ordered.unshift(p);
+    }
+  }
+  for(const cell of ordered){
     const span=Math.min(Math.max(1,cell.colSpan||1),N);
-    let found=false;
-    for(let r=0;r<5000&&!found;r++){
-      for(let c=0;c+span<=N;c++){
-        if(isFree(r,c,span)){
-          result.push({cell,row:r,col:c,span});
-          mark(r,c,span);
-          found=true;
-          break;
+    let placed=false;
+    if(priority&&cell.id===priority.cellId&&priority.preferredRow!=null&&priority.preferredCol!=null){
+      const r=priority.preferredRow,c=priority.preferredCol;
+      if(isFree(r,c,span)){
+        result.push({cell,row:r,col:c,span});
+        mark(r,c,span);
+        placed=true;
+      }
+    }
+    if(!placed){
+      for(let r=0;r<5000&&!placed;r++){
+        for(let c=0;c+span<=N;c++){
+          if(isFree(r,c,span)){
+            result.push({cell,row:r,col:c,span});
+            mark(r,c,span);
+            placed=true;
+            break;
+          }
         }
       }
     }
@@ -675,7 +702,7 @@ function computeLayout(cells, N){
   return result;
 }
 
-function renderGrid(view){
+function renderGrid(view,priority){
   const container=$('#columnsContainer');if(!container)return;
   container.innerHTML='';
   const N=Math.max(1,view.columnCount);
@@ -691,7 +718,7 @@ function renderGrid(view){
     container.innerHTML='<p class="empty">Нет подходящих</p>';
     return;
   }
-  const layout=computeLayout(visible,N);
+  const layout=computeLayout(visible,N,priority||null);
   layout.forEach(({cell,row,col,span})=>{
     const card=buildCellCard(view,cell,words);
     card.style.gridRow=(row+1)+' / span 1';
@@ -790,10 +817,12 @@ function startResize(e,card,cell,view){
   const startX=e.clientX,startY=e.clientY;
   const startSpan=cell.colSpan||1;
   const startHeight=cell.height||DEFAULT_HEIGHT;
+  const startRow=parseGridRow(card.style.gridRow);
+  const startCol=parseGridCol(card.style.gridColumn);
   const grid=$('#columnsContainer');
-  const containerRect=grid.getBoundingClientRect();
+  const rect=grid.getBoundingClientRect();
   const gapPx=10;
-  const colWidth=(containerRect.width-gapPx*(view.columnCount-1))/view.columnCount;
+  const colWidth=(rect.width-gapPx*(view.columnCount-1))/view.columnCount;
   haptic();
   const move=ev=>{
     const dx=ev.clientX-startX;
@@ -801,7 +830,7 @@ function startResize(e,card,cell,view){
     const spanDelta=Math.round(dx/(colWidth+gapPx));
     cell.colSpan=Math.max(1,Math.min(view.columnCount,startSpan+spanDelta));
     cell.height=Math.max(MIN_HEIGHT,Math.min(MAX_HEIGHT,startHeight+dy));
-    card.style.gridColumn=`span ${cell.colSpan}`;
+    card.style.gridColumn=(startCol+1)+' / span '+cell.colSpan;
     card.style.minHeight=cell.height+'px';
     card.style.maxHeight=cell.height+'px';
   };
@@ -810,7 +839,8 @@ function startResize(e,card,cell,view){
     document.removeEventListener('pointerup',up);
     document.removeEventListener('pointercancel',up);
     saveState();haptic('medium');
-    renderGrid(view);
+    layoutPriority={cellId:cell.id,preferredRow:startRow,preferredCol:startCol};
+    renderContent();
   };
   document.addEventListener('pointermove',move,{passive:false});
   document.addEventListener('pointerup',up);
@@ -902,7 +932,10 @@ function startDrag(card,cell,view){
 function endDrag(){
   if(!dragState){suppressClick=false;return;}
   const{cell,view,target}=dragState;
+  let priority=null;
   if(target){
+    const targetRow=parseGridRow(target.style.gridRow);
+    const targetCol=parseGridCol(target.style.gridColumn);
     const targetId=target.dataset.cellId;
     const cells=view.cells;
     const sIdx=cells.indexOf(cell);
@@ -910,12 +943,14 @@ function endDrag(){
     const tIdx=cells.findIndex(c=>c.id===targetId);
     if(tIdx>=0)cells.splice(tIdx,0,cell);
     else cells.push(cell);
+    priority={cellId:cell.id,preferredRow:targetRow,preferredCol:targetCol};
     saveState();haptic('medium');
   }
   dragState?.card?.classList.remove('dragging');
   $$('.drag-target').forEach(el=>el.classList.remove('drag-target'));
   dragState=null;
   setTimeout(()=>{suppressClick=false;},100);
+  layoutPriority=priority;
   renderContent();
 }
 
@@ -1121,6 +1156,8 @@ function setCellCount(v,newCount){
       v.cells.push(makeCell('',i,[]));
     }
   }
+  if(v.columnCount>v.cells.length)v.columnCount=Math.max(1,v.cells.length);
+  v.cells.forEach(c=>{c.colSpan=Math.min(c.colSpan||1,v.columnCount);});
   saveState();renderContent();
 }
 
@@ -1128,6 +1165,7 @@ function changeColumns(v,delta){setColumns(v,v.columnCount+delta);}
 
 function setColumns(v,newCount){
   if(newCount<1)newCount=1;
+  if(newCount>v.cells.length)newCount=Math.max(1,v.cells.length);
   v.columnCount=newCount;
   v.cells.forEach(c=>{c.colSpan=Math.min(c.colSpan||1,v.columnCount);});
   saveState();renderContent();
@@ -1172,9 +1210,8 @@ function generatePresetCells(preset){
     const daysInMonth=new Date(year,month+1,0).getDate();
     for(let i=1;i<=daysInMonth;i++){
       const d=new Date(year,month,i);
-      const name=formatDate(d);
       const dayIdx=(d.getDay()+6)%7;
-      cells.push(makeCell(name,i-1,[dayIdx]));
+      cells.push(makeCell(formatDate(d),i-1,[dayIdx]));
     }
     return cells;
   }
@@ -1276,6 +1313,8 @@ $('#confirmYes').addEventListener('click',()=>{
     const v=state.views.find(x=>x.id===currentViewId);if(!v)return;
     v.cells=v.cells.filter(c=>c.id!==id);
     if(!v.cells.length)v.cells=[makeCell('',0,[])];
+    if(v.columnCount>v.cells.length)v.columnCount=Math.max(1,v.cells.length);
+    v.cells.forEach(c=>{c.colSpan=Math.min(c.colSpan||1,v.columnCount);});
     saveState();closeModal($('#cellModal'));renderContent();
   }
 });
