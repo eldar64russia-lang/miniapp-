@@ -2,32 +2,60 @@
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
-<!-- viewport-fit=cover — для «челки» и безопасных зон iOS -->
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#0f0f12">
+<meta name="theme-color" content="#f5f5f7">
 <title>Конструктор</title>
-<!-- Официальный SDK Telegram Mini Apps -->
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <style>
   /* ============================================================
-     Переменные темы. Всё оформление опирается на них,
-     поэтому смена --accent меняет цвет у ВСЕХ активных кнопок.
+     ТЕМЫ. Светлая — по умолчанию (как macOS).
+     Всё оформление на переменных, поэтому тема меняется одной
+     строкой: document.documentElement.dataset.theme = 'dark'.
      ============================================================ */
   :root {
-    --bg: #0f0f12;
-    --bg-2: #1a1a20;
-    --bg-3: #252530;
-    --text: #e8e8ee;
-    --text-dim: #8b8b98;
-    --accent: #5b8def;
-    --accent-soft: rgba(91, 141, 239, 0.18);
-    --border: #2a2a35;
-    --radius: 14px;
-    --tap: 44px; /* минимальный размер тач-цели */
+    --bg: #f5f5f7;
+    --bg-2: #ffffff;
+    --bg-3: #ececf0;
+    --text: #1d1d1f;
+    --text-dim: #86868b;
+    --text-muted: #c7c7cc;
+    --border: #e0e0e5;
+    --accent: #007aff;
+    --accent-soft: rgba(0, 122, 255, 0.12);
+    --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.06);
+    --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08);
+    --shadow-lg: 0 10px 30px rgba(0, 0, 0, 0.12);
+    --radius-sm: 12px;
+    --radius: 18px;
+    --radius-lg: 24px;
+    --tap: 44px;
     --gap: 10px;
+    --dock-bg: rgba(255, 255, 255, 0.72);
+    --dock-border: rgba(0, 0, 0, 0.06);
   }
 
-  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  [data-theme="dark"] {
+    --bg: #1c1c1e;
+    --bg-2: #2c2c2e;
+    --bg-3: #3a3a3c;
+    --text: #f5f5f7;
+    --text-dim: #98989d;
+    --text-muted: #48484a;
+    --border: #38383a;
+    --accent: #0a84ff;
+    --accent-soft: rgba(10, 132, 255, 0.18);
+    --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.2);
+    --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.3);
+    --shadow-lg: 0 10px 30px rgba(0, 0, 0, 0.4);
+    --dock-bg: rgba(44, 44, 46, 0.72);
+    --dock-border: rgba(255, 255, 255, 0.08);
+  }
+
+  * {
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+    -webkit-touch-callout: none;
+  }
 
   html, body {
     margin: 0;
@@ -38,56 +66,52 @@
     font-size: 15px;
     line-height: 1.35;
     min-height: 100vh;
-    /* не даём скроллу «просачиваться» в Telegram */
     overscroll-behavior-y: contain;
+    transition: background 0.2s, color 0.2s;
   }
 
+  /* Запрет выделения на интерактиве — убирает iOS-«лупу» */
+  .day-card, .task-row, .task-text, .icon-btn, .mini-btn,
+  .dock-item, .swatch, .filters button, .segmented button,
+  .btn, .day-name, .day-body {
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-user-drag: none;
+  }
+
+  /* ============================================================
+     КАРКАС
+     ============================================================ */
   .app {
     max-width: 720px;
     margin: 0 auto;
-    padding: 12px 14px calc(20px + env(safe-area-inset-bottom));
+    /* большой bottom-padding — чтобы контент не прятался за доком */
+    padding: 12px 16px calc(110px + env(safe-area-inset-bottom));
     padding-top: calc(12px + env(safe-area-inset-top));
   }
 
-  /* ---------- Верхняя панель: поиск + палитра ---------- */
-  .topbar {
+  /* ============================================================
+     ШАПКА
+     ============================================================ */
+  .app-header {
     display: flex;
-    gap: 10px;
     align-items: center;
-    margin-bottom: 12px;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 16px;
+    min-height: 44px;
   }
-  .search-wrap {
+  .app-header h1 {
+    margin: 0;
+    font-size: 28px;
+    font-weight: 700;
+    letter-spacing: -0.5px;
     flex: 1;
+  }
+  .header-actions {
     display: flex;
-    align-items: center;
     gap: 8px;
-    background: var(--bg-3);
-    border-radius: 12px;
-    padding: 0 12px;
-    min-height: var(--tap);
   }
-  .search-wrap:focus-within { box-shadow: 0 0 0 2px var(--accent-soft); }
-  .search-icon { color: var(--text-dim); flex: none; }
-  .search {
-    flex: 1;
-    width: 100%;
-    background: var(--bg-3);
-    border: none;
-    color: var(--text);
-    font-size: 15px;
-    outline: none;
-    padding: 12px;
-    border-radius: 12px;
-    min-height: var(--tap);
-    font-family: inherit;
-  }
-  .search-wrap .search {
-    background: transparent;
-    padding: 12px 0;
-    border-radius: 0;
-    min-height: auto;
-  }
-  input[type="search"]::-webkit-search-cancel-button { -webkit-appearance: none; }
 
   .icon-btn {
     min-width: var(--tap);
@@ -95,24 +119,74 @@
     border: none;
     background: var(--bg-3);
     color: var(--text);
-    border-radius: 12px;
-    font-size: 20px;
+    border-radius: var(--radius-sm);
+    font-size: 18px;
     display: inline-flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
     padding: 0;
-    transition: background 0.15s;
+    transition: background 0.15s, transform 0.1s;
   }
-  .icon-btn:active { background: var(--accent-soft); }
+  .icon-btn:active {
+    background: var(--accent-soft);
+    transform: scale(0.94);
+  }
 
-  /* ---------- Баннер-предупреждение про свайп ---------- */
+  /* ============================================================
+     ПАНЕЛЬ ПОИСКА (выезжает под шапкой)
+     ============================================================ */
+  .search-overlay {
+    max-height: 0;
+    overflow: hidden;
+    margin-bottom: 0;
+    transition: max-height 0.2s ease, margin-bottom 0.2s ease;
+  }
+  .search-overlay.open {
+    max-height: 60px;
+    margin-bottom: 12px;
+  }
+  .search-field {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--bg-2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 0 12px;
+    min-height: var(--tap);
+    box-shadow: var(--shadow-sm);
+  }
+  .search-field input {
+    flex: 1;
+    background: transparent;
+    border: none;
+    color: var(--text);
+    font-size: 15px;
+    outline: none;
+    padding: 10px 0;
+    font-family: inherit;
+  }
+  .search-field input::-webkit-search-cancel-button { -webkit-appearance: none; }
+  .search-field .close-search {
+    background: transparent;
+    border: none;
+    color: var(--text-dim);
+    font-size: 16px;
+    cursor: pointer;
+    padding: 4px;
+    min-width: 32px;
+    min-height: 32px;
+  }
+
+  /* ============================================================
+     ПРЕДУПРЕЖДЕНИЕ О СВАЙПЕ (компактное)
+     ============================================================ */
   .warn {
-    background: rgba(245, 158, 11, 0.14);
-    border: 1px solid rgba(245, 158, 11, 0.3);
-    color: #f5c98a;
-    padding: 10px 12px;
-    border-radius: 10px;
+    background: rgba(245, 158, 11, 0.12);
+    color: #b4730a;
+    padding: 8px 12px;
+    border-radius: var(--radius-sm);
     font-size: 12px;
     line-height: 1.4;
     display: flex;
@@ -120,148 +194,124 @@
     align-items: flex-start;
     margin-bottom: 12px;
   }
+  [data-theme="dark"] .warn {
+    background: rgba(245, 158, 11, 0.18);
+    color: #f5c98a;
+  }
   .warn.hidden { display: none; }
   .warn-close {
     background: transparent;
     border: none;
     color: inherit;
-    font-size: 16px;
+    font-size: 14px;
     padding: 0 4px;
     margin-left: auto;
     cursor: pointer;
-    min-width: 28px;
-    min-height: 28px;
+    min-width: 24px;
+    min-height: 24px;
+    opacity: 0.7;
   }
 
-  /* ---------- Виды (главная / планировщик) ---------- */
-  .view { display: none; }
-  .view.active { display: block; }
-
-  h1 {
-    font-size: 22px;
-    margin: 4px 0 4px;
-    font-weight: 700;
-  }
-  .subtitle {
-    color: var(--text-dim);
-    font-size: 13px;
-    margin: 0 0 16px;
-  }
-  .view-head {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 8px;
-    gap: 12px;
-  }
-  .hint {
-    color: var(--text-dim);
-    font-size: 12px;
-    margin: 12px 0 0;
-    text-align: center;
-  }
-
-  /* ---------- Модули (2 колонки) ---------- */
-  .modules {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: var(--gap);
-  }
-  .module-card {
-    background: var(--bg-2);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 14px;
-    min-height: 100px;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    gap: 8px;
-    text-align: left;
-    color: var(--text);
-    cursor: pointer;
-    transition: transform 0.1s, border-color 0.15s;
-    font-family: inherit;
-  }
-  .module-card:active {
-    transform: scale(0.98);
-    border-color: var(--accent);
-  }
-  .module-icon { font-size: 28px; }
-  .module-title { font-weight: 600; font-size: 15px; }
-  .module-badge { font-size: 12px; color: var(--text-dim); margin-top: 2px; }
-
-  /* ---------- Фильтры (чипсы, скроллятся по горизонтали) ---------- */
+  /* ============================================================
+     ФИЛЬТРЫ (чипсы)
+     ============================================================ */
   .filters {
     display: flex;
     gap: 8px;
     overflow-x: auto;
-    padding-bottom: 8px;
-    margin-bottom: 12px;
+    padding-bottom: 10px;
+    margin-bottom: 10px;
     scrollbar-width: none;
   }
   .filters::-webkit-scrollbar { display: none; }
   .filters button {
-    min-height: var(--tap);
-    padding: 0 16px;
-    border-radius: 22px;
-    border: 1px solid var(--border);
-    background: transparent;
+    min-height: 36px;
+    padding: 0 14px;
+    border-radius: 18px;
+    border: none;
+    background: var(--bg-3);
     color: var(--text-dim);
     font-size: 13px;
+    font-weight: 500;
     white-space: nowrap;
     cursor: pointer;
     font-family: inherit;
+    transition: background 0.15s, color 0.15s;
   }
   .filters button.active {
     background: var(--accent);
     color: #fff;
-    border-color: var(--accent);
   }
 
-  /* ---------- Неделя (по умолчанию 2 колонки, вертикально) ---------- */
+  /* ============================================================
+     НЕДЕЛЯ
+     ============================================================ */
   .week-grid {
     display: grid;
-    /* grid-template-columns задаётся в JS из настроек */
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: var(--gap);
   }
   .day-card {
     background: var(--bg-2);
-    border: 1px solid var(--border);
-    border-left: 4px solid var(--card-color, var(--accent));
     border-radius: var(--radius);
-    padding: 10px 12px;
-    min-height: 90px;
+    padding: 12px 14px;
+    min-height: 96px;
     display: flex;
     flex-direction: column;
     gap: 6px;
     cursor: pointer;
-    transition: transform 0.12s, opacity 0.12s;
+    box-shadow: var(--shadow-sm);
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.12s, box-shadow 0.15s;
   }
-  .day-card.dragging { opacity: 0.5; transform: scale(0.97); }
-  .day-card.drag-target { outline: 2px dashed var(--accent); outline-offset: 2px; }
+  .day-card::before {
+    content: '';
+    position: absolute;
+    top: 12px;
+    left: 0;
+    bottom: 12px;
+    width: 3px;
+    background: var(--card-color, var(--accent));
+    border-radius: 0 2px 2px 0;
+  }
+  .day-card:active {
+    transform: scale(0.98);
+    box-shadow: var(--shadow-md);
+  }
+  .day-card.dragging {
+    opacity: 0.45;
+    transform: scale(0.96);
+  }
+  .day-card.drag-target {
+    box-shadow: 0 0 0 2px var(--accent);
+  }
 
   .day-head {
     display: flex;
     align-items: center;
     justify-content: space-between;
     gap: 4px;
+    padding-left: 8px;
   }
-  .day-name { font-weight: 700; font-size: 16px; }
-  .day-actions { display: flex; gap: 0; }
-
-  /* Маленькие кнопки 32×32 визуально, но 44×44 по площади касания
-     (через ::before с отрицательными отступами). */
+  .day-name {
+    font-weight: 700;
+    font-size: 17px;
+    letter-spacing: -0.3px;
+  }
+  .day-actions {
+    display: flex;
+    gap: 0;
+  }
   .mini-btn {
     position: relative;
-    width: 32px;
-    height: 32px;
+    width: 30px;
+    height: 30px;
     border: none;
     background: transparent;
     color: var(--text-dim);
     border-radius: 8px;
-    font-size: 16px;
+    font-size: 15px;
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -272,47 +322,132 @@
   .mini-btn::before {
     content: '';
     position: absolute;
-    inset: -6px; /* расширяем тач-зону до 44px */
+    inset: -7px;
   }
-  .mini-btn:active { background: var(--accent-soft); }
-
+  .mini-btn:active {
+    background: var(--accent-soft);
+    color: var(--accent);
+  }
   .drag-handle {
     cursor: grab;
-    touch-action: none; /* ВАЖНО: отключает скролл, пока палец на ручке */
+    touch-action: none;
   }
 
-  .day-body { font-size: 12px; color: var(--text-dim); }
-  .task-count { color: var(--text); font-size: 13px; }
+  .day-body {
+    font-size: 12px;
+    color: var(--text-dim);
+    padding-left: 8px;
+    margin-top: auto;
+  }
+  .task-count {
+    color: var(--text);
+    font-size: 13px;
+    font-weight: 500;
+  }
   .task-preview {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    margin-top: 4px;
+    margin-top: 2px;
   }
 
   .empty {
     text-align: center;
     color: var(--text-dim);
-    padding: 20px;
+    padding: 40px 20px;
     font-size: 14px;
     grid-column: 1 / -1;
     margin: 0;
   }
 
-  /* ---------- Модальные окна (bottom-sheet) ---------- */
+  /* ============================================================
+     DOCK-БАР (снизу, как в macOS)
+     ============================================================ */
+  .dock {
+    position: fixed;
+    bottom: calc(12px + env(safe-area-inset-bottom));
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--dock-bg);
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    border: 1px solid var(--dock-border);
+    border-radius: var(--radius-lg);
+    padding: 8px;
+    display: flex;
+    gap: 4px;
+    box-shadow: var(--shadow-lg);
+    z-index: 100;
+    max-width: calc(100vw - 32px);
+  }
+  .dock-item {
+    width: 58px;
+    height: 58px;
+    border: none;
+    background: transparent;
+    border-radius: 16px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 26px;
+    transition: background 0.15s, transform 0.1s;
+    position: relative;
+    padding: 0;
+  }
+  .dock-item:active {
+    transform: scale(0.92);
+  }
+  .dock-item.active {
+    background: var(--accent-soft);
+  }
+  .dock-item.active::after {
+    content: '';
+    position: absolute;
+    bottom: 4px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 4px;
+    height: 4px;
+    background: var(--accent);
+    border-radius: 50%;
+  }
+  .dock-item .dock-badge {
+    position: absolute;
+    top: 6px;
+    right: 6px;
+    background: var(--accent);
+    color: #fff;
+    font-size: 10px;
+    font-weight: 700;
+    min-width: 18px;
+    height: 18px;
+    border-radius: 9px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 5px;
+    border: 2px solid var(--dock-bg);
+  }
+
+  /* ============================================================
+     МОДАЛКИ (bottom-sheet)
+     ============================================================ */
   .modal {
     position: fixed;
     inset: 0;
-    background: rgba(0, 0, 0, 0.6);
+    background: rgba(0, 0, 0, 0.4);
     display: none;
     align-items: flex-end;
     justify-content: center;
     z-index: 200;
+    backdrop-filter: blur(2px);
+    -webkit-backdrop-filter: blur(2px);
   }
   .modal.open { display: flex; }
   .modal-card {
     background: var(--bg-2);
-    border-radius: 20px 20px 0 0;
+    border-radius: var(--radius-lg) var(--radius-lg) 0 0;
     padding: 20px;
     width: 100%;
     max-width: 500px;
@@ -320,188 +455,290 @@
     max-height: 85vh;
     display: flex;
     flex-direction: column;
+    animation: modalSlideUp 0.2s ease;
+  }
+  @keyframes modalSlideUp {
+    from { transform: translateY(20px); opacity: 0.5; }
+    to   { transform: translateY(0);    opacity: 1; }
   }
   .modal h2 {
     margin: 0 0 16px;
-    font-size: 17px;
+    font-size: 20px;
     font-weight: 700;
+    letter-spacing: -0.4px;
   }
   .modal-head {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    margin-bottom: 12px;
+    margin-bottom: 14px;
     gap: 12px;
   }
   .modal-head h2 { margin: 0; }
 
-  /* Палитра цветов */
+  /* ============================================================
+     КОМПАКТНАЯ ПАЛИТРА (маленькие кружки)
+     ============================================================ */
   .swatches {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 12px;
-    margin-bottom: 16px;
+    grid-template-columns: repeat(8, 1fr);
+    gap: 8px;
+    margin-bottom: 18px;
+  }
+  @media (max-width: 340px) {
+    .swatches { grid-template-columns: repeat(4, 1fr); }
   }
   .swatch {
     aspect-ratio: 1;
-    border: 3px solid transparent;
-    border-radius: 14px;
+    border: none;
+    border-radius: 50%;
     cursor: pointer;
     padding: 0;
-    min-height: 60px;
     transition: transform 0.1s;
+    position: relative;
   }
-  .swatch:active { transform: scale(0.94); }
+  .swatch:active { transform: scale(0.88); }
   .swatch.active {
-    border-color: #fff;
-    box-shadow: 0 0 0 2px var(--bg-2);
+    box-shadow: 0 0 0 2px var(--bg-2), 0 0 0 4px currentColor;
   }
 
-  /* Кнопки */
+  /* ============================================================
+     НАСТРОЙКИ — расширенная шестерёнка
+     ============================================================ */
+  .setting-block {
+    padding: 12px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .setting-block:last-of-type { border-bottom: none; }
+  .setting-label {
+    font-size: 13px;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    font-weight: 600;
+    margin-bottom: 10px;
+  }
+  .setting-options {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+  .setting-options button {
+    flex: 1;
+    min-width: 60px;
+    min-height: 44px;
+    border: 1px solid var(--border);
+    background: var(--bg-3);
+    color: var(--text);
+    border-radius: var(--radius-sm);
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    font-family: inherit;
+    transition: background 0.15s, color 0.15s, border-color 0.15s;
+  }
+  .setting-options button.active {
+    background: var(--accent);
+    color: #fff;
+    border-color: var(--accent);
+  }
+
+  /* ============================================================
+     КНОПКИ (универсальные)
+     ============================================================ */
   .btn {
     width: 100%;
-    min-height: 48px;
+    min-height: 50px;
     border: none;
     background: var(--bg-3);
     color: var(--text);
-    border-radius: 12px;
-    font-size: 15px;
+    border-radius: var(--radius-sm);
+    font-size: 16px;
     font-weight: 600;
     cursor: pointer;
     font-family: inherit;
+    transition: opacity 0.15s, transform 0.1s;
   }
-  .btn.primary { background: var(--accent); color: #fff; }
-  .btn:active { opacity: 0.8; }
+  .btn.primary {
+    background: var(--accent);
+    color: #fff;
+  }
+  .btn.danger {
+    background: rgba(255, 59, 48, 0.12);
+    color: #ff3b30;
+  }
+  .btn:active {
+    opacity: 0.8;
+    transform: scale(0.98);
+  }
+  .btn + .btn { margin-top: 8px; }
 
-  /* Настройки: сегменты */
-  .setting-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 12px;
-    padding: 8px 0 16px;
-  }
-  .setting-row label { font-size: 14px; color: var(--text-dim); }
-  .segmented {
-    display: flex;
-    background: var(--bg-3);
-    border-radius: 10px;
-    padding: 4px;
-    gap: 4px;
-  }
-  .segmented button {
-    min-width: 44px;
-    min-height: 40px;
-    border: none;
-    background: transparent;
-    color: var(--text-dim);
-    border-radius: 8px;
-    font-size: 14px;
-    cursor: pointer;
-    font-family: inherit;
-  }
-  .segmented button.active {
-    background: var(--bg-2);
-    color: var(--text);
-  }
-
-  /* Задачи внутри дня */
+  /* ============================================================
+     СПИСОК ЗАДАЧ В ДНЕ
+     ============================================================ */
   .task-list {
     max-height: 50vh;
     overflow-y: auto;
-    overscroll-behavior: contain; /* не тащим скролл в Telegram */
+    overscroll-behavior: contain;
     margin-bottom: 12px;
     display: flex;
     flex-direction: column;
-    gap: 6px;
+    gap: 8px;
   }
   .task-row {
     display: flex;
     align-items: center;
     gap: 8px;
     background: var(--bg-3);
-    border-radius: 10px;
-    padding: 4px 4px 4px 12px;
+    border-radius: var(--radius-sm);
+    padding: 4px 4px 4px 14px;
     min-height: 48px;
   }
-  .task-text { flex: 1; font-size: 14px; word-break: break-word; }
-  .add-row { display: flex; gap: 8px; }
-  .add-row .search { flex: 1; }
+  .task-text {
+    flex: 1;
+    font-size: 15px;
+    word-break: break-word;
+    padding: 8px 0;
+    cursor: text;
+  }
+  .task-edit-input {
+    flex: 1;
+    background: transparent;
+    border: none;
+    color: var(--text);
+    font-size: 15px;
+    font-family: inherit;
+    outline: none;
+    padding: 8px 0;
+    border-bottom: 2px solid var(--accent);
+  }
+  .add-row {
+    display: flex;
+    gap: 8px;
+  }
+  .add-row input {
+    flex: 1;
+    background: var(--bg-3);
+    border: 1px solid var(--border);
+    color: var(--text);
+    font-size: 15px;
+    font-family: inherit;
+    padding: 12px 14px;
+    border-radius: var(--radius-sm);
+    min-height: var(--tap);
+    outline: none;
+  }
+  .add-row input:focus {
+    border-color: var(--accent);
+  }
 
-  /* ---------- Toast ---------- */
+  /* ============================================================
+     ЗАГЛУШКИ ДЛЯ МОДУЛЕЙ («скоро»)
+     ============================================================ */
+  .placeholder {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 80px 20px;
+    color: var(--text-dim);
+    gap: 16px;
+  }
+  .placeholder-icon {
+    font-size: 64px;
+    opacity: 0.5;
+  }
+  .placeholder-title {
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--text);
+    letter-spacing: -0.4px;
+  }
+  .placeholder-sub {
+    font-size: 14px;
+    max-width: 280px;
+    line-height: 1.5;
+  }
+
+  /* ============================================================
+     TOAST
+     ============================================================ */
   .toast {
     position: fixed;
-    bottom: calc(20px + env(safe-area-inset-bottom));
+    bottom: calc(100px + env(safe-area-inset-bottom));
     left: 50%;
     transform: translate(-50%, 20px);
-    background: var(--bg-3);
-    color: var(--text);
-    padding: 10px 16px;
-    border-radius: 12px;
+    background: rgba(0, 0, 0, 0.85);
+    color: #fff;
+    padding: 10px 18px;
+    border-radius: 20px;
     font-size: 13px;
+    font-weight: 500;
     opacity: 0;
     pointer-events: none;
     transition: opacity 0.2s, transform 0.2s;
     z-index: 300;
     max-width: 90vw;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
   }
   .toast.show {
     opacity: 1;
     transform: translate(-50%, 0);
+  }
+
+  .hint {
+    color: var(--text-dim);
+    font-size: 12px;
+    margin: 16px 0 0;
+    text-align: center;
+    line-height: 1.5;
   }
 </style>
 </head>
 <body>
 
 <div class="app">
-
-  <!-- ===== Верхняя панель: поиск + палитра темы ===== -->
-  <header class="topbar">
-    <div class="search-wrap">
-      <svg class="search-icon" width="18" height="18" viewBox="0 0 24 24"
-           fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
-        <circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/>
-      </svg>
-      <input type="search" class="search" id="searchInput"
-             placeholder="Поиск по приложению…" autocomplete="off">
+  <!-- ===== Шапка ===== -->
+  <header class="app-header">
+    <h1 id="pageTitle">Планировщик</h1>
+    <div class="header-actions">
+      <button class="icon-btn" id="searchBtn" aria-label="Поиск">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none"
+             stroke="currentColor" stroke-width="2.2" stroke-linecap="round">
+          <circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/>
+        </svg>
+      </button>
+      <button class="icon-btn" id="settingsBtn" aria-label="Настройки">⚙️</button>
     </div>
-    <button class="icon-btn" id="appColorBtn"
-            aria-label="Цвет темы" title="Цвет темы">🎨</button>
   </header>
 
-  <!-- ===== Баннер о свайпе Telegram (можно скрыть) ===== -->
+  <!-- ===== Раскрывающийся поиск ===== -->
+  <div class="search-overlay" id="searchOverlay">
+    <div class="search-field">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+           stroke="var(--text-dim)" stroke-width="2.2" stroke-linecap="round">
+        <circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/>
+      </svg>
+      <input type="search" id="globalSearch" placeholder="Поиск..." autocomplete="off">
+      <button class="close-search" id="searchClose">✕</button>
+    </div>
+  </div>
+
+  <!-- ===== Баннер о свайпе ===== -->
   <div class="warn" id="swipeWarn">
     <span aria-hidden="true">⚠️</span>
-    <span>Свайп вниз от верхнего края в Telegram закрывает Mini App.
-          Крутите содержимое пальцем по центру экрана.</span>
+    <span>Свайп вниз от верхнего края закрывает Mini App. Скролльте по центру.</span>
     <button class="warn-close" id="warnClose" aria-label="Скрыть">✕</button>
   </div>
 
-  <!-- ===== Вид 1: список модулей ===== -->
-  <main class="view active" id="view-main">
-    <h1>Конструктор</h1>
-    <p class="subtitle">Полезные инструменты — в одном месте</p>
-    <div class="modules" id="modulesGrid"></div>
-  </main>
-
-  <!-- ===== Вид 2: планировщик ===== -->
-  <main class="view" id="view-planner">
-    <div class="view-head">
-      <h1>Планировщик</h1>
-      <button class="icon-btn" id="plannerSettingsBtn"
-              aria-label="Настройки структуры" title="Настройки структуры">⚙️</button>
-    </div>
-    <div class="filters" id="plannerFilters">
-      <button data-filter="all" class="active">Все дни</button>
-      <button data-filter="busy">С задачами</button>
-      <button data-filter="empty">Без задач</button>
-    </div>
-    <div class="week-grid" id="weekGrid"></div>
-    <p class="hint">Удерживайте ☰ и тяните — порядок дней сохраняется.
-       🎨 — цвет карточки.</p>
-  </main>
-
+  <!-- ===== Содержимое текущего вида ===== -->
+  <div id="content"></div>
 </div>
+
+<!-- ===== DOCK ===== -->
+<nav class="dock" id="dock"></nav>
 
 <!-- ===== Модалка: цвет карточки дня ===== -->
 <div class="modal" id="colorModal">
@@ -512,51 +749,77 @@
   </div>
 </div>
 
-<!-- ===== Модалка: цвет темы приложения ===== -->
-<div class="modal" id="appColorModal">
+<!-- ===== Модалка: акцентный цвет ===== -->
+<div class="modal" id="accentModal">
   <div class="modal-card">
     <h2>Акцентный цвет</h2>
-    <div class="swatches" id="appSwatches"></div>
+    <div class="swatches" id="accentSwatches"></div>
     <button class="btn" data-close>Готово</button>
   </div>
 </div>
 
-<!-- ===== Модалка: настройки структуры недели ===== -->
+<!-- ===== Модалка: настройки структуры ===== -->
 <div class="modal" id="settingsModal">
   <div class="modal-card">
-    <h2>Настройки структуры</h2>
-    <div class="setting-row">
-      <label>Колонок в неделе</label>
-      <div class="segmented" id="colsSeg">
-        <button data-cols="1">1</button>
-        <button data-cols="2" class="active">2</button>
-        <button data-cols="3">3</button>
+    <h2>Настройки</h2>
+
+    <div class="setting-block">
+      <div class="setting-label">Тема</div>
+      <div class="setting-options" data-setting="theme">
+        <button data-value="light">☀️ Светлая</button>
+        <button data-value="dark">🌙 Тёмная</button>
       </div>
     </div>
-    <button class="btn primary" data-close>Готово</button>
+
+    <div class="setting-block">
+      <div class="setting-label">Колонок в неделе</div>
+      <div class="setting-options" data-setting="weekColumns">
+        <button data-value="1">1</button>
+        <button data-value="2">2</button>
+        <button data-value="3">3</button>
+      </div>
+    </div>
+
+    <div class="setting-block">
+      <div class="setting-label">Выходные</div>
+      <div class="setting-options" data-setting="showWeekend">
+        <button data-value="true">Показывать</button>
+        <button data-value="false">Скрыть</button>
+      </div>
+    </div>
+
+    <div class="setting-block">
+      <div class="setting-label">Акцентный цвет</div>
+      <div class="setting-options">
+        <button id="openAccentPicker">🎨 Выбрать цвет</button>
+      </div>
+    </div>
+
+    <div class="setting-block">
+      <div class="setting-label">Данные</div>
+      <div class="setting-options" style="flex-direction:column;">
+        <button id="resetOrderBtn">↺ Сбросить порядок дней</button>
+        <button id="resetAllBtn" class="btn danger" style="margin-top:8px;">
+          Сбросить всё
+        </button>
+      </div>
+    </div>
+
+    <button class="btn primary" data-close style="margin-top:16px;">Готово</button>
   </div>
 </div>
 
-<!-- ===== Модалка: задачи выбранного дня ===== -->
+<!-- ===== Модалка: задачи дня ===== -->
 <div class="modal" id="dayModal">
   <div class="modal-card">
     <div class="modal-head">
       <h2 id="dayTitle">День</h2>
       <button class="icon-btn" id="dayClose" aria-label="Закрыть">✕</button>
     </div>
-    <div class="search-wrap" style="margin-bottom:10px;">
-      <svg class="search-icon" width="18" height="18" viewBox="0 0 24 24"
-           fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
-        <circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/>
-      </svg>
-      <input type="search" class="search" id="daySearch"
-             placeholder="Поиск в задачах…" autocomplete="off">
-    </div>
     <div class="task-list" id="taskList"></div>
     <div class="add-row">
-      <input type="text" class="search" id="newTask"
-             placeholder="Новая задача…" autocomplete="off">
-      <button class="icon-btn" id="addTaskBtn" aria-label="Добавить задачу">+</button>
+      <input type="text" id="newTask" placeholder="Новая задача..." autocomplete="off">
+      <button class="icon-btn" id="addTaskBtn" aria-label="Добавить">+</button>
     </div>
   </div>
 </div>
@@ -568,57 +831,73 @@
 'use strict';
 
 /* ============================================================
-   Telegram WebApp — инициализация
+   TELEGRAM
    ============================================================ */
 const tg = window.Telegram?.WebApp;
 if (tg) {
   tg.ready();
-  tg.expand(); // разворачиваем на весь экран
-  // Отключаем вертикальный свайп-закрытие (Telegram 7.7+).
-  // Если метод недоступен — остаётся наш баннер-предупреждение.
+  tg.expand();
   if (typeof tg.disableVerticalSwipes === 'function') {
-    try { tg.disableVerticalSwipes(); } catch (e) { /* старая версия */ }
+    try { tg.disableVerticalSwipes(); } catch (e) {}
   }
-  try {
-    tg.setHeaderColor('#0f0f12');
-    tg.setBackgroundColor('#0f0f12');
-  } catch (e) {}
 }
+document.addEventListener('contextmenu', (e) => e.preventDefault());
 
 /* ============================================================
-   Константы и состояние
+   КОНСТАНТЫ
    ============================================================ */
-const STORAGE_KEY = 'miniapp-constructor-v1';
+const STORAGE_KEY = 'miniapp-constructor-v2';
 
-// Палитра доступных цветов (используется и для карточек, и для темы)
-const PALETTE = [
-  '#3d6bb8', '#8b5cf6', '#ec4899', '#ef4444',
-  '#f59e0b', '#10b981', '#06b6d4', '#6b7280',
+// Приятные пастельные цвета для карточек (iOS-like)
+const CARD_PALETTE = [
+  '#5ac8fa', '#af52de', '#ff2d55', '#ff9500',
+  '#34c759', '#30b0c7', '#5856d6', '#ffcc00',
+];
+
+// Акцентные цвета (более насыщенные, iOS system colors)
+const ACCENT_PALETTE = [
+  '#007aff', '#5856d6', '#af52de', '#ff2d55',
+  '#ff9500', '#34c759', '#30b0c7', '#8e8e93',
+];
+
+// Метаданные модулей (иконки в доке)
+const VIEWS = {
+  planner:   { title: 'Планировщик', icon: '📅' },
+  notes:     { title: 'Заметки',     icon: '📝' },
+  reminders: { title: 'Напоминания', icon: '⏰' },
+  words:     { title: 'Слова',       icon: '📚' },
+};
+
+const WEEK_ORDER = [
+  { id: 'mon', day: 'Пн', full: 'Понедельник', color: '#5ac8fa' },
+  { id: 'tue', day: 'Вт', full: 'Вторник',     color: '#af52de' },
+  { id: 'wed', day: 'Ср', full: 'Среда',       color: '#ff2d55' },
+  { id: 'thu', day: 'Чт', full: 'Четверг',     color: '#ff9500' },
+  { id: 'fri', day: 'Пт', full: 'Пятница',     color: '#34c759' },
+  { id: 'sat', day: 'Сб', full: 'Суббота',     color: '#30b0c7' },
+  { id: 'sun', day: 'Вс', full: 'Воскресенье', color: '#5856d6' },
 ];
 
 const DEFAULT_STATE = {
-  accent: '#5b8def',      // цвет темы
-  weekColumns: 2,         // колонок в неделе по умолчанию — 2
-  plannerFilter: 'all',   // активный фильтр
-  warnDismissed: false,   // скрыт ли баннер про свайп
-  modules: [
-    { id: 'notes',     title: 'Заметки',      icon: '📝', count: 12 },
-    { id: 'planner',   title: 'Планировщик',  icon: '📅', count: 7  },
-    { id: 'reminders', title: 'Напоминания',  icon: '⏰', count: 3  },
-    { id: 'words',     title: 'Слова',        icon: '🈯', count: 24 },
-  ],
-  week: [
-    { id: 'mon', day: 'Пн', full: 'Понедельник', color: '#3d6bb8', tasks: ['Встреча с командой'] },
-    { id: 'tue', day: 'Вт', full: 'Вторник',     color: '#8b5cf6', tasks: [] },
-    { id: 'wed', day: 'Ср', full: 'Среда',       color: '#ec4899', tasks: ['Отчёт за неделю'] },
-    { id: 'thu', day: 'Чт', full: 'Четверг',     color: '#f59e0b', tasks: [] },
-    { id: 'fri', day: 'Пт', full: 'Пятница',     color: '#10b981', tasks: ['Звонок клиенту'] },
-    { id: 'sat', day: 'Сб', full: 'Суббота',     color: '#06b6d4', tasks: [] },
-    { id: 'sun', day: 'Вс', full: 'Воскресенье', color: '#6b7280', tasks: [] },
-  ],
+  theme: 'light',
+  accent: '#007aff',
+  weekColumns: 2,
+  showWeekend: true,
+  plannerFilter: 'all',
+  warnDismissed: false,
+  week: WEEK_ORDER.map(d => ({ ...d, tasks: [] })),
 };
 
-// Загрузка состояния из localStorage (если было сохранено)
+// Стартовые задачи (только для новых пользователей)
+const SEED_TASKS = {
+  mon: ['Встреча с командой'],
+  wed: ['Отчёт за неделю'],
+  fri: ['Звонок клиенту'],
+};
+
+/* ============================================================
+   СОСТОЯНИЕ
+   ============================================================ */
 function loadState() {
   try {
     const saved = JSON.parse(localStorage.getItem(STORAGE_KEY));
@@ -626,31 +905,34 @@ function loadState() {
       return { ...DEFAULT_STATE, ...saved };
     }
   } catch (e) {}
-  return JSON.parse(JSON.stringify(DEFAULT_STATE));
+  // Первый запуск — накатываем seed-задачи
+  const fresh = JSON.parse(JSON.stringify(DEFAULT_STATE));
+  fresh.week.forEach(d => {
+    if (SEED_TASKS[d.id]) d.tasks = [...SEED_TASKS[d.id]];
+  });
+  return fresh;
 }
 function saveState() {
   try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch (e) {}
 }
 
 let state = loadState();
-let currentView = 'main';       // 'main' | 'planner'
-let searchQuery = '';           // глобальный поисковый запрос
-let currentDayId = null;        // открытый день в модалке
-let dragState = null;           // состояние drag-n-drop
+let currentView = 'planner';
+let searchQuery = '';
+let currentDayId = null;
+let dragState = null;
 
 /* ============================================================
-   Утилиты
+   УТИЛИТЫ
    ============================================================ */
 const $  = (sel, root = document) => root.querySelector(sel);
 const $$ = (sel, root = document) => [...root.querySelectorAll(sel)];
 
-// Экранируем пользовательский текст, чтобы не вставить HTML
 function escapeHtml(s) {
   return String(s).replace(/[&<>"']/g, c =>
     ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[c]));
 }
 
-// Показать короткое сообщение внизу
 let toastTimer = null;
 function toast(msg) {
   const el = $('#toast');
@@ -660,69 +942,146 @@ function toast(msg) {
   toastTimer = setTimeout(() => el.classList.remove('show'), 2000);
 }
 
-// Тактильный отклик (если Telegram поддерживает)
 function haptic(type = 'light') {
   try { tg?.HapticFeedback?.impactOccurred(type); } catch (e) {}
 }
 
 /* ============================================================
-   Применение темы
+   ТЕМА И АКЦЕНТ
    ============================================================ */
+function applyTheme() {
+  document.documentElement.dataset.theme = state.theme;
+  // Красим статус-бар Telegram под фон
+  try {
+    const color = state.theme === 'dark' ? '#1c1c1e' : '#f5f5f7';
+    tg?.setHeaderColor?.(color);
+    tg?.setBackgroundColor?.(color);
+  } catch (e) {}
+}
+
 function applyAccent() {
   document.documentElement.style.setProperty('--accent', state.accent);
-  // Полупрозрачный вариант акцента (для подсветки) считаем вручную —
-  // так работает во всех WebView без CSS color-mix.
   const [r, g, b] = [1, 3, 5].map(i => parseInt(state.accent.slice(i, i + 2), 16));
   document.documentElement.style.setProperty(
-    '--accent-soft', `rgba(${r}, ${g}, ${b}, 0.18)`);
+    '--accent-soft', `rgba(${r}, ${g}, ${b}, 0.16)`);
 }
 
 /* ============================================================
-   Рендер: главный экран (модули)
+   DOCK
    ============================================================ */
-function renderModules() {
-  const grid = $('#modulesGrid');
-  grid.innerHTML = '';
-  const q = searchQuery;
-  const items = state.modules.filter(m => !q || m.title.toLowerCase().includes(q));
-
-  if (!items.length) {
-    grid.innerHTML = '<p class="empty">Ничего не найдено</p>';
-    return;
-  }
-  for (const m of items) {
-    const card = document.createElement('button');
-    card.className = 'module-card';
-    card.dataset.moduleId = m.id;
-    card.innerHTML = `
-      <div class="module-icon" aria-hidden="true">${m.icon}</div>
-      <div>
-        <div class="module-title">${escapeHtml(m.title)}</div>
-        <div class="module-badge">${m.count} записей</div>
-      </div>`;
-    card.addEventListener('click', () => openModule(m.id));
-    grid.appendChild(card);
+function renderDock() {
+  const dock = $('#dock');
+  dock.innerHTML = '';
+  for (const [id, meta] of Object.entries(VIEWS)) {
+    const btn = document.createElement('button');
+    btn.className = 'dock-item' + (id === currentView ? ' active' : '');
+    btn.dataset.view = id;
+    btn.setAttribute('aria-label', meta.title);
+    btn.innerHTML = `<span aria-hidden="true">${meta.icon}</span>`;
+    btn.addEventListener('click', () => {
+      if (id === currentView) return;
+      haptic();
+      switchView(id);
+    });
+    dock.appendChild(btn);
   }
 }
 
 /* ============================================================
-   Рендер: неделя (с учётом поиска и фильтра)
+   ПЕРЕКЛЮЧЕНИЕ ВИДОВ
    ============================================================ */
-function renderWeek() {
+function switchView(view) {
+  currentView = view;
+  $('#pageTitle').textContent = VIEWS[view].title;
+  renderDock();
+  renderContent();
+  // Закрываем поиск при смене вида
+  closeSearch();
+  window.scrollTo({ top: 0, behavior: 'instant' });
+}
+
+function renderContent() {
+  const content = $('#content');
+  content.innerHTML = '';
+  if (currentView === 'planner') {
+    renderPlanner(content);
+  } else {
+    renderPlaceholder(content, currentView);
+  }
+}
+
+/* ============================================================
+   ЗАГЛУШКИ ДЛЯ НЕ-ПЛАНИРОВЩИКА
+   ============================================================ */
+function renderPlaceholder(root, viewId) {
+  const meta = VIEWS[viewId];
+  const messages = {
+    notes:     'Здесь будут заметки с папками, тегами и поиском.',
+    reminders: 'Здесь будут напоминания с датой, временем и повтором.',
+    words:     'Здесь будут карточки слов с повторением по системе Лейтнера.',
+  };
+  root.innerHTML = `
+    <div class="placeholder">
+      <div class="placeholder-icon">${meta.icon}</div>
+      <div class="placeholder-title">${meta.title}</div>
+      <div class="placeholder-sub">${messages[viewId] || 'Скоро'}</div>
+    </div>`;
+}
+
+/* ============================================================
+   ПЛАНИРОВЩИК
+   ============================================================ */
+function renderPlanner(root) {
+  root.innerHTML = `
+    <div class="filters" id="plannerFilters">
+      <button data-filter="all" class="${state.plannerFilter === 'all' ? 'active' : ''}">Все дни</button>
+      <button data-filter="busy" class="${state.plannerFilter === 'busy' ? 'active' : ''}">С задачами</button>
+      <button data-filter="empty" class="${state.plannerFilter === 'empty' ? 'active' : ''}">Свободные</button>
+      <button data-filter="today" class="${state.plannerFilter === 'today' ? 'active' : ''}">Сегодня</button>
+    </div>
+    <div class="week-grid" id="weekGrid"></div>
+    <p class="hint">Удерживайте ☰ — перетащить день. 🎨 — цвет. Тап на задачу — редактировать.</p>
+  `;
+
+  $('#plannerFilters').addEventListener('click', (e) => {
+    const btn = e.target.closest('[data-filter]');
+    if (!btn) return;
+    state.plannerFilter = btn.dataset.filter;
+    saveState();
+    $$('#plannerFilters button').forEach(b =>
+      b.classList.toggle('active', b.dataset.filter === state.plannerFilter));
+    renderWeekGrid();
+    haptic();
+  });
+
+  renderWeekGrid();
+}
+
+function renderWeekGrid() {
   const grid = $('#weekGrid');
+  if (!grid) return;
   grid.innerHTML = '';
+  grid.style.gridTemplateColumns =
+    `repeat(${state.weekColumns}, minmax(0, 1fr))`;
+
   const q = searchQuery;
-  const filter = state.plannerFilter;
+  // Сегодняшний день недели (0=Вс, 1=Пн ... 6=Сб)
+  const todayIdx = new Date().getDay();
+  const todayId = ['sun','mon','tue','wed','thu','fri','sat'][todayIdx];
 
   const visible = state.week.filter(d => {
+    // Выходные скрыты — пропускаем сб/вс
+    if (!state.showWeekend && (d.id === 'sat' || d.id === 'sun')) return false;
     const matchQ = !q ||
       d.day.toLowerCase().includes(q) ||
       d.full.toLowerCase().includes(q) ||
       d.tasks.some(t => t.toLowerCase().includes(q));
     const matchF =
-      filter === 'all'  ? true :
-      filter === 'busy' ? d.tasks.length > 0 :
-                          d.tasks.length === 0;
+      state.plannerFilter === 'all'   ? true :
+      state.plannerFilter === 'busy'  ? d.tasks.length > 0 :
+      state.plannerFilter === 'empty' ? d.tasks.length === 0 :
+      state.plannerFilter === 'today' ? d.id === todayId :
+                                        true;
     return matchQ && matchF;
   });
 
@@ -736,21 +1095,28 @@ function renderWeek() {
     card.className = 'day-card';
     card.dataset.dayId = d.id;
     card.dataset.draggable = 'true';
+    card.draggable = false;
     card.style.setProperty('--card-color', d.color);
+
+    const taskWord = d.tasks.length === 1 ? 'задача'
+                   : (d.tasks.length >= 2 && d.tasks.length <= 4) ? 'задачи'
+                   : 'задач';
+
     card.innerHTML = `
       <div class="day-head">
         <div class="day-name">${escapeHtml(d.day)}</div>
         <div class="day-actions">
-          <button class="mini-btn palette-btn" aria-label="Изменить цвет"
-                  title="Изменить цвет">🎨</button>
-          <button class="mini-btn drag-handle" aria-label="Перетащить"
-                  title="Перетащить" data-drag-handle>☰</button>
+          <button class="mini-btn palette-btn" draggable="false"
+                  aria-label="Цвет" title="Цвет">🎨</button>
+          <button class="mini-btn drag-handle" draggable="false"
+                  aria-label="Перетащить" title="Перетащить"
+                  data-drag-handle>☰</button>
         </div>
       </div>
       <div class="day-body">
         <div class="task-count">${
           d.tasks.length
-            ? d.tasks.length + ' задач' + (d.tasks.length === 1 ? 'а' : 'и')
+            ? d.tasks.length + ' ' + taskWord
             : 'Свободно'
         }</div>
         ${d.tasks.length
@@ -759,23 +1125,20 @@ function renderWeek() {
           : ''}
       </div>`;
 
-    // Тап по карточке (кроме ручки и палитры) — открыть день
     card.addEventListener('click', (e) => {
       if (e.target.closest('.palette-btn, .drag-handle')) return;
       openDay(d.id);
     });
 
-    // Палитра цвета карточки
     card.querySelector('.palette-btn').addEventListener('click', (e) => {
       e.stopPropagation();
-      openColorPicker(d.color, (newColor) => {
+      openCardColorPicker(d.color, (newColor) => {
         d.color = newColor;
         saveState();
-        renderWeek();
+        renderWeekGrid();
       });
     });
 
-    // Ручка перетаскивания
     card.querySelector('.drag-handle')
       .addEventListener('pointerdown', (e) => startDrag(e, card));
 
@@ -783,33 +1146,13 @@ function renderWeek() {
   }
 }
 
-// Сетка колонок по настройкам
-function applyWeekColumns() {
-  $('#weekGrid').style.gridTemplateColumns =
-    `repeat(${state.weekColumns}, minmax(0, 1fr))`;
-}
-
-function renderWarnBanner() {
-  $('#swipeWarn').classList.toggle('hidden', !!state.warnDismissed);
-}
-
-function renderFilters() {
-  $$('#plannerFilters button').forEach(b =>
-    b.classList.toggle('active', b.dataset.filter === state.plannerFilter));
-}
-
-function renderColsSeg() {
-  $$('#colsSeg button').forEach(b =>
-    b.classList.toggle('active', Number(b.dataset.cols) === state.weekColumns));
-}
-
 /* ============================================================
-   Drag & drop (лёгкий, без «прыгающих» анимаций)
-   Принцип: исходная карточка полупрозрачная, карточка под пальцем
-   подсвечивается пунктиром. Отпустил — порядок поменялся.
+   DRAG & DROP
    ============================================================ */
 function startDrag(e, card) {
+  if (e.button && e.button !== 0) return;
   e.preventDefault();
+  e.stopPropagation();
   haptic();
   dragState = { card, target: null };
   card.classList.add('dragging');
@@ -817,13 +1160,14 @@ function startDrag(e, card) {
   document.addEventListener('pointermove', onDragMove);
   document.addEventListener('pointerup', endDrag);
   document.addEventListener('pointercancel', endDrag);
+  document.addEventListener('touchmove', preventDuringDrag, { passive: false });
 }
-
+function preventDuringDrag(e) {
+  if (dragState) e.preventDefault();
+}
 function onDragMove(e) {
   if (!dragState) return;
   $$('.drag-target').forEach(el => el.classList.remove('drag-target'));
-
-  // Ищем карточку под пальцем (кроме исходной)
   const el = document.elementFromPoint(e.clientX, e.clientY);
   const target = el?.closest('[data-draggable]');
   if (target && target !== dragState.card) {
@@ -833,7 +1177,6 @@ function onDragMove(e) {
     dragState.target = null;
   }
 }
-
 function endDrag() {
   if (dragState?.target) {
     const sourceId = dragState.card.dataset.dayId;
@@ -853,11 +1196,12 @@ function endDrag() {
   document.removeEventListener('pointermove', onDragMove);
   document.removeEventListener('pointerup', endDrag);
   document.removeEventListener('pointercancel', endDrag);
-  renderWeek();
+  document.removeEventListener('touchmove', preventDuringDrag);
+  renderWeekGrid();
 }
 
 /* ============================================================
-   Модальные окна
+   МОДАЛКИ
    ============================================================ */
 function openModal(m) {
   m.classList.add('open');
@@ -869,25 +1213,26 @@ function closeModal(m) {
   if (!$$('.modal.open').length) document.body.style.overflow = '';
   updateBackButton();
 }
-
-// Верхняя нативная кнопка «назад» Telegram: закрывает модал или вид
 function updateBackButton() {
   if (!tg?.BackButton) return;
   const hasModal = $$('.modal.open').length > 0;
-  const nested   = currentView !== 'main';
-  if (hasModal || nested) tg.BackButton.show();
-  else                     tg.BackButton.hide();
+  if (hasModal) tg.BackButton.show();
+  else tg.BackButton.hide();
 }
 
-// Универсальный пикер цвета
-function openColorPicker(current, onPick) {
+/* ============================================================
+   ПАЛИТРА КАРТОЧКИ (компактная)
+   ============================================================ */
+function openCardColorPicker(current, onPick) {
   const modal = $('#colorModal');
   const wrap = $('#swatches');
   wrap.innerHTML = '';
-  for (const color of PALETTE) {
+  for (const color of CARD_PALETTE) {
     const b = document.createElement('button');
     b.className = 'swatch' + (color === current ? ' active' : '');
     b.style.background = color;
+    b.style.color = color; // для box-shadow в .active
+    b.draggable = false;
     b.setAttribute('aria-label', color);
     b.addEventListener('click', () => { onPick(color); closeModal(modal); });
     wrap.appendChild(b);
@@ -895,14 +1240,19 @@ function openColorPicker(current, onPick) {
   openModal(modal);
 }
 
-function openAppColorPicker() {
-  const modal = $('#appColorModal');
-  const wrap = $('#appSwatches');
+/* ============================================================
+   ПАЛИТРА АКЦЕНТА
+   ============================================================ */
+function openAccentPicker() {
+  const modal = $('#accentModal');
+  const wrap = $('#accentSwatches');
   wrap.innerHTML = '';
-  for (const color of PALETTE) {
+  for (const color of ACCENT_PALETTE) {
     const b = document.createElement('button');
     b.className = 'swatch' + (color === state.accent ? ' active' : '');
     b.style.background = color;
+    b.style.color = color;
+    b.draggable = false;
     b.setAttribute('aria-label', color);
     b.addEventListener('click', () => {
       state.accent = color;
@@ -916,14 +1266,13 @@ function openAppColorPicker() {
 }
 
 /* ============================================================
-   Экран «День»: список задач + поиск внутри
+   ЭКРАН ДНЯ + РЕДАКТИРОВАНИЕ ЗАДАЧ
    ============================================================ */
 function openDay(dayId) {
   currentDayId = dayId;
   const day = state.week.find(d => d.id === dayId);
   if (!day) return;
   $('#dayTitle').textContent = day.full;
-  $('#daySearch').value = '';
   $('#newTask').value = '';
   renderTasks();
   openModal($('#dayModal'));
@@ -932,33 +1281,75 @@ function openDay(dayId) {
 function renderTasks() {
   const day = state.week.find(d => d.id === currentDayId);
   if (!day) return;
-  const q = $('#daySearch').value.trim().toLowerCase();
   const list = $('#taskList');
   list.innerHTML = '';
 
-  const visible = day.tasks
-    .map((text, idx) => ({ text, idx }))
-    .filter(o => !q || o.text.toLowerCase().includes(q));
-
-  if (!visible.length) {
-    list.innerHTML = `<p class="empty">${
-      q ? 'Ничего не найдено' : 'Задач пока нет'}</p>`;
+  if (!day.tasks.length) {
+    list.innerHTML = '<p class="empty">Задач пока нет.<br>Добавьте первую ↓</p>';
     return;
   }
-  for (const { text, idx } of visible) {
+
+  day.tasks.forEach((text, idx) => {
     const row = document.createElement('div');
     row.className = 'task-row';
     row.innerHTML = `
-      <span class="task-text">${escapeHtml(text)}</span>
-      <button class="mini-btn" aria-label="Удалить" data-del="${idx}">✕</button>`;
+      <span class="task-text" data-idx="${idx}">${escapeHtml(text)}</span>
+      <button class="mini-btn" draggable="false" aria-label="Удалить"
+              data-del="${idx}">✕</button>`;
+
+    // Тап на текст → редактирование
+    row.querySelector('.task-text').addEventListener('click', () => {
+      startEditTask(idx, row);
+    });
+
     row.querySelector('[data-del]').addEventListener('click', () => {
       day.tasks.splice(idx, 1);
       saveState();
       renderTasks();
-      renderWeek();
+      renderWeekGrid();
     });
     list.appendChild(row);
+  });
+}
+
+function startEditTask(idx, rowEl) {
+  const day = state.week.find(d => d.id === currentDayId);
+  if (!day) return;
+  const oldText = day.tasks[idx];
+  const textEl = rowEl.querySelector('.task-text');
+  if (!textEl) return;
+
+  const input = document.createElement('input');
+  input.type = 'text';
+  input.value = oldText;
+  input.className = 'task-edit-input';
+  textEl.replaceWith(input);
+  input.focus();
+  input.setSelectionRange(input.value.length, input.value.length);
+
+  let done = false;
+  function save() {
+    if (done) return;
+    done = true;
+    const newText = input.value.trim();
+    if (newText && newText !== oldText) {
+      day.tasks[idx] = newText;
+      saveState();
+      renderWeekGrid();
+    }
+    renderTasks();
   }
+  function cancel() {
+    if (done) return;
+    done = true;
+    renderTasks();
+  }
+
+  input.addEventListener('blur', save);
+  input.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') { e.preventDefault(); input.blur(); }
+    else if (e.key === 'Escape') { e.preventDefault(); cancel(); }
+  });
 }
 
 function addTaskFromInput() {
@@ -971,89 +1362,130 @@ function addTaskFromInput() {
   input.value = '';
   saveState();
   renderTasks();
-  renderWeek();
+  renderWeekGrid();
+  haptic();
 }
 
 /* ============================================================
-   Переключение видов
+   НАСТРОЙКИ (шестерёнка)
    ============================================================ */
-function switchView(view) {
-  currentView = view;
-  $$('.view').forEach(v => v.classList.remove('active'));
-  $('#view-' + view).classList.add('active');
-  updateBackButton();
+function renderSettings() {
+  // Тема
+  $$('[data-setting="theme"] button').forEach(b =>
+    b.classList.toggle('active', b.dataset.value === state.theme));
+  // Колонки
+  $$('[data-setting="weekColumns"] button').forEach(b =>
+    b.classList.toggle('active', Number(b.dataset.value) === state.weekColumns));
+  // Выходные
+  $$('[data-setting="showWeekend"] button').forEach(b =>
+    b.classList.toggle('active',
+      (b.dataset.value === 'true') === state.showWeekend));
 }
 
-function openModule(id) {
+function handleSettingClick(e) {
+  const btn = e.target.closest('[data-value]');
+  if (!btn) return;
+  const group = btn.closest('[data-setting]');
+  if (!group) return;
+  const setting = group.dataset.setting;
+  const value = btn.dataset.value;
+
+  if (setting === 'theme') {
+    state.theme = value;
+    applyTheme();
+  } else if (setting === 'weekColumns') {
+    state.weekColumns = Number(value);
+    if (currentView === 'planner') renderWeekGrid();
+  } else if (setting === 'showWeekend') {
+    state.showWeekend = value === 'true';
+    if (currentView === 'planner') renderWeekGrid();
+  }
+  saveState();
+  renderSettings();
   haptic();
-  if (id === 'planner') {
-    switchView('planner');
-    renderWeek();
-  } else {
-    toast('Модуль «' + id + '» скоро появится');
+}
+
+/* ============================================================
+   ПОИСК
+   ============================================================ */
+function openSearch() {
+  $('#searchOverlay').classList.add('open');
+  setTimeout(() => $('#globalSearch').focus(), 100);
+}
+function closeSearch() {
+  $('#searchOverlay').classList.remove('open');
+  $('#globalSearch').value = '';
+  if (searchQuery) {
+    searchQuery = '';
+    if (currentView === 'planner') renderWeekGrid();
   }
 }
 
 /* ============================================================
-   Обработчики событий
+   ОБРАБОТЧИКИ
    ============================================================ */
-
-// Глобальный поиск — фильтрует текущий вид
-$('#searchInput').addEventListener('input', (e) => {
+$('#searchBtn').addEventListener('click', openSearch);
+$('#searchClose').addEventListener('click', closeSearch);
+$('#globalSearch').addEventListener('input', (e) => {
   searchQuery = e.target.value.trim().toLowerCase();
-  if (currentView === 'main')      renderModules();
-  else if (currentView === 'planner') renderWeek();
+  if (currentView === 'planner') renderWeekGrid();
 });
 
-// Палитра темы приложения
-$('#appColorBtn').addEventListener('click', openAppColorPicker);
-
-// Шестерёнка настроек структуры
-$('#plannerSettingsBtn').addEventListener('click', () => {
-  renderColsSeg();
+$('#settingsBtn').addEventListener('click', () => {
+  renderSettings();
   openModal($('#settingsModal'));
 });
 
-// Выбор количества колонок
-$('#colsSeg').addEventListener('click', (e) => {
-  const btn = e.target.closest('[data-cols]');
-  if (!btn) return;
-  state.weekColumns = Number(btn.dataset.cols);
-  saveState();
-  renderColsSeg();
-  applyWeekColumns();
-  haptic();
+// Все кнопки [data-value] в модалке настроек
+$('#settingsModal').addEventListener('click', handleSettingClick);
+
+// Открыть палитру акцента из настроек
+$('#openAccentPicker').addEventListener('click', () => {
+  closeModal($('#settingsModal'));
+  setTimeout(openAccentPicker, 150);
 });
 
-// Фильтры недели
-$('#plannerFilters').addEventListener('click', (e) => {
-  const btn = e.target.closest('[data-filter]');
-  if (!btn) return;
-  state.plannerFilter = btn.dataset.filter;
+// Сброс порядка дней
+$('#resetOrderBtn').addEventListener('click', () => {
+  // Сохраняем цвета и задачи по id, восстанавливаем стандартный порядок
+  const byId = Object.fromEntries(state.week.map(d => [d.id, d]));
+  state.week = WEEK_ORDER.map(base => {
+    const old = byId[base.id];
+    return old
+      ? { ...base, color: old.color, tasks: old.tasks }
+      : { ...base, tasks: [] };
+  });
   saveState();
-  renderFilters();
-  renderWeek();
-  haptic();
+  renderWeekGrid();
+  toast('Порядок восстановлен');
+  haptic('medium');
 });
 
-// Скрыть баннер про свайп
+// Полный сброс
+$('#resetAllBtn').addEventListener('click', () => {
+  if (!confirm('Сбросить все настройки и задачи?')) return;
+  localStorage.removeItem(STORAGE_KEY);
+  location.reload();
+});
+
+// Баннер о свайпе
 $('#warnClose').addEventListener('click', () => {
   state.warnDismissed = true;
   saveState();
-  renderWarnBanner();
+  $('#swipeWarn').classList.add('hidden');
 });
 
-// Кнопки «Отмена/Готово» внутри модалок
+// Закрыть модалки по [data-close] и по фону
 $$('[data-close]').forEach(b =>
   b.addEventListener('click', () => closeModal(b.closest('.modal'))));
+$$('.modal').forEach(m => {
+  m.addEventListener('click', (e) => {
+    if (e.target === m) closeModal(m);
+  });
+});
 
-// Закрыть модалку дня
+// День: закрыть, добавить задачу
 $('#dayClose').addEventListener('click', () => closeModal($('#dayModal')));
-
-// Поиск внутри задач дня
-$('#daySearch').addEventListener('input', renderTasks);
-
-// Добавить задачу (кнопка + Enter)
 $('#addTaskBtn').addEventListener('click', addTaskFromInput);
 $('#newTask').addEventListener('keydown', (e) => {
   if (e.key === 'Enter') addTaskFromInput();
@@ -1064,27 +1496,19 @@ if (tg?.BackButton) {
   tg.BackButton.onClick(() => {
     const open = $$('.modal.open');
     if (open.length) { open.forEach(closeModal); return; }
-    if (currentView !== 'main') switchView('main');
+    if (searchQuery) closeSearch();
   });
 }
 
-// Тап по фону модалки — закрыть
-$$('.modal').forEach(m => {
-  m.addEventListener('click', (e) => {
-    if (e.target === m) closeModal(m);
-  });
-});
-
 /* ============================================================
-   Старт приложения
+   СТАРТ
    ============================================================ */
 (function init() {
+  applyTheme();
   applyAccent();
-  applyWeekColumns();
-  renderWarnBanner();
-  renderFilters();
-  renderModules();
-  renderWeek();
+  renderDock();
+  switchView('planner'); // сразу планировщик!
+  $('#swipeWarn').classList.toggle('hidden', !!state.warnDismissed);
   updateBackButton();
 })();
 </script>
