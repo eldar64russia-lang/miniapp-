@@ -8,416 +8,261 @@
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <style>
 :root {
-  --bg: #f5f5f7; --bg-2: #ffffff; --bg-3: #ececf0;
-  --text: #1d1d1f; --text-dim: #86868b; --text-muted: #c7c7cc;
-  --border: #e0e0e5;
-  --accent: #007aff; --accent-soft: rgba(0,122,255,0.12);
-  --shadow-sm: 0 1px 3px rgba(0,0,0,0.06);
-  --shadow-md: 0 4px 12px rgba(0,0,0,0.08);
-  --shadow-lg: 0 10px 30px rgba(0,0,0,0.12);
-  --radius-sm: 12px; --radius: 18px; --radius-lg: 24px;
-  --tap: 44px; --gap: 10px;
-  --dock-bg: rgba(255,255,255,0.72);
-  --dock-border: rgba(0,0,0,0.06);
+  --bg:#f5f5f7;--bg-2:#fff;--bg-3:#ececf0;
+  --text:#1d1d1f;--text-dim:#86868b;--text-muted:#c7c7cc;
+  --border:#e0e0e5;--accent:#007aff;--accent-soft:rgba(0,122,255,.12);
+  --shadow-sm:0 1px 3px rgba(0,0,0,.06);--shadow-md:0 4px 12px rgba(0,0,0,.08);
+  --shadow-lg:0 10px 30px rgba(0,0,0,.12);
+  --radius-sm:12px;--radius:18px;--radius-lg:24px;
+  --tap:44px;--gap:10px;
+  --dock-bg:rgba(255,255,255,.72);--dock-border:rgba(0,0,0,.06);
 }
-[data-theme="dark"] {
-  --bg: #1c1c1e; --bg-2: #2c2c2e; --bg-3: #3a3a3c;
-  --text: #f5f5f7; --text-dim: #98989d; --text-muted: #48484a;
-  --border: #38383a;
-  --accent: #0a84ff; --accent-soft: rgba(10,132,255,0.18);
-  --shadow-sm: 0 1px 3px rgba(0,0,0,0.2);
-  --shadow-md: 0 4px 12px rgba(0,0,0,0.3);
-  --shadow-lg: 0 10px 30px rgba(0,0,0,0.4);
-  --dock-bg: rgba(44,44,46,0.72);
-  --dock-border: rgba(255,255,255,0.08);
+[data-theme=dark]{
+  --bg:#1c1c1e;--bg-2:#2c2c2e;--bg-3:#3a3a3c;
+  --text:#f5f5f7;--text-dim:#98989d;--text-muted:#48484a;
+  --border:#38383a;--accent:#0a84ff;--accent-soft:rgba(10,132,255,.18);
+  --shadow-sm:0 1px 3px rgba(0,0,0,.2);--shadow-md:0 4px 12px rgba(0,0,0,.3);
+  --shadow-lg:0 10px 30px rgba(0,0,0,.4);
+  --dock-bg:rgba(44,44,46,.72);--dock-border:rgba(255,255,255,.08);
 }
-* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; -webkit-touch-callout: none; }
-html, body {
-  margin: 0; padding: 0; background: var(--bg); color: var(--text);
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
-  font-size: 15px; line-height: 1.35; min-height: 100vh;
-  overscroll-behavior-y: contain; transition: background 0.2s, color 0.2s;
-}
-.day-card, .task-row, .task-text, .icon-btn, .mini-btn, .dock-item,
-.swatch, .filters button, .setting-options button, .btn, .checkbox,
-.check-item, .check-text, .tpl-tile, .category-header, .tpl-tile-icon, .tpl-tile-label {
-  -webkit-user-select: none; user-select: none; -webkit-user-drag: none;
-}
-.app {
-  max-width: 720px; margin: 0 auto;
-  padding: 12px 16px calc(120px + env(safe-area-inset-bottom));
-  padding-top: calc(12px + env(safe-area-inset-top));
-}
-.app-header {
-  display: flex; align-items: center; justify-content: space-between;
-  gap: 12px; margin-bottom: 16px; min-height: 44px;
-}
-.app-header h1 { margin: 0; font-size: 28px; font-weight: 700; letter-spacing: -0.5px; flex: 1; }
-.header-actions { display: flex; gap: 8px; }
-.icon-btn {
-  min-width: var(--tap); min-height: var(--tap); border: none;
-  background: var(--bg-3); color: var(--text); border-radius: var(--radius-sm);
-  font-size: 18px; display: inline-flex; align-items: center; justify-content: center;
-  cursor: pointer; padding: 0; transition: background 0.15s, transform 0.1s;
-}
-.icon-btn:active { background: var(--accent-soft); transform: scale(0.94); }
-.search-overlay {
-  max-height: 0; overflow: hidden; margin-bottom: 0;
-  transition: max-height 0.2s, margin-bottom 0.2s;
-}
-.search-overlay.open { max-height: 60px; margin-bottom: 12px; }
-.search-field {
-  display: flex; align-items: center; gap: 8px; background: var(--bg-2);
-  border: 1px solid var(--border); border-radius: var(--radius-sm);
-  padding: 0 12px; min-height: var(--tap); box-shadow: var(--shadow-sm);
-}
-.search-field input {
-  flex: 1; background: transparent; border: none; color: var(--text);
-  font-size: 15px; outline: none; padding: 10px 0; font-family: inherit;
-}
-.search-field input::-webkit-search-cancel-button { -webkit-appearance: none; }
-.close-search {
-  background: transparent; border: none; color: var(--text-dim);
-  font-size: 16px; cursor: pointer; padding: 4px; min-width: 32px; min-height: 32px;
-}
-.warn {
-  background: rgba(245,158,11,0.12); color: #b4730a;
-  padding: 8px 12px; border-radius: var(--radius-sm); font-size: 12px;
-  display: flex; gap: 8px; align-items: flex-start; margin-bottom: 12px;
-}
-[data-theme="dark"] .warn { background: rgba(245,158,11,0.18); color: #f5c98a; }
-.warn.hidden { display: none; }
-.warn-close {
-  background: transparent; border: none; color: inherit; font-size: 14px;
-  padding: 0 4px; margin-left: auto; cursor: pointer; opacity: 0.7;
-}
-.filters {
-  display: flex; gap: 8px; overflow-x: auto; padding-bottom: 10px;
-  margin-bottom: 10px; scrollbar-width: none;
-}
-.filters::-webkit-scrollbar { display: none; }
-.filters button {
-  min-height: 36px; padding: 0 14px; border-radius: 18px; border: none;
-  background: var(--bg-3); color: var(--text-dim); font-size: 13px;
-  font-weight: 500; white-space: nowrap; cursor: pointer; font-family: inherit;
-}
-.filters button.active { background: var(--accent); color: #fff; }
-.week-grid { display: grid; gap: var(--gap); }
-.day-card {
-  background: var(--bg-2); border-radius: var(--radius); padding: 12px 14px;
-  min-height: 96px; display: flex; flex-direction: column; gap: 6px;
-  cursor: pointer; box-shadow: var(--shadow-sm); position: relative;
-  overflow: hidden; transition: transform 0.12s, box-shadow 0.15s;
-}
-.day-card::before {
-  content: ''; position: absolute; top: 12px; left: 0; bottom: 12px;
-  width: 3px; background: var(--card-color, var(--accent)); border-radius: 0 2px 2px 0;
-}
-.day-card:active { transform: scale(0.98); box-shadow: var(--shadow-md); }
-.day-card.dragging { opacity: 0.45; transform: scale(0.96); }
-.day-card.drag-target { box-shadow: 0 0 0 2px var(--accent); }
-.day-head {
-  display: flex; align-items: center; justify-content: space-between;
-  gap: 4px; padding-left: 8px;
-}
-.day-name { font-weight: 700; font-size: 17px; letter-spacing: -0.3px; }
-.day-actions { display: flex; gap: 0; }
-.mini-btn {
-  position: relative; width: 30px; height: 30px; border: none;
-  background: transparent; color: var(--text-dim); border-radius: 8px;
-  font-size: 15px; display: inline-flex; align-items: center;
-  justify-content: center; cursor: pointer; padding: 0; font-family: inherit;
-}
-.mini-btn::before { content: ''; position: absolute; inset: -7px; }
-.mini-btn:active { background: var(--accent-soft); color: var(--accent); }
-.drag-handle { cursor: grab; touch-action: none; }
-.day-body { font-size: 12px; color: var(--text-dim); padding-left: 8px; margin-top: auto; }
-.task-count { color: var(--text); font-size: 13px; font-weight: 500; }
-.task-preview { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 2px; }
-.empty {
-  text-align: center; color: var(--text-dim); padding: 40px 20px;
-  font-size: 14px; grid-column: 1 / -1; margin: 0;
-}
-.dock {
-  position: fixed; bottom: calc(12px + env(safe-area-inset-bottom));
-  left: 50%; transform: translateX(-50%);
-  background: var(--dock-bg);
-  backdrop-filter: blur(20px) saturate(180%);
-  -webkit-backdrop-filter: blur(20px) saturate(180%);
-  border: 1px solid var(--dock-border); border-radius: var(--radius-lg);
-  padding: 8px; display: flex; gap: 6px; align-items: center;
-  box-shadow: var(--shadow-lg); z-index: 100;
-  max-width: calc(100vw - 24px);
-}
-.dock-scroll {
-  display: flex; gap: 4px; overflow-x: auto; scrollbar-width: none;
-  max-width: calc(100vw - 100px); min-width: 0;
-}
-.dock-scroll::-webkit-scrollbar { display: none; }
-.dock-item {
-  width: 56px; height: 56px; border: none; background: transparent;
-  border-radius: 16px; cursor: pointer; display: flex; align-items: center;
-  justify-content: center; font-size: 24px; flex: none;
-  transition: background 0.15s, transform 0.1s; position: relative; padding: 0;
-}
-.dock-item:active { transform: scale(0.92); }
-.dock-item.active { background: var(--accent-soft); }
-.dock-item.active::after {
-  content: ''; position: absolute; bottom: 4px; left: 50%;
-  transform: translateX(-50%); width: 4px; height: 4px;
-  background: var(--accent); border-radius: 50%;
-}
-.dock-add {
-  width: 56px; height: 56px; border: 2px dashed var(--border);
-  background: transparent; color: var(--text-dim); border-radius: 16px;
-  font-size: 26px; cursor: pointer; flex: none; display: flex;
-  align-items: center; justify-content: center;
-}
-.dock-add:active { background: var(--accent-soft); color: var(--accent); border-color: var(--accent); }
-.modal {
-  position: fixed; inset: 0; background: rgba(0,0,0,0.4);
-  display: none; align-items: flex-end; justify-content: center;
-  z-index: 200; backdrop-filter: blur(2px); -webkit-backdrop-filter: blur(2px);
-}
-.modal.open { display: flex; }
-.modal-card {
-  background: var(--bg-2); border-radius: var(--radius-lg) var(--radius-lg) 0 0;
-  padding: 20px; width: 100%; max-width: 500px;
-  padding-bottom: calc(20px + env(safe-area-inset-bottom));
-  max-height: 88vh; display: flex; flex-direction: column; overflow-y: auto;
-  animation: modalSlideUp 0.2s ease;
-}
-@keyframes modalSlideUp {
-  from { transform: translateY(20px); opacity: 0.5; }
-  to   { transform: translateY(0);    opacity: 1; }
-}
-.modal h2 { margin: 0 0 16px; font-size: 20px; font-weight: 700; letter-spacing: -0.4px; }
-.modal-head {
-  display: flex; align-items: center; justify-content: space-between;
-  margin-bottom: 14px; gap: 12px;
-}
-.modal-head h2 { margin: 0; }
-.swatches {
-  display: grid; grid-template-columns: repeat(8, 1fr); gap: 8px; margin-bottom: 18px;
-}
-@media (max-width: 340px) { .swatches { grid-template-columns: repeat(4, 1fr); } }
-.swatch {
-  aspect-ratio: 1; border: none; border-radius: 50%; cursor: pointer;
-  padding: 0; transition: transform 0.1s; position: relative;
-}
-.swatch:active { transform: scale(0.88); }
-.swatch.active { box-shadow: 0 0 0 2px var(--bg-2), 0 0 0 4px currentColor; }
-.setting-block { padding: 12px 0; border-bottom: 1px solid var(--border); }
-.setting-block:last-of-type { border-bottom: none; }
-.setting-label {
-  font-size: 12px; color: var(--text-dim); text-transform: uppercase;
-  letter-spacing: 0.4px; font-weight: 600; margin-bottom: 10px;
-}
-.setting-options { display: flex; gap: 8px; flex-wrap: wrap; }
-.setting-options button {
-  flex: 1; min-width: 60px; min-height: 44px; border: 1px solid var(--border);
-  background: var(--bg-3); color: var(--text); border-radius: var(--radius-sm);
-  font-size: 14px; font-weight: 500; cursor: pointer; font-family: inherit;
-}
-.setting-options button.active {
-  background: var(--accent); color: #fff; border-color: var(--accent);
-}
-.btn {
-  width: 100%; min-height: 50px; border: none; background: var(--bg-3);
-  color: var(--text); border-radius: var(--radius-sm); font-size: 16px;
-  font-weight: 600; cursor: pointer; font-family: inherit;
-}
-.btn.primary { background: var(--accent); color: #fff; }
-.btn.danger { background: rgba(255,59,48,0.12); color: #ff3b30; }
-.btn:active { opacity: 0.8; }
-.btn + .btn { margin-top: 8px; }
-.task-list {
-  max-height: 50vh; overflow-y: auto; overscroll-behavior: contain;
-  margin-bottom: 12px; display: flex; flex-direction: column; gap: 8px;
-}
-.task-row, .check-item {
-  display: flex; align-items: center; gap: 8px; background: var(--bg-3);
-  border-radius: var(--radius-sm); padding: 4px 4px 4px 8px; min-height: 52px;
-}
-.task-text, .check-text {
-  flex: 1; font-size: 15px; word-break: break-word; padding: 8px 4px;
-  cursor: text; transition: opacity 0.15s;
-}
-.task-text.done, .check-text.done {
-  text-decoration: line-through; opacity: 0.55; color: var(--text-dim);
-}
-.task-edit-input {
-  flex: 1; background: transparent; border: none; color: var(--text);
-  font-size: 15px; font-family: inherit; outline: none; padding: 8px 0;
-  border-bottom: 2px solid var(--accent);
-}
-.checkbox {
-  width: 26px; height: 26px; min-width: 26px; border-radius: 50%;
-  border: 2px solid var(--text-muted); background: transparent;
-  cursor: pointer; padding: 0; display: inline-flex; align-items: center;
-  justify-content: center; position: relative; color: var(--cb-color, var(--accent));
-}
-.checkbox::before { content: ''; position: absolute; inset: -9px; }
-.checkbox svg { width: 15px; height: 15px; display: block; }
-.checkbox.checked {
-  background: var(--cb-color, var(--accent));
-  border-color: var(--cb-color, var(--accent));
-}
-.bell-btn { color: var(--text-dim); opacity: 0.5; }
-.bell-btn.active { color: var(--accent); opacity: 1; }
-.add-row { display: flex; gap: 8px; }
-.add-row input, .modal-input {
-  flex: 1; background: var(--bg-3); border: 1px solid var(--border);
-  color: var(--text); font-size: 15px; font-family: inherit;
-  padding: 12px 14px; border-radius: var(--radius-sm);
-  min-height: var(--tap); outline: none; width: 100%;
-}
-.add-row input:focus, .modal-input:focus { border-color: var(--accent); }
-.training-tabs {
-  display: flex; gap: 6px; background: var(--bg-3); padding: 4px;
-  border-radius: var(--radius-sm); margin-bottom: 14px;
-}
-.training-tabs button {
-  flex: 1; min-height: 40px; border: none; background: transparent;
-  color: var(--text-dim); border-radius: 8px; font-size: 14px; font-weight: 600;
-  cursor: pointer; font-family: inherit;
-}
-.training-tabs button.active { background: var(--bg-2); color: var(--text); }
-.category-card {
-  background: var(--bg-2); border-radius: var(--radius); padding: 14px;
-  margin-bottom: 10px; box-shadow: var(--shadow-sm);
-}
-.category-header { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
-.category-name { font-weight: 700; font-size: 16px; letter-spacing: -0.2px; flex: 1; }
-.category-meta { font-size: 12px; color: var(--text-dim); }
-.category-items { display: flex; flex-direction: column; gap: 6px; }
-.check-item { background: var(--bg-3); padding: 4px 4px 4px 8px; min-height: 46px; }
-.check-meta { font-size: 12px; color: var(--text-dim); white-space: nowrap; padding: 0 6px; }
-.add-item-row { display: flex; gap: 6px; margin-top: 8px; }
-.add-item-row input {
-  flex: 1; background: var(--bg-3); border: 1px solid var(--border);
-  color: var(--text); font-size: 14px; font-family: inherit;
-  padding: 10px 12px; border-radius: var(--radius-sm);
-  min-height: 42px; outline: none;
-}
-.add-item-row input:focus { border-color: var(--accent); }
-.add-category-btn {
-  width: 100%; min-height: 44px; border: 2px dashed var(--border);
-  background: transparent; color: var(--text-dim); border-radius: var(--radius);
-  font-size: 14px; font-weight: 600; cursor: pointer; font-family: inherit;
-  margin-bottom: 10px;
-}
-.placeholder {
-  display: flex; flex-direction: column; align-items: center;
-  justify-content: center; text-align: center; padding: 80px 20px;
-  color: var(--text-dim); gap: 16px;
-}
-.placeholder-icon { font-size: 64px; opacity: 0.5; }
-.placeholder-title { font-size: 20px; font-weight: 700; color: var(--text); letter-spacing: -0.4px; }
-.placeholder-sub { font-size: 14px; max-width: 280px; line-height: 1.5; }
-.toggle {
-  width: 51px; height: 31px; border-radius: 16px; background: var(--bg-3);
-  border: none; cursor: pointer; position: relative; padding: 0;
-  transition: background 0.2s;
-}
-.toggle::after {
-  content: ''; position: absolute; top: 2px; left: 2px; width: 27px; height: 27px;
-  border-radius: 50%; background: #fff; box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-  transition: transform 0.2s;
-}
-.toggle.on { background: var(--accent); }
-.toggle.on::after { transform: translateX(20px); }
-.notify-toggle-row {
-  display: flex; justify-content: space-between; align-items: center;
-  padding: 8px 0 16px; border-bottom: 1px solid var(--border); margin-bottom: 12px;
-}
-.check-row {
-  display: flex; align-items: center; gap: 10px; padding: 10px 0;
-  min-height: 44px; cursor: pointer; font-size: 15px;
-}
-.check-row input { width: 22px; height: 22px; accent-color: var(--accent); cursor: pointer; }
-.notify-info {
-  background: var(--accent-soft); color: var(--accent);
-  padding: 10px 12px; border-radius: var(--radius-sm);
-  font-size: 12px; line-height: 1.4; margin: 12px 0;
-}
-.template-library {
-  display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin-bottom: 12px;
-}
-.tpl-tile {
-  background: var(--bg-3); border: 2px solid transparent;
-  border-radius: var(--radius-sm); padding: 12px; cursor: pointer;
-  display: flex; align-items: center; gap: 10px; font-family: inherit;
-  color: var(--text); font-size: 14px; font-weight: 500; text-align: left;
-}
-.tpl-tile.enabled { border-color: var(--accent); background: var(--accent-soft); }
-.tpl-tile-icon { font-size: 22px; }
-.custom-template-form { display: flex; gap: 8px; margin-bottom: 10px; }
-.tpl-icon-input {
-  width: 60px; text-align: center; font-size: 20px;
-  background: var(--bg-3); border: 1px solid var(--border);
-  border-radius: var(--radius-sm); color: var(--text);
-  font-family: inherit; padding: 8px;
-}
-.tpl-name-input {
-  flex: 1; background: var(--bg-3); border: 1px solid var(--border);
-  border-radius: var(--radius-sm); color: var(--text); font-family: inherit;
-  font-size: 15px; padding: 8px 12px;
-}
-.toast {
-  position: fixed; bottom: calc(100px + env(safe-area-inset-bottom));
-  left: 50%; transform: translate(-50%, 20px); background: rgba(0,0,0,0.85);
-  color: #fff; padding: 10px 18px; border-radius: 20px; font-size: 13px;
-  font-weight: 500; opacity: 0; pointer-events: none;
-  transition: opacity 0.2s, transform 0.2s; z-index: 300; max-width: 90vw;
-}
-.toast.show { opacity: 1; transform: translate(-50%, 0); }
-.hint {
-  color: var(--text-dim); font-size: 12px; margin: 16px 0 0;
-  text-align: center; line-height: 1.5;
-}
-.version-tag {
-  text-align: center; color: var(--text-dim); font-size: 11px;
-  margin-top: 20px; padding-top: 12px; border-top: 1px solid var(--border);
-}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent;-webkit-touch-callout:none}
+html,body{margin:0;padding:0;background:var(--bg);color:var(--text);
+  font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif;
+  font-size:15px;line-height:1.35;min-height:100vh;
+  overscroll-behavior-y:contain;transition:background .2s,color .2s}
+.day-card,.task-row,.task-text,.icon-btn,.mini-btn,.dock-item,.swatch,
+.filters button,.setting-options button,.btn,.checkbox,.check-item,.check-text,
+.tpl-tile,.category-header,.category-name,.day-name,.day-body{
+  -webkit-user-select:none;user-select:none;-webkit-user-drag:none}
+.app{max-width:720px;margin:0 auto;
+  padding:12px 16px calc(120px + env(safe-area-inset-bottom));
+  padding-top:calc(12px + env(safe-area-inset-top))}
+.app-header{display:flex;align-items:center;justify-content:space-between;
+  gap:12px;margin-bottom:16px;min-height:44px}
+.app-header h1{margin:0;font-size:28px;font-weight:700;letter-spacing:-.5px;flex:1;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.header-actions{display:flex;gap:8px}
+.icon-btn{min-width:var(--tap);min-height:var(--tap);border:none;
+  background:var(--bg-3);color:var(--text);border-radius:var(--radius-sm);
+  font-size:18px;display:inline-flex;align-items:center;justify-content:center;
+  cursor:pointer;padding:0;transition:background .15s,transform .1s}
+.icon-btn:active{background:var(--accent-soft);transform:scale(.94)}
+.search-overlay{max-height:0;overflow:hidden;margin-bottom:0;
+  transition:max-height .2s,margin-bottom .2s}
+.search-overlay.open{max-height:60px;margin-bottom:12px}
+.search-field{display:flex;align-items:center;gap:8px;background:var(--bg-2);
+  border:1px solid var(--border);border-radius:var(--radius-sm);
+  padding:0 12px;min-height:var(--tap);box-shadow:var(--shadow-sm)}
+.search-field input{flex:1;background:transparent;border:none;color:var(--text);
+  font-size:15px;outline:none;padding:10px 0;font-family:inherit}
+.search-field input::-webkit-search-cancel-button{-webkit-appearance:none}
+.close-search{background:transparent;border:none;color:var(--text-dim);
+  font-size:16px;cursor:pointer;padding:4px;min-width:32px;min-height:32px}
+.filters{display:flex;gap:8px;overflow-x:auto;padding-bottom:10px;
+  margin-bottom:10px;scrollbar-width:none}
+.filters::-webkit-scrollbar{display:none}
+.filters button{min-height:36px;padding:0 14px;border-radius:18px;border:none;
+  background:var(--bg-3);color:var(--text-dim);font-size:13px;font-weight:500;
+  white-space:nowrap;cursor:pointer;font-family:inherit}
+.filters button.active{background:var(--accent);color:#fff}
+.week-grid{display:grid;gap:var(--gap)}
+.day-card{background:var(--bg-2);border-radius:var(--radius);padding:12px 14px;
+  min-height:96px;display:flex;flex-direction:column;gap:6px;cursor:pointer;
+  box-shadow:var(--shadow-sm);position:relative;overflow:hidden;
+  transition:transform .12s,box-shadow .15s}
+.day-card::before{content:'';position:absolute;top:12px;left:0;bottom:12px;
+  width:3px;background:var(--card-color,var(--accent));border-radius:0 2px 2px 0}
+.day-card:active{transform:scale(.98);box-shadow:var(--shadow-md)}
+.day-card.dragging{opacity:.45;transform:scale(.96)}
+.day-card.drag-target{box-shadow:0 0 0 2px var(--accent)}
+.day-head{display:flex;align-items:center;justify-content:space-between;
+  gap:4px;padding-left:8px}
+.day-name{font-weight:700;font-size:17px;letter-spacing:-.3px}
+.day-actions{display:flex;gap:0}
+.mini-btn{position:relative;width:30px;height:30px;border:none;background:transparent;
+  color:var(--text-dim);border-radius:8px;font-size:15px;display:inline-flex;
+  align-items:center;justify-content:center;cursor:pointer;padding:0;font-family:inherit}
+.mini-btn::before{content:'';position:absolute;inset:-7px}
+.mini-btn:active{background:var(--accent-soft);color:var(--accent)}
+.mini-btn.bell-active{color:var(--accent);opacity:1}
+.drag-handle{cursor:grab;touch-action:none}
+.day-body{font-size:12px;color:var(--text-dim);padding-left:8px;margin-top:auto}
+.task-count{color:var(--text);font-size:13px;font-weight:500}
+.task-preview{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:2px}
+.empty{text-align:center;color:var(--text-dim);padding:40px 20px;font-size:14px;
+  grid-column:1/-1;margin:0}
+.dock{position:fixed;bottom:calc(12px + env(safe-area-inset-bottom));
+  left:50%;transform:translateX(-50%);
+  background:var(--dock-bg);backdrop-filter:blur(20px) saturate(180%);
+  -webkit-backdrop-filter:blur(20px) saturate(180%);
+  border:1px solid var(--dock-border);border-radius:var(--radius-lg);
+  padding:8px;display:flex;gap:6px;align-items:center;
+  box-shadow:var(--shadow-lg);z-index:100}
+.dock-scroll{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;
+  max-width:180px;min-width:0}
+.dock-scroll::-webkit-scrollbar{display:none}
+.dock-item{width:56px;height:56px;border:none;background:transparent;
+  border-radius:16px;cursor:pointer;display:flex;align-items:center;
+  justify-content:center;font-size:24px;flex:none;
+  transition:background .15s,transform .1s;position:relative;padding:0}
+.dock-item:active{transform:scale(.92)}
+.dock-item.active{background:var(--accent-soft)}
+.dock-item.active::after{content:'';position:absolute;bottom:4px;left:50%;
+  transform:translateX(-50%);width:4px;height:4px;background:var(--accent);border-radius:50%}
+.dock-add{width:56px;height:56px;border:2px dashed var(--border);background:transparent;
+  color:var(--text-dim);border-radius:16px;font-size:26px;cursor:pointer;
+  flex:none;display:flex;align-items:center;justify-content:center}
+.dock-add:active{background:var(--accent-soft);color:var(--accent);border-color:var(--accent)}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.4);display:none;
+  align-items:flex-end;justify-content:center;z-index:200;
+  backdrop-filter:blur(2px);-webkit-backdrop-filter:blur(2px)}
+.modal.open{display:flex}
+.modal-card{background:var(--bg-2);border-radius:var(--radius-lg) var(--radius-lg) 0 0;
+  padding:20px;width:100%;max-width:500px;
+  padding-bottom:calc(20px + env(safe-area-inset-bottom));
+  max-height:88vh;display:flex;flex-direction:column;overflow-y:auto;
+  animation:up .2s ease}
+@keyframes up{from{transform:translateY(20px);opacity:.5}to{transform:translateY(0);opacity:1}}
+.modal h2{margin:0 0 16px;font-size:20px;font-weight:700;letter-spacing:-.4px}
+.modal-head{display:flex;align-items:center;justify-content:space-between;
+  margin-bottom:14px;gap:12px}
+.modal-head h2{margin:0}
+.swatches{display:grid;grid-template-columns:repeat(8,1fr);gap:8px;margin-bottom:18px}
+@media (max-width:340px){.swatches{grid-template-columns:repeat(4,1fr)}}
+.swatch{aspect-ratio:1;border:none;border-radius:50%;cursor:pointer;padding:0;position:relative}
+.swatch:active{transform:scale(.88)}
+.swatch.active{box-shadow:0 0 0 2px var(--bg-2),0 0 0 4px currentColor}
+.setting-block{padding:12px 0;border-bottom:1px solid var(--border)}
+.setting-block:last-of-type{border-bottom:none}
+.setting-label{font-size:12px;color:var(--text-dim);text-transform:uppercase;
+  letter-spacing:.4px;font-weight:600;margin-bottom:10px}
+.setting-options{display:flex;gap:8px;flex-wrap:wrap}
+.setting-options button{flex:1;min-width:60px;min-height:44px;
+  border:1px solid var(--border);background:var(--bg-3);color:var(--text);
+  border-radius:var(--radius-sm);font-size:14px;font-weight:500;
+  cursor:pointer;font-family:inherit}
+.setting-options button.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+.btn{width:100%;min-height:50px;border:none;background:var(--bg-3);color:var(--text);
+  border-radius:var(--radius-sm);font-size:16px;font-weight:600;cursor:pointer;font-family:inherit}
+.btn.primary{background:var(--accent);color:#fff}
+.btn.danger{background:rgba(255,59,48,.12);color:#ff3b30}
+.btn:active{opacity:.8}
+.btn+.btn{margin-top:8px}
+.task-list{max-height:50vh;overflow-y:auto;overscroll-behavior:contain;
+  margin-bottom:12px;display:flex;flex-direction:column;gap:8px}
+.task-row,.check-item{display:flex;align-items:center;gap:8px;background:var(--bg-3);
+  border-radius:var(--radius-sm);padding:4px 4px 4px 8px;min-height:52px}
+.task-text,.check-text{flex:1;font-size:15px;word-break:break-word;
+  padding:8px 4px;cursor:text;transition:opacity .15s}
+.task-text.done,.check-text.done{text-decoration:line-through;opacity:.55;color:var(--text-dim)}
+.task-edit-input,.name-edit-input{flex:1;background:transparent;border:none;
+  color:var(--text);font-size:15px;font-family:inherit;outline:none;padding:8px 0;
+  border-bottom:2px solid var(--accent)}
+.name-edit-input{font-weight:700;font-size:16px;letter-spacing:-.2px}
+.checkbox{width:26px;height:26px;min-width:26px;border-radius:50%;
+  border:2px solid var(--text-muted);background:transparent;cursor:pointer;padding:0;
+  display:inline-flex;align-items:center;justify-content:center;position:relative;
+  color:var(--cb-color,var(--accent))}
+.checkbox::before{content:'';position:absolute;inset:-9px}
+.checkbox svg{width:15px;height:15px;display:block}
+.checkbox.checked{background:var(--cb-color,var(--accent));border-color:var(--cb-color,var(--accent))}
+.add-row{display:flex;gap:8px}
+.add-row input,.modal-input{flex:1;background:var(--bg-3);border:1px solid var(--border);
+  color:var(--text);font-size:15px;font-family:inherit;padding:12px 14px;
+  border-radius:var(--radius-sm);min-height:var(--tap);outline:none;width:100%}
+.add-row input:focus,.modal-input:focus{border-color:var(--accent)}
+.training-tabs{display:flex;gap:6px;background:var(--bg-3);padding:4px;
+  border-radius:var(--radius-sm);margin-bottom:14px}
+.training-tabs button{flex:1;min-height:40px;border:none;background:transparent;
+  color:var(--text-dim);border-radius:8px;font-size:14px;font-weight:600;
+  cursor:pointer;font-family:inherit}
+.training-tabs button.active{background:var(--bg-2);color:var(--text)}
+.category-card{background:var(--bg-2);border-radius:var(--radius);padding:14px;
+  margin-bottom:10px;box-shadow:var(--shadow-sm)}
+.category-header{display:flex;align-items:center;gap:8px;margin-bottom:10px}
+.category-name{font-weight:700;font-size:16px;letter-spacing:-.2px;flex:1;
+  padding:4px 0;cursor:text}
+.category-meta{font-size:12px;color:var(--text-dim)}
+.category-items{display:flex;flex-direction:column;gap:6px}
+.check-item{background:var(--bg-3);padding:4px 4px 4px 8px;min-height:46px}
+.check-meta{font-size:12px;color:var(--text-dim);white-space:nowrap;padding:0 6px}
+.add-item-row{display:flex;gap:6px;margin-top:8px}
+.add-item-row input{flex:1;background:var(--bg-3);border:1px solid var(--border);
+  color:var(--text);font-size:14px;font-family:inherit;padding:10px 12px;
+  border-radius:var(--radius-sm);min-height:42px;outline:none}
+.add-category-btn{width:100%;min-height:44px;border:2px dashed var(--border);
+  background:transparent;color:var(--text-dim);border-radius:var(--radius);
+  font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;margin-bottom:10px}
+.placeholder{display:flex;flex-direction:column;align-items:center;
+  justify-content:center;text-align:center;padding:80px 20px;color:var(--text-dim);gap:16px}
+.placeholder-icon{font-size:64px;opacity:.5}
+.placeholder-title{font-size:20px;font-weight:700;color:var(--text);letter-spacing:-.4px}
+.placeholder-sub{font-size:14px;max-width:280px;line-height:1.5}
+.toggle{width:51px;height:31px;border-radius:16px;background:var(--bg-3);border:none;
+  cursor:pointer;position:relative;padding:0;transition:background .2s;flex:none}
+.toggle::after{content:'';position:absolute;top:2px;left:2px;width:27px;height:27px;
+  border-radius:50%;background:#fff;box-shadow:0 2px 4px rgba(0,0,0,.2);transition:transform .2s}
+.toggle.on{background:var(--accent)}
+.toggle.on::after{transform:translateX(20px)}
+.notify-toggle-row{display:flex;justify-content:space-between;align-items:center;
+  padding:8px 0 16px;border-bottom:1px solid var(--border);margin-bottom:12px}
+.check-row{display:flex;align-items:center;gap:10px;padding:10px 0;
+  min-height:44px;cursor:pointer;font-size:15px}
+.check-row input{width:22px;height:22px;accent-color:var(--accent);cursor:pointer}
+.day-select{display:flex;gap:4px;flex-wrap:wrap}
+.day-select button{min-width:40px;min-height:40px;border:1px solid var(--border);
+  background:var(--bg-3);color:var(--text-dim);border-radius:8px;
+  font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;flex:1}
+.day-select button.on{background:var(--accent);color:#fff;border-color:var(--accent)}
+.notify-info{background:var(--accent-soft);color:var(--accent);padding:10px 12px;
+  border-radius:var(--radius-sm);font-size:12px;line-height:1.4;margin:12px 0}
+.template-library{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:12px}
+.tpl-tile{background:var(--bg-3);border:2px solid transparent;border-radius:var(--radius-sm);
+  padding:12px;cursor:pointer;display:flex;align-items:center;gap:10px;
+  font-family:inherit;color:var(--text);font-size:14px;font-weight:500;text-align:left}
+.tpl-tile.enabled{border-color:var(--accent);background:var(--accent-soft)}
+.tpl-tile-icon{font-size:22px}
+.custom-template-form{display:flex;gap:8px;margin-bottom:10px}
+.tpl-icon-input{width:60px;text-align:center;font-size:20px;background:var(--bg-3);
+  border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text);
+  font-family:inherit;padding:8px}
+.tpl-name-input{flex:1;background:var(--bg-3);border:1px solid var(--border);
+  border-radius:var(--radius-sm);color:var(--text);font-family:inherit;
+  font-size:15px;padding:8px 12px}
+.toast{position:fixed;bottom:calc(100px + env(safe-area-inset-bottom));left:50%;
+  transform:translate(-50%,20px);background:rgba(0,0,0,.85);color:#fff;
+  padding:10px 18px;border-radius:20px;font-size:13px;font-weight:500;
+  opacity:0;pointer-events:none;transition:opacity .2s,transform .2s;
+  z-index:300;max-width:90vw}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+.hint{color:var(--text-dim);font-size:12px;margin:16px 0 0;text-align:center;line-height:1.5}
+.version-tag{text-align:center;color:var(--text-dim);font-size:11px;
+  margin-top:20px;padding-top:12px;border-top:1px solid var(--border)}
+.sync-status{font-size:13px;padding:8px 0;color:var(--text-dim)}
+.sync-status.ok{color:#34c759}
+.sync-status.err{color:#ff3b30}
 </style>
 </head>
 <body>
-
 <div class="app">
   <header class="app-header">
     <h1 id="pageTitle">Планировщик</h1>
     <div class="header-actions">
       <button class="icon-btn" id="searchBtn" aria-label="Поиск">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none"
-             stroke="currentColor" stroke-width="2.2" stroke-linecap="round">
-          <circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/>
-        </svg>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
       </button>
       <button class="icon-btn" id="settingsBtn" aria-label="Настройки">⚙️</button>
     </div>
   </header>
-
   <div class="search-overlay" id="searchOverlay">
     <div class="search-field">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
-           stroke="var(--text-dim)" stroke-width="2.2" stroke-linecap="round">
-        <circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/>
-      </svg>
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--text-dim)" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
       <input type="search" id="globalSearch" placeholder="Поиск..." autocomplete="off">
       <button class="close-search" id="searchClose">✕</button>
     </div>
   </div>
-
-  <div class="warn hidden" id="swipeWarn">
-    <span aria-hidden="true">⚠️</span>
-    <span>Свайп вниз от верхнего края закрывает Mini App.</span>
-    <button class="warn-close" id="warnClose">✕</button>
-  </div>
-
   <div id="content"></div>
 </div>
-
 <nav class="dock" id="dock"></nav>
 
 <div class="modal" id="colorModal">
@@ -464,18 +309,25 @@ html, body {
     <div class="setting-block">
       <div class="setting-label">Акцентный цвет</div>
       <div class="setting-options">
-        <button id="openAccentPicker">🎨 Выбрать цвет</button>
+        <button id="openAccentPicker">🎨 Выбрать</button>
       </div>
     </div>
     <div class="setting-block">
+      <div class="setting-label">Telegram-бот (опционально)</div>
+      <input type="url" id="backendUrl" class="modal-input" placeholder="https://ваш-бот.up.railway.app" style="margin-bottom:8px">
+      <input type="text" id="userId" class="modal-input" placeholder="Ваш ID из бота (цифры)" style="margin-bottom:8px">
+      <button class="btn" id="syncNowBtn">Синхронизировать</button>
+      <div class="sync-status" id="syncStatus">Не подключён</div>
+    </div>
+    <div class="setting-block">
       <div class="setting-label">Данные</div>
-      <div class="setting-options" style="flex-direction:column;">
-        <button id="resetOrderBtn">↺ Сбросить порядок дней</button>
-        <button id="resetAllBtn" class="btn danger" style="margin-top:8px;">Сбросить всё</button>
+      <div class="setting-options" style="flex-direction:column">
+        <button id="resetOrderBtn">↺ Сбросить порядок</button>
+        <button id="resetAllBtn" class="btn danger" style="margin-top:8px">Сбросить всё</button>
       </div>
     </div>
-    <button class="btn primary" data-close style="margin-top:16px;">Готово</button>
-    <div class="version-tag">Версия 4.0</div>
+    <button class="btn primary" data-close style="margin-top:16px">Готово</button>
+    <div class="version-tag">Версия 5.0</div>
   </div>
 </div>
 
@@ -495,29 +347,28 @@ html, body {
 
 <div class="modal" id="notifyModal">
   <div class="modal-card">
-    <h2>Напоминание</h2>
+    <h2 id="notifyTitle">Напоминание</h2>
     <div class="notify-toggle-row">
-      <span style="font-weight:500;">Включить напоминание</span>
+      <span style="font-weight:500">Включить напоминание</span>
       <button class="toggle" id="notifyToggle"></button>
     </div>
-    <div id="notifyWhen" style="display:none;">
+    <div id="notifyWhen" style="display:none">
       <div class="setting-block">
-        <div class="setting-label">Когда напомнить</div>
+        <div class="setting-label">Когда</div>
         <label class="check-row"><input type="checkbox" id="notifyOnDay"><span>В день события</span></label>
-        <label class="check-row"><input type="checkbox" id="notifyHourBefore"><span>За час до события</span></label>
-        <label class="check-row"><input type="checkbox" id="notifyDayBefore"><span>За день до события</span></label>
+        <label class="check-row"><input type="checkbox" id="notifyDayBefore"><span>За день до</span></label>
       </div>
       <div class="setting-block">
-        <div class="setting-label">Время события</div>
+        <div class="setting-label">Время отправки</div>
         <input type="time" id="notifyTime" class="modal-input">
       </div>
-      <div class="setting-block">
-        <div class="setting-label">Точная дата и время</div>
-        <input type="datetime-local" id="notifyCustomAt" class="modal-input">
+      <div class="setting-block" id="notifyDaysBlock" style="display:none">
+        <div class="setting-label">Повторять по дням</div>
+        <div class="day-select" id="daySelect"></div>
       </div>
     </div>
     <div class="notify-info">
-      Настройки сохраняются на устройстве. Отправка в Telegram подключится позже.
+      Бот присылает сводку со всеми пунктами этой колонки. Нажмите ✅ в боте — отметится и в приложении.
     </div>
     <button class="btn primary" data-close>Готово</button>
   </div>
@@ -535,16 +386,16 @@ html, body {
       </div>
       <button class="btn primary" id="createCustomTpl">Создать и добавить</button>
     </div>
-    <button class="btn" data-close style="margin-top:12px;">Готово</button>
+    <button class="btn" data-close style="margin-top:12px">Готово</button>
   </div>
 </div>
 
 <div class="modal" id="confirmModal">
   <div class="modal-card">
     <h2>Удалить?</h2>
-    <p id="confirmText" style="color:var(--text-dim);margin:0 0 16px;font-size:14px;"></p>
+    <p id="confirmText" style="color:var(--text-dim);margin:0 0 16px;font-size:14px"></p>
     <button class="btn danger" id="confirmYes">Удалить</button>
-    <button class="btn" data-close style="margin-top:8px;">Отмена</button>
+    <button class="btn" data-close style="margin-top:8px">Отмена</button>
   </div>
 </div>
 
@@ -552,248 +403,210 @@ html, body {
 
 <script>
 'use strict';
-
-/* ---------- Telegram ---------- */
 const tg = window.Telegram?.WebApp;
-if (tg) {
-  tg.ready();
-  tg.expand();
-  if (typeof tg.disableVerticalSwipes === 'function') {
-    try { tg.disableVerticalSwipes(); window.__swipeBlocked = true; } catch (e) {}
-  }
-}
-document.addEventListener('contextmenu', (e) => e.preventDefault());
+if (tg) { tg.ready(); tg.expand();
+  if (typeof tg.disableVerticalSwipes === 'function') { try { tg.disableVerticalSwipes(); } catch(e){} } }
+document.addEventListener('contextmenu', e => e.preventDefault());
 
-/* ---------- Константы ---------- */
-const STORAGE_KEY = 'miniapp-constructor-v4';
-
-const CARD_PALETTE = [
-  '#5ac8fa', '#af52de', '#ff2d55', '#ff9500',
-  '#34c759', '#30b0c7', '#5856d6', '#ffcc00',
-];
-const ACCENT_PALETTE = [
-  '#007aff', '#5856d6', '#af52de', '#ff2d55',
-  '#ff9500', '#34c759', '#30b0c7', '#8e8e93',
-];
-
+const STORAGE_KEY = 'miniapp-constructor-v5';
+const CARD_PALETTE = ['#5ac8fa','#af52de','#ff2d55','#ff9500','#34c759','#30b0c7','#5856d6','#ffcc00'];
+const ACCENT_PALETTE = ['#007aff','#5856d6','#af52de','#ff2d55','#ff9500','#34c759','#30b0c7','#8e8e93'];
 const BASE_VIEWS = {
-  planner:   { title: 'Планировщик', icon: '📅', removable: false },
-  training:  { title: 'Тренировки',  icon: '💪', removable: true  },
-  notes:     { title: 'Заметки',     icon: '📝', removable: true  },
-  reminders: { title: 'Напоминания', icon: '⏰', removable: true  },
-  words:     { title: 'Слова',       icon: '📚', removable: true  },
+  planner:{title:'Планировщик',icon:'📅',removable:false},
+  training:{title:'Тренировки',icon:'💪',removable:true},
+  notes:{title:'Заметки',icon:'📝',removable:true},
+  reminders:{title:'Напоминания',icon:'⏰',removable:true},
+  words:{title:'Слова',icon:'📚',removable:true},
 };
-
 const WEEK_ORDER = [
-  { id: 'mon', day: 'Пн', full: 'Понедельник', color: '#5ac8fa' },
-  { id: 'tue', day: 'Вт', full: 'Вторник',     color: '#af52de' },
-  { id: 'wed', day: 'Ср', full: 'Среда',       color: '#ff2d55' },
-  { id: 'thu', day: 'Чт', full: 'Четверг',     color: '#ff9500' },
-  { id: 'fri', day: 'Пт', full: 'Пятница',     color: '#34c759' },
-  { id: 'sat', day: 'Сб', full: 'Суббота',     color: '#30b0c7' },
-  { id: 'sun', day: 'Вс', full: 'Воскресенье', color: '#5856d6' },
+  {id:'mon',day:'Пн',full:'Понедельник',color:'#5ac8fa'},
+  {id:'tue',day:'Вт',full:'Вторник',color:'#af52de'},
+  {id:'wed',day:'Ср',full:'Среда',color:'#ff2d55'},
+  {id:'thu',day:'Чт',full:'Четверг',color:'#ff9500'},
+  {id:'fri',day:'Пт',full:'Пятница',color:'#34c759'},
+  {id:'sat',day:'Сб',full:'Суббота',color:'#30b0c7'},
+  {id:'sun',day:'Вс',full:'Воскресенье',color:'#5856d6'},
 ];
+const DEFAULT_NOTIFY_DAY = {enabled:false,time:'08:00',onDay:true,dayBefore:false};
+const DEFAULT_NOTIFY_CAT = {enabled:false,time:'08:00',onDay:true,dayBefore:false};
 
-const DEFAULT_NOTIFY = {
-  enabled: false, onDay: true, hourBefore: false, dayBefore: false,
-  time: null, customAt: null,
-};
+function makeId(p='id'){return p+'_'+Date.now().toString(36)+Math.random().toString(36).slice(2,6);}
+function makeTask(text){return {id:makeId('t'),text,done:false};}
 
 const DEFAULT_STATE = {
-  theme: 'light',
-  accent: '#007aff',
-  weekColumns: 2,
-  showWeekend: true,
-  plannerFilter: 'all',
-  warnDismissed: true,
-  enabledViews: ['planner', 'training', 'notes', 'reminders', 'words'],
-  customViews: [],
-  week: WEEK_ORDER.map(d => ({ ...d, tasks: [] })),
-  training: {
-    activeTab: 'workouts',
-    workouts: [
-      { id: 'w1', name: 'Утро', items: [
-        { id: 'wi1', text: 'Отжимания 3×15', done: false, notify: { ...DEFAULT_NOTIFY } },
-        { id: 'wi2', text: 'Приседания 3×20', done: false, notify: { ...DEFAULT_NOTIFY } },
+  userId:null,
+  backendUrl:'',
+  theme:'light',
+  accent:'#007aff',
+  weekColumns:2,
+  showWeekend:true,
+  plannerFilter:'all',
+  enabledViews:['planner','training','notes'],
+  customViews:[],
+  week: WEEK_ORDER.map(d => ({...d,tasks:[],notify:{...DEFAULT_NOTIFY_DAY}})),
+  training:{
+    activeTab:'workouts',
+    workouts:[
+      {id:'w1',name:'Утро',days:[0,1,2,3,4],notify:{...DEFAULT_NOTIFY_CAT},items:[
+        {id:'wi1',text:'Отжимания 3×15',done:false},
+        {id:'wi2',text:'Приседания 3×20',done:false},
       ]},
-      { id: 'w2', name: 'Вечер', items: [
-        { id: 'wi3', text: 'Растяжка 10 мин', done: false, notify: { ...DEFAULT_NOTIFY } },
+      {id:'w2',name:'Вечер',days:[0,1,2,3,4],notify:{...DEFAULT_NOTIFY_CAT},items:[
+        {id:'wi3',text:'Растяжка 10 мин',done:false},
       ]},
     ],
-    nutrition: [
-      { id: 'n1', name: 'Завтрак', items: [
-        { id: 'ni1', text: 'Овсянка с ягодами', meta: '350 ккал', done: false, notify: { ...DEFAULT_NOTIFY } },
+    nutrition:[
+      {id:'n1',name:'Завтрак',days:[0,1,2,3,4,5,6],notify:{...DEFAULT_NOTIFY_CAT},items:[
+        {id:'ni1',text:'Овсянка с ягодами',meta:'350 ккал',done:false},
+        {id:'ni2',text:'Кофе',meta:'50 ккал',done:false},
       ]},
-      { id: 'n2', name: 'Обед', items: [
-        { id: 'ni2', text: 'Курица с рисом', meta: '550 ккал', done: false, notify: { ...DEFAULT_NOTIFY } },
+      {id:'n2',name:'Обед',days:[0,1,2,3,4,5,6],notify:{...DEFAULT_NOTIFY_CAT},items:[
+        {id:'ni3',text:'Курица с рисом',meta:'550 ккал',done:false},
       ]},
-      { id: 'n3', name: 'Ужин', items: [
-        { id: 'ni3', text: 'Салат с рыбой', meta: '400 ккал', done: false, notify: { ...DEFAULT_NOTIFY } },
+      {id:'n3',name:'Ужин',days:[0,1,2,3,4,5,6],notify:{...DEFAULT_NOTIFY_CAT},items:[
+        {id:'ni4',text:'Салат с рыбой',meta:'400 ккал',done:false},
       ]},
     ],
   },
 };
+const SEED_TASKS = {mon:['Встреча с командой'],wed:['Отчёт за неделю'],fri:['Звонок клиенту']};
 
-const SEED_TASKS = {
-  mon: ['Встреча с командой'],
-  wed: ['Отчёт за неделю'],
-  fri: ['Звонок клиенту'],
-};
+function loadState(){
+  try{const s=JSON.parse(localStorage.getItem(STORAGE_KEY));
+    if(s&&typeof s==='object')return{...DEFAULT_STATE,...s};}catch(e){}
+  const f=JSON.parse(JSON.stringify(DEFAULT_STATE));
+  f.week.forEach(d=>{if(SEED_TASKS[d.id])d.tasks=SEED_TASKS[d.id].map(makeTask);});
+  return f;
+}
+let state=loadState();
+function saveState(){
+  try{localStorage.setItem(STORAGE_KEY,JSON.stringify(state));}catch(e){}
+  pushToBackend();
+}
+let currentView='planner',searchQuery='',currentDayId=null,dragState=null;
+let currentNotifyTarget=null,confirmCallback=null;
+let lastSyncTime=0;
 
-/* ---------- Состояние ---------- */
-function makeId(p = 'id') {
-  return p + '_' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
-}
-function makeTask(text) {
-  return { id: makeId('t'), text, done: false, color: null, time: null,
-    notify: { ...DEFAULT_NOTIFY } };
-}
+const $=(s,r=document)=>r.querySelector(s);
+const $$=(s,r=document)=>[...r.querySelectorAll(s)];
+function escapeHtml(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+let toastTimer=null;
+function toast(msg){const el=$('#toast');el.textContent=msg;el.classList.add('show');
+  clearTimeout(toastTimer);toastTimer=setTimeout(()=>el.classList.remove('show'),2000);}
+function haptic(t='light'){try{tg?.HapticFeedback?.impactOccurred(t);}catch(e){}}
+function hasAnyNotify(n){return n&&n.enabled&&(n.onDay||n.dayBefore);}
 
-function loadState() {
-  try {
-    const saved = JSON.parse(localStorage.getItem(STORAGE_KEY));
-    if (saved && typeof saved === 'object') return { ...DEFAULT_STATE, ...saved };
-  } catch (e) {}
-  const fresh = JSON.parse(JSON.stringify(DEFAULT_STATE));
-  fresh.week.forEach(d => {
-    if (SEED_TASKS[d.id]) d.tasks = SEED_TASKS[d.id].map(makeTask);
-  });
-  return fresh;
+/* ---------- Backend sync ---------- */
+async function pushToBackend(){
+  if(!state.backendUrl||!state.userId)return;
+  try{
+    await fetch(state.backendUrl.replace(/\/$/,'')+'/api/sync',{
+      method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({userId:state.userId,state})
+    });
+    lastSyncTime=Date.now();
+  }catch(e){}
 }
-function saveState() {
-  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch (e) {}
+async function pullFromBackend(){
+  if(!state.backendUrl||!state.userId)return false;
+  try{
+    const r=await fetch(state.backendUrl.replace(/\/$/,'')+'/api/state/'+state.userId);
+    if(!r.ok)return false;
+    const data=await r.json();
+    if(!data.ok||!data.state)return false;
+    mergeDoneFlags(state,data.state);
+    try{localStorage.setItem(STORAGE_KEY,JSON.stringify(state));}catch(e){}
+    return true;
+  }catch(e){return false;}
 }
-
-let state = loadState();
-let currentView = 'planner';
-let searchQuery = '';
-let currentDayId = null;
-let dragState = null;
-let currentNotifyTarget = null;
-let confirmCallback = null;
-
-const $  = (s, r = document) => r.querySelector(s);
-const $$ = (s, r = document) => [...r.querySelectorAll(s)];
-
-function escapeHtml(s) {
-  return String(s).replace(/[&<>"']/g, c =>
-    ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[c]));
+function mergeDoneFlags(local,remote){
+  const lookup={};
+  const walk=(arr,key)=>{arr?.forEach(cat=>{(cat.items||cat.tasks||[]).forEach(it=>{lookup[it.id]=it;});});};
+  walk(remote.training?.workouts);walk(remote.training?.nutrition);
+  (remote.week||[]).forEach(d=>{(d.tasks||[]).forEach(it=>{lookup[it.id]=it;});});
+  (remote.customViews||[]).forEach(v=>{(v.items||[]).forEach(it=>{lookup[it.id]=it;});});
+  const apply=(arr)=>{arr?.forEach(cat=>{(cat.items||cat.tasks||[]).forEach(it=>{
+    if(lookup[it.id]&&typeof lookup[it.id].done==='boolean')it.done=lookup[it.id].done;
+  });});};
+  apply(local.training?.workouts);apply(local.training?.nutrition);
+  (local.week||[]).forEach(d=>{(d.tasks||[]).forEach(it=>{
+    if(lookup[it.id]&&typeof lookup[it.id].done==='boolean')it.done=lookup[it.id].done;
+  });});
+  (local.customViews||[]).forEach(v=>(v.items||[]).forEach(it=>{
+    if(lookup[it.id]&&typeof lookup[it.id].done==='boolean')it.done=lookup[it.id].done;
+  }));
 }
-let toastTimer = null;
-function toast(msg) {
-  const el = $('#toast');
-  el.textContent = msg;
-  el.classList.add('show');
-  clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => el.classList.remove('show'), 2000);
-}
-function haptic(t = 'light') {
-  try { tg?.HapticFeedback?.impactOccurred(t); } catch (e) {}
-}
-function hasAnyNotify(n) {
-  return n && n.enabled && (n.onDay || n.hourBefore || n.dayBefore || n.customAt);
-}
+setInterval(async()=>{if(await pullFromBackend()){renderContent();}},30000);
 
 /* ---------- Тема ---------- */
-function applyTheme() {
-  document.documentElement.dataset.theme = state.theme;
-  try {
-    const c = state.theme === 'dark' ? '#1c1c1e' : '#f5f5f7';
-    tg?.setHeaderColor?.(c);
-    tg?.setBackgroundColor?.(c);
-  } catch (e) {}
+function applyTheme(){
+  document.documentElement.dataset.theme=state.theme;
+  try{const c=state.theme==='dark'?'#1c1c1e':'#f5f5f7';
+    tg?.setHeaderColor?.(c);tg?.setBackgroundColor?.(c);}catch(e){}
 }
-function applyAccent() {
-  document.documentElement.style.setProperty('--accent', state.accent);
-  const [r, g, b] = [1, 3, 5].map(i => parseInt(state.accent.slice(i, i + 2), 16));
-  document.documentElement.style.setProperty('--accent-soft', `rgba(${r},${g},${b},0.16)`);
+function applyAccent(){
+  document.documentElement.style.setProperty('--accent',state.accent);
+  const [r,g,b]=[1,3,5].map(i=>parseInt(state.accent.slice(i,i+2),16));
+  document.documentElement.style.setProperty('--accent-soft',`rgba(${r},${g},${b},0.16)`);
 }
 
 /* ---------- Dock ---------- */
-function renderDock() {
-  const dock = $('#dock');
-  dock.innerHTML = '';
-  const scroll = document.createElement('div');
-  scroll.className = 'dock-scroll';
-
-  const orderedIds = [
-    ...state.enabledViews.filter(id => BASE_VIEWS[id]),
-    ...state.customViews.map(v => v.id),
-  ];
-
-  for (const id of orderedIds) {
-    const meta = BASE_VIEWS[id] || state.customViews.find(v => v.id === id);
-    if (!meta) continue;
-    const btn = document.createElement('button');
-    btn.className = 'dock-item' + (id === currentView ? ' active' : '');
-    btn.dataset.view = id;
-    btn.setAttribute('aria-label', meta.title);
-    btn.innerHTML = `<span aria-hidden="true">${meta.icon}</span>`;
-    btn.addEventListener('click', () => {
-      if (id === currentView) return;
-      haptic();
-      switchView(id);
-    });
+function renderDock(){
+  const dock=$('#dock');dock.innerHTML='';
+  const scroll=document.createElement('div');scroll.className='dock-scroll';
+  const ids=[...state.enabledViews.filter(id=>BASE_VIEWS[id]),...state.customViews.map(v=>v.id)];
+  for(const id of ids){
+    const meta=BASE_VIEWS[id]||state.customViews.find(v=>v.id===id);
+    if(!meta)continue;
+    const btn=document.createElement('button');
+    btn.className='dock-item'+(id===currentView?' active':'');
+    btn.dataset.view=id;btn.setAttribute('aria-label',meta.title);
+    btn.innerHTML=`<span aria-hidden="true">${meta.icon}</span>`;
+    btn.addEventListener('click',()=>{if(id===currentView)return;haptic();switchView(id);});
     scroll.appendChild(btn);
   }
   dock.appendChild(scroll);
-
-  const addBtn = document.createElement('button');
-  addBtn.className = 'dock-add';
-  addBtn.setAttribute('aria-label', 'Добавить шаблон');
-  addBtn.textContent = '+';
-  addBtn.addEventListener('click', () => {
-    haptic();
-    renderTemplateLibrary();
-    openModal($('#addTemplateModal'));
-  });
+  const addBtn=document.createElement('button');
+  addBtn.className='dock-add';addBtn.textContent='+';
+  addBtn.addEventListener('click',()=>{haptic();renderTemplateLibrary();openModal($('#addTemplateModal'));});
   dock.appendChild(addBtn);
 }
 
-/* ---------- Роутер ---------- */
-function switchView(view) {
-  currentView = view;
-  const meta = BASE_VIEWS[view] || state.customViews.find(v => v.id === view);
-  $('#pageTitle').textContent = meta?.title || 'Модуль';
-  renderDock();
-  renderContent();
-  closeSearch();
-  window.scrollTo({ top: 0, behavior: 'instant' });
+/* ---------- Router ---------- */
+function switchView(view){
+  currentView=view;
+  const meta=BASE_VIEWS[view]||state.customViews.find(v=>v.id===view);
+  $('#pageTitle').textContent=meta?.title||'Модуль';
+  renderDock();renderContent();closeSearch();
+  window.scrollTo({top:0,behavior:'instant'});
 }
-function renderContent() {
-  const content = $('#content');
-  content.innerHTML = '';
-  if (currentView === 'planner')  return renderPlanner(content);
-  if (currentView === 'training') return renderTraining(content);
-  if (currentView === 'notes')    return renderPlaceholder(content, 'notes');
-  if (currentView === 'reminders')return renderPlaceholder(content, 'reminders');
-  if (currentView === 'words')    return renderPlaceholder(content, 'words');
-  const custom = state.customViews.find(v => v.id === currentView);
-  if (custom) return renderCustomView(content, custom);
+function renderContent(){
+  const c=$('#content');c.innerHTML='';
+  if(currentView==='planner')return renderPlanner(c);
+  if(currentView==='training')return renderTraining(c);
+  if(currentView==='notes')return renderPlaceholder(c,'notes');
+  if(currentView==='reminders')return renderPlaceholder(c,'reminders');
+  if(currentView==='words')return renderPlaceholder(c,'words');
+  const custom=state.customViews.find(v=>v.id===currentView);
+  if(custom)return renderCustomView(c,custom);
   switchView('planner');
 }
 
-/* ---------- Чекбокс ---------- */
-function makeCheckbox(checked, onToggle, color) {
-  const btn = document.createElement('button');
-  btn.type = 'button';
-  btn.className = 'checkbox' + (checked ? ' checked' : '');
-  if (color) btn.style.setProperty('--cb-color', color);
-  btn.setAttribute('aria-label', checked ? 'Снять' : 'Отметить');
-  btn.innerHTML = checked
-    ? '<svg viewBox="0 0 20 20" fill="none" stroke="#fff" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 10l4 4 8-8"/></svg>'
-    : '';
-  btn.addEventListener('click', (e) => {
-    e.stopPropagation();
-    haptic();
-    onToggle();
-  });
+/* ---------- Checkbox ---------- */
+function makeCheckbox(checked,onToggle,color){
+  const btn=document.createElement('button');
+  btn.type='button';
+  btn.className='checkbox'+(checked?' checked':'');
+  if(color)btn.style.setProperty('--cb-color',color);
+  btn.setAttribute('aria-label',checked?'Снять':'Отметить');
+  btn.innerHTML=checked?'<svg viewBox="0 0 20 20" fill="none" stroke="#fff" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 10l4 4 8-8"/></svg>':'';
+  btn.addEventListener('click',e=>{e.stopPropagation();haptic();onToggle();});
   return btn;
 }
 
-/* ---------- Планировщик ---------- */
-function renderPlanner(root) {
-  root.innerHTML = `
+/* ---------- Planner ---------- */
+function renderPlanner(root){
+  root.innerHTML=`
     <div class="filters" id="plannerFilters">
       <button data-filter="all" class="${state.plannerFilter==='all'?'active':''}">Все</button>
       <button data-filter="busy" class="${state.plannerFilter==='busy'?'active':''}">С задачами</button>
@@ -801,676 +614,350 @@ function renderPlanner(root) {
       <button data-filter="today" class="${state.plannerFilter==='today'?'active':''}">Сегодня</button>
     </div>
     <div class="week-grid" id="weekGrid"></div>
-    <p class="hint">Удерживайте ☰ — перетащить. 🎨 — цвет. Тап на карточку — задачи.</p>
+    <p class="hint">Удерживайте ☰ — перетащить. 🎨 — цвет. 🔔 — уведомления. Тап по карточке — задачи.</p>
   `;
-  $('#plannerFilters').addEventListener('click', (e) => {
-    const btn = e.target.closest('[data-filter]');
-    if (!btn) return;
-    state.plannerFilter = btn.dataset.filter;
-    saveState();
-    $$('#plannerFilters button').forEach(b =>
-      b.classList.toggle('active', b.dataset.filter === state.plannerFilter));
-    renderWeekGrid();
-    haptic();
+  $('#plannerFilters').addEventListener('click',e=>{
+    const b=e.target.closest('[data-filter]');if(!b)return;
+    state.plannerFilter=b.dataset.filter;saveState();
+    $$('#plannerFilters button').forEach(x=>x.classList.toggle('active',x.dataset.filter===state.plannerFilter));
+    renderWeekGrid();haptic();
   });
   renderWeekGrid();
 }
-function renderWeekGrid() {
-  const grid = $('#weekGrid');
-  if (!grid) return;
-  grid.innerHTML = '';
-  grid.style.gridTemplateColumns = `repeat(${state.weekColumns}, minmax(0,1fr))`;
-
-  const q = searchQuery;
-  const todayIdx = new Date().getDay();
-  const todayId = ['sun','mon','tue','wed','thu','fri','sat'][todayIdx];
-
-  const visible = state.week.filter(d => {
-    if (!state.showWeekend && (d.id === 'sat' || d.id === 'sun')) return false;
-    const mq = !q ||
-      d.day.toLowerCase().includes(q) || d.full.toLowerCase().includes(q) ||
-      d.tasks.some(t => t.text.toLowerCase().includes(q));
-    const mf =
-      state.plannerFilter === 'all'   ? true :
-      state.plannerFilter === 'busy'  ? d.tasks.length > 0 :
-      state.plannerFilter === 'empty' ? d.tasks.length === 0 :
-      state.plannerFilter === 'today' ? d.id === todayId : true;
-    return mq && mf;
+function renderWeekGrid(){
+  const grid=$('#weekGrid');if(!grid)return;
+  grid.innerHTML='';
+  grid.style.gridTemplateColumns=`repeat(${state.weekColumns}, minmax(0,1fr))`;
+  const q=searchQuery;
+  const todayIdx=new Date().getDay();
+  const todayId=['sun','mon','tue','wed','thu','fri','sat'][todayIdx];
+  const visible=state.week.filter(d=>{
+    if(!state.showWeekend&&(d.id==='sat'||d.id==='sun'))return false;
+    const mq=!q||d.day.toLowerCase().includes(q)||d.full.toLowerCase().includes(q)
+      ||d.tasks.some(t=>t.text.toLowerCase().includes(q));
+    const mf=state.plannerFilter==='all'?true
+      :state.plannerFilter==='busy'?d.tasks.length>0
+      :state.plannerFilter==='empty'?d.tasks.length===0
+      :state.plannerFilter==='today'?d.id===todayId:true;
+    return mq&&mf;
   });
-
-  if (!visible.length) {
-    grid.innerHTML = '<p class="empty">Нет подходящих дней</p>';
-    return;
-  }
-  for (const d of visible) {
-    const card = document.createElement('div');
-    card.className = 'day-card';
-    card.dataset.dayId = d.id;
-    card.dataset.draggable = 'true';
-    card.draggable = false;
-    card.style.setProperty('--card-color', d.color);
-
-    const done = d.tasks.filter(t => t.done).length;
-    const total = d.tasks.length;
-    const word = total === 1 ? 'задача' : (total >= 2 && total <= 4) ? 'задачи' : 'задач';
-
-    card.innerHTML = `
+  if(!visible.length){grid.innerHTML='<p class="empty">Нет подходящих дней</p>';return;}
+  for(const d of visible){
+    const card=document.createElement('div');
+    card.className='day-card';card.dataset.dayId=d.id;card.dataset.draggable='true';
+    card.draggable=false;card.style.setProperty('--card-color',d.color);
+    const done=d.tasks.filter(t=>t.done).length,total=d.tasks.length;
+    const word=total===1?'задача':(total>=2&&total<=4)?'задачи':'задач';
+    card.innerHTML=`
       <div class="day-head">
         <div class="day-name">${escapeHtml(d.day)}</div>
         <div class="day-actions">
-          <button class="mini-btn palette-btn" draggable="false">🎨</button>
-          <button class="mini-btn drag-handle" draggable="false">☰</button>
+          <button class="mini-btn bell-btn ${hasAnyNotify(d.notify)?'bell-active':''}" data-bell="1" aria-label="Уведомления">🔔</button>
+          <button class="mini-btn palette-btn" aria-label="Цвет">🎨</button>
+          <button class="mini-btn drag-handle" aria-label="Перетащить">☰</button>
         </div>
       </div>
       <div class="day-body">
-        <div class="task-count">${total ? `${done}/${total} ${word}` : 'Свободно'}</div>
-        ${total ? `<div class="task-preview">${escapeHtml(d.tasks[0].text)}${total > 1 ? '…' : ''}</div>` : ''}
+        <div class="task-count">${total?`${done}/${total} ${word}`:'Свободно'}</div>
+        ${total?`<div class="task-preview">${escapeHtml(d.tasks[0].text)}${total>1?'…':''}</div>`:''}
       </div>`;
-
-    card.addEventListener('click', (e) => {
-      if (e.target.closest('.palette-btn, .drag-handle')) return;
+    card.addEventListener('click',e=>{
+      if(e.target.closest('.palette-btn,.drag-handle,[data-bell]'))return;
       openDay(d.id);
     });
-    card.querySelector('.palette-btn').addEventListener('click', (e) => {
-      e.stopPropagation();
-      openCardColorPicker(d.color, (c) => { d.color = c; saveState(); renderWeekGrid(); });
+    card.querySelector('[data-bell]').addEventListener('click',e=>{
+      e.stopPropagation();openNotifyModal({type:'day',ref:d});
     });
-    card.querySelector('.drag-handle')
-      .addEventListener('pointerdown', (e) => startDrag(e, card));
+    card.querySelector('.palette-btn').addEventListener('click',e=>{
+      e.stopPropagation();
+      openCardColorPicker(d.color,c=>{d.color=c;saveState();renderWeekGrid();});
+    });
+    card.querySelector('.drag-handle').addEventListener('pointerdown',e=>startDrag(e,card));
     grid.appendChild(card);
   }
 }
 
 /* ---------- Drag ---------- */
-function startDrag(e, card) {
-  if (e.button && e.button !== 0) return;
-  e.preventDefault(); e.stopPropagation();
-  haptic();
-  dragState = { card, target: null };
-  card.classList.add('dragging');
-  document.addEventListener('pointermove', onDragMove);
-  document.addEventListener('pointerup', endDrag);
-  document.addEventListener('pointercancel', endDrag);
-  document.addEventListener('touchmove', preventDuringDrag, { passive: false });
+function startDrag(e,card){
+  if(e.button&&e.button!==0)return;
+  e.preventDefault();e.stopPropagation();haptic();
+  dragState={card,target:null};card.classList.add('dragging');
+  document.addEventListener('pointermove',onDragMove);
+  document.addEventListener('pointerup',endDrag);
+  document.addEventListener('pointercancel',endDrag);
+  document.addEventListener('touchmove',preventDrag,{passive:false});
 }
-function preventDuringDrag(e) { if (dragState) e.preventDefault(); }
-function onDragMove(e) {
-  if (!dragState) return;
-  $$('.drag-target').forEach(el => el.classList.remove('drag-target'));
-  const el = document.elementFromPoint(e.clientX, e.clientY);
-  const target = el?.closest('[data-draggable]');
-  if (target && target !== dragState.card) {
-    target.classList.add('drag-target');
-    dragState.target = target;
-  } else dragState.target = null;
+function preventDrag(e){if(dragState)e.preventDefault();}
+function onDragMove(e){
+  if(!dragState)return;
+  $$('.drag-target').forEach(el=>el.classList.remove('drag-target'));
+  const el=document.elementFromPoint(e.clientX,e.clientY);
+  const t=el?.closest('[data-draggable]');
+  if(t&&t!==dragState.card){t.classList.add('drag-target');dragState.target=t;}
+  else dragState.target=null;
 }
-function endDrag() {
-  if (dragState?.target) {
-    const sId = dragState.card.dataset.dayId;
-    const tId = dragState.target.dataset.dayId;
-    const f = state.week.findIndex(d => d.id === sId);
-    const t = state.week.findIndex(d => d.id === tId);
-    if (f >= 0 && t >= 0) {
-      const [m] = state.week.splice(f, 1);
-      state.week.splice(t, 0, m);
-      saveState();
-      haptic('medium');
-    }
+function endDrag(){
+  if(dragState?.target){
+    const sId=dragState.card.dataset.dayId,tId=dragState.target.dataset.dayId;
+    const f=state.week.findIndex(d=>d.id===sId),t=state.week.findIndex(d=>d.id===tId);
+    if(f>=0&&t>=0){const[m]=state.week.splice(f,1);state.week.splice(t,0,m);saveState();haptic('medium');}
   }
   dragState?.card?.classList.remove('dragging');
-  $$('.drag-target').forEach(el => el.classList.remove('drag-target'));
-  dragState = null;
-  document.removeEventListener('pointermove', onDragMove);
-  document.removeEventListener('pointerup', endDrag);
-  document.removeEventListener('pointercancel', endDrag);
-  document.removeEventListener('touchmove', preventDuringDrag);
+  $$('.drag-target').forEach(el=>el.classList.remove('drag-target'));
+  dragState=null;
+  document.removeEventListener('pointermove',onDragMove);
+  document.removeEventListener('pointerup',endDrag);
+  document.removeEventListener('pointercancel',endDrag);
+  document.removeEventListener('touchmove',preventDrag);
   renderWeekGrid();
 }
 
-/* ---------- День ---------- */
-function openDay(dayId) {
-  currentDayId = dayId;
-  const day = state.week.find(d => d.id === dayId);
-  if (!day) return;
-  $('#dayTitle').textContent = day.full;
-  $('#newTask').value = '';
-  renderTasks();
-  openModal($('#dayModal'));
+/* ---------- Day ---------- */
+function openDay(dayId){
+  currentDayId=dayId;
+  const day=state.week.find(d=>d.id===dayId);if(!day)return;
+  $('#dayTitle').textContent=day.full;$('#newTask').value='';
+  renderTasks();openModal($('#dayModal'));
 }
-function renderTasks() {
-  const day = state.week.find(d => d.id === currentDayId);
-  if (!day) return;
-  const list = $('#taskList');
-  list.innerHTML = '';
-  if (!day.tasks.length) {
-    list.innerHTML = '<p class="empty">Задач нет. Добавьте первую ↓</p>';
-    return;
-  }
-  day.tasks.forEach(task => {
-    const row = document.createElement('div');
-    row.className = 'task-row';
-    row.appendChild(makeCheckbox(task.done, () => {
-      task.done = !task.done; saveState(); renderTasks(); renderWeekGrid();
-    }, day.color));
-    const txt = document.createElement('span');
-    txt.className = 'task-text' + (task.done ? ' done' : '');
-    txt.textContent = task.text;
-    txt.addEventListener('click', () => editInline(txt, task.text, (n) => {
-      task.text = n; saveState(); renderTasks(); renderWeekGrid();
+function renderTasks(){
+  const day=state.week.find(d=>d.id===currentDayId);if(!day)return;
+  const list=$('#taskList');list.innerHTML='';
+  if(!day.tasks.length){list.innerHTML='<p class="empty">Задач нет. Добавьте первую ↓</p>';return;}
+  day.tasks.forEach(task=>{
+    const row=document.createElement('div');row.className='task-row';
+    row.appendChild(makeCheckbox(task.done,()=>{
+      task.done=!task.done;saveState();renderTasks();renderWeekGrid();
+    },day.color));
+    const txt=document.createElement('span');
+    txt.className='task-text'+(task.done?' done':'');txt.textContent=task.text;
+    txt.addEventListener('click',()=>editInline(txt,task.text,false,n=>{
+      task.text=n;saveState();renderTasks();renderWeekGrid();
     }));
     row.appendChild(txt);
-    const bell = document.createElement('button');
-    bell.className = 'mini-btn bell-btn' + (hasAnyNotify(task.notify) ? ' active' : '');
-    bell.textContent = '🔔';
-    bell.addEventListener('click', () => openNotifyModal({ item: task }));
-    row.appendChild(bell);
-    const del = document.createElement('button');
-    del.className = 'mini-btn';
-    del.textContent = '✕';
-    del.addEventListener('click', () => {
-      const i = day.tasks.indexOf(task);
-      if (i >= 0) day.tasks.splice(i, 1);
-      saveState(); renderTasks(); renderWeekGrid();
+    const del=document.createElement('button');
+    del.className='mini-btn';del.textContent='✕';
+    del.addEventListener('click',()=>{
+      const i=day.tasks.indexOf(task);if(i>=0)day.tasks.splice(i,1);
+      saveState();renderTasks();renderWeekGrid();
     });
     row.appendChild(del);
     list.appendChild(row);
   });
 }
-function editInline(el, oldText, onSave) {
-  const input = document.createElement('input');
-  input.type = 'text';
-  input.value = oldText;
-  input.className = 'task-edit-input';
-  el.replaceWith(input);
-  input.focus();
-  input.setSelectionRange(input.value.length, input.value.length);
-  let done = false;
-  const finish = (save) => {
-    if (done) return; done = true;
-    const v = input.value.trim();
-    onSave(save && v ? v : oldText);
-  };
-  input.addEventListener('blur', () => finish(true));
-  input.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter') { e.preventDefault(); input.blur(); }
-    else if (e.key === 'Escape') { e.preventDefault(); finish(false); }
+function editInline(el,oldText,isName,onSave){
+  const input=document.createElement('input');
+  input.type='text';input.value=oldText;
+  input.className=isName?'name-edit-input':'task-edit-input';
+  el.replaceWith(input);input.focus();
+  input.setSelectionRange(input.value.length,input.value.length);
+  let done=false;
+  const finish=save=>{if(done)return;done=true;
+    const v=input.value.trim();onSave(save&&v?v:oldText);};
+  input.addEventListener('blur',()=>finish(true));
+  input.addEventListener('keydown',e=>{
+    if(e.key==='Enter'){e.preventDefault();input.blur();}
+    else if(e.key==='Escape'){e.preventDefault();finish(false);}
   });
 }
 
-/* ---------- Тренировки ---------- */
-function renderTraining(root) {
-  const t = state.training;
-  root.innerHTML = `
+/* ---------- Training ---------- */
+function renderTraining(root){
+  const t=state.training;
+  root.innerHTML=`
     <div class="training-tabs">
       <button data-tab="workouts" class="${t.activeTab==='workouts'?'active':''}">💪 Тренировки</button>
       <button data-tab="nutrition" class="${t.activeTab==='nutrition'?'active':''}">🥗 Питание</button>
     </div>
     <div id="trainingBody"></div>
   `;
-  $$('.training-tabs button').forEach(b =>
-    b.addEventListener('click', () => {
-      t.activeTab = b.dataset.tab;
-      saveState();
-      renderTraining(root);
-    }));
+  $$('.training-tabs button').forEach(b=>b.addEventListener('click',()=>{
+    t.activeTab=b.dataset.tab;saveState();renderTraining(root);
+  }));
   renderTrainingBody();
 }
-function renderTrainingBody() {
-  const body = $('#trainingBody');
-  if (!body) return;
-  const t = state.training;
-  const cats = t.activeTab === 'workouts' ? t.workouts : t.nutrition;
-  body.innerHTML = '';
-
-  for (const cat of cats) {
-    const card = document.createElement('div');
-    card.className = 'category-card';
-
-    const done = cat.items.filter(i => i.done).length;
-    const head = document.createElement('div');
-    head.className = 'category-header';
-    head.innerHTML = `<span class="category-name">${escapeHtml(cat.name)}</span>
+function renderTrainingBody(){
+  const body=$('#trainingBody');if(!body)return;
+  const t=state.training;
+  const cats=t.activeTab==='workouts'?t.workouts:t.nutrition;
+  body.innerHTML='';
+  for(const cat of cats){
+    const card=document.createElement('div');card.className='category-card';
+    const done=cat.items.filter(i=>i.done).length;
+    const head=document.createElement('div');head.className='category-header';
+    head.innerHTML=`<span class="category-name">${escapeHtml(cat.name)}</span>
       <span class="category-meta">${done}/${cat.items.length}</span>`;
-    const delCat = document.createElement('button');
-    delCat.className = 'mini-btn';
-    delCat.textContent = '✕';
-    delCat.addEventListener('click', () => {
-      askConfirm(`Удалить «${cat.name}»?`, () => {
-        const arr = t.activeTab === 'workouts' ? t.workouts : t.nutrition;
-        const i = arr.indexOf(cat);
-        if (i >= 0) arr.splice(i, 1);
-        saveState(); renderTrainingBody();
+    const bell=document.createElement('button');
+    bell.className='mini-btn'+(hasAnyNotify(cat.notify)?' bell-active':'');
+    bell.textContent='🔔';bell.setAttribute('aria-label','Уведомления');
+    bell.addEventListener('click',()=>openNotifyModal({type:'category',ref:cat}));
+    head.appendChild(bell);
+    const delCat=document.createElement('button');
+    delCat.className='mini-btn';delCat.textContent='✕';
+    delCat.addEventListener('click',()=>{
+      askConfirm(`Удалить «${cat.name}»?`,()=>{
+        const arr=t.activeTab==='workouts'?t.workouts:t.nutrition;
+        const i=arr.indexOf(cat);if(i>=0)arr.splice(i,1);
+        saveState();renderTrainingBody();
       });
     });
     head.appendChild(delCat);
+    head.querySelector('.category-name').addEventListener('click',function(){
+      editInline(this,cat.name,true,n=>{
+        cat.name=n;saveState();renderTrainingBody();
+      });
+    });
     card.appendChild(head);
-
-    const itemsBox = document.createElement('div');
-    itemsBox.className = 'category-items';
-    for (const item of cat.items) {
-      const row = document.createElement('div');
-      row.className = 'check-item';
-      row.appendChild(makeCheckbox(item.done, () => {
-        item.done = !item.done; saveState(); renderTrainingBody();
+    const itemsBox=document.createElement('div');itemsBox.className='category-items';
+    for(const item of cat.items){
+      const row=document.createElement('div');row.className='check-item';
+      row.appendChild(makeCheckbox(item.done,()=>{
+        item.done=!item.done;saveState();renderTrainingBody();
       }));
-      const txt = document.createElement('span');
-      txt.className = 'check-text' + (item.done ? ' done' : '');
-      txt.textContent = item.text;
-      txt.addEventListener('click', () => editInline(txt, item.text, (n) => {
-        item.text = n; saveState(); renderTrainingBody();
+      const txt=document.createElement('span');
+      txt.className='check-text'+(item.done?' done':'');txt.textContent=item.text;
+      txt.addEventListener('click',()=>editInline(txt,item.text,false,n=>{
+        item.text=n;saveState();renderTrainingBody();
       }));
       row.appendChild(txt);
-      if (item.meta) {
-        const m = document.createElement('span');
-        m.className = 'check-meta';
-        m.textContent = item.meta;
-        row.appendChild(m);
-      }
-      const bell = document.createElement('button');
-      bell.className = 'mini-btn bell-btn' + (hasAnyNotify(item.notify) ? ' active' : '');
-      bell.textContent = '🔔';
-      bell.addEventListener('click', () => openNotifyModal({ item }));
-      row.appendChild(bell);
-      const del = document.createElement('button');
-      del.className = 'mini-btn';
-      del.textContent = '✕';
-      del.addEventListener('click', () => {
-        const i = cat.items.indexOf(item);
-        if (i >= 0) cat.items.splice(i, 1);
-        saveState(); renderTrainingBody();
+      if(item.meta){const m=document.createElement('span');
+        m.className='check-meta';m.textContent=item.meta;row.appendChild(m);}
+      const del=document.createElement('button');
+      del.className='mini-btn';del.textContent='✕';
+      del.addEventListener('click',()=>{
+        const i=cat.items.indexOf(item);if(i>=0)cat.items.splice(i,1);
+        saveState();renderTrainingBody();
       });
-      row.appendChild(del);
-      itemsBox.appendChild(row);
+      row.appendChild(del);itemsBox.appendChild(row);
     }
     card.appendChild(itemsBox);
-
-    const addRow = document.createElement('div');
-    addRow.className = 'add-item-row';
-    const inp = document.createElement('input');
-    inp.type = 'text';
-    inp.placeholder = t.activeTab === 'workouts' ? 'Упражнение…' : 'Блюдо…';
-    const addB = document.createElement('button');
-    addB.className = 'icon-btn';
-    addB.textContent = '+';
-    const add = () => {
-      const v = inp.value.trim();
-      if (!v) return;
-      cat.items.push({ id: makeId('i'), text: v, meta: '', done: false,
-        notify: { ...DEFAULT_NOTIFY } });
-      inp.value = '';
-      saveState(); renderTrainingBody(); haptic();
+    const addRow=document.createElement('div');addRow.className='add-item-row';
+    const inp=document.createElement('input');inp.type='text';
+    inp.placeholder=t.activeTab==='workouts'?'Упражнение…':'Блюдо…';
+    const addB=document.createElement('button');addB.className='icon-btn';addB.textContent='+';
+    const add=()=>{
+      const v=inp.value.trim();if(!v)return;
+      cat.items.push({id:makeId('i'),text:v,meta:'',done:false});
+      inp.value='';saveState();renderTrainingBody();haptic();
     };
-    addB.addEventListener('click', add);
-    inp.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); add(); } });
-    addRow.appendChild(inp); addRow.appendChild(addB);
-    card.appendChild(addRow);
+    addB.addEventListener('click',add);
+    inp.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();add();}});
+    addRow.appendChild(inp);addRow.appendChild(addB);card.appendChild(addRow);
     body.appendChild(card);
   }
-
-  const addCatB = document.createElement('button');
-  addCatB.className = 'add-category-btn';
-  addCatB.textContent = '+ Добавить категорию';
-  addCatB.addEventListener('click', () => {
-    const n = prompt('Название категории:');
-    if (!n || !n.trim()) return;
-    const arr = t.activeTab === 'workouts' ? t.workouts : t.nutrition;
-    arr.push({ id: makeId('c'), name: n.trim(), items: [] });
-    saveState(); renderTrainingBody();
+  const addCat=document.createElement('button');
+  addCat.className='add-category-btn';addCat.textContent='+ Добавить категорию';
+  addCat.addEventListener('click',()=>{
+    const n=prompt('Название категории:');if(!n||!n.trim())return;
+    const arr=t.activeTab==='workouts'?t.workouts:t.nutrition;
+    arr.push({id:makeId('c'),name:n.trim(),days:[0,1,2,3,4,5,6],
+      notify:{...DEFAULT_NOTIFY_CAT},items:[]});
+    saveState();renderTrainingBody();
   });
-  body.appendChild(addCatB);
-  body.insertAdjacentHTML('beforeend',
-    `<p class="hint">Тап по тексту — редактировать. 🔔 — напоминание. Кружок — отметить.</p>`);
+  body.appendChild(addCat);
+  body.insertAdjacentHTML('beforeend','<p class="hint">Тап по имени — переименовать. 🔔 — напоминания. Кружок — отметить.</p>');
 }
 
-/* ---------- Свои шаблоны ---------- */
-function renderCustomView(root, view) {
-  root.innerHTML = `<div id="customBody"></div>`;
-  const body = $('#customBody');
-  if (!view.items) view.items = [];
-
-  const card = document.createElement('div');
-  card.className = 'category-card';
-  const head = document.createElement('div');
-  head.className = 'category-header';
-  head.innerHTML = `<span class="category-name">${escapeHtml(view.title)}</span>
+/* ---------- Custom views ---------- */
+function renderCustomView(root,view){
+  root.innerHTML='<div id="customBody"></div>';
+  const body=$('#customBody');
+  if(!view.items)view.items=[];
+  const card=document.createElement('div');card.className='category-card';
+  const head=document.createElement('div');head.className='category-header';
+  head.innerHTML=`<span class="category-name">${escapeHtml(view.title)}</span>
     <span class="category-meta">${view.items.filter(i=>i.done).length}/${view.items.length}</span>`;
+  const bell=document.createElement('button');
+  bell.className='mini-btn'+(hasAnyNotify(view.notify)?' bell-active':'');
+  bell.textContent='🔔';
+  bell.addEventListener('click',()=>openNotifyModal({type:'category',ref:view}));
+  head.appendChild(bell);
+  head.querySelector('.category-name').addEventListener('click',function(){
+    editInline(this,view.title,true,n=>{
+      view.title=n;saveState();renderCustomView(body,view);
+    });
+  });
   card.appendChild(head);
-
-  const itemsBox = document.createElement('div');
-  itemsBox.className = 'category-items';
-  for (const item of view.items) {
-    const row = document.createElement('div');
-    row.className = 'check-item';
-    row.appendChild(makeCheckbox(item.done, () => {
-      item.done = !item.done; saveState(); renderCustomView(body, view);
+  const itemsBox=document.createElement('div');itemsBox.className='category-items';
+  for(const item of view.items){
+    const row=document.createElement('div');row.className='check-item';
+    row.appendChild(makeCheckbox(item.done,()=>{
+      item.done=!item.done;saveState();renderCustomView(body,view);
     }));
-    const txt = document.createElement('span');
-    txt.className = 'check-text' + (item.done ? ' done' : '');
-    txt.textContent = item.text;
-    txt.addEventListener('click', () => editInline(txt, item.text, (n) => {
-      item.text = n; saveState(); renderCustomView(body, view);
+    const txt=document.createElement('span');
+    txt.className='check-text'+(item.done?' done':'');txt.textContent=item.text;
+    txt.addEventListener('click',()=>editInline(txt,item.text,false,n=>{
+      item.text=n;saveState();renderCustomView(body,view);
     }));
     row.appendChild(txt);
-    const bell = document.createElement('button');
-    bell.className = 'mini-btn bell-btn' + (hasAnyNotify(item.notify) ? ' active' : '');
-    bell.textContent = '🔔';
-    bell.addEventListener('click', () => openNotifyModal({ item }));
-    row.appendChild(bell);
-    const del = document.createElement('button');
-    del.className = 'mini-btn';
-    del.textContent = '✕';
-    del.addEventListener('click', () => {
-      const i = view.items.indexOf(item);
-      if (i >= 0) view.items.splice(i, 1);
-      saveState(); renderCustomView(body, view);
+    const del=document.createElement('button');
+    del.className='mini-btn';del.textContent='✕';
+    del.addEventListener('click',()=>{
+      const i=view.items.indexOf(item);if(i>=0)view.items.splice(i,1);
+      saveState();renderCustomView(body,view);
     });
-    row.appendChild(del);
-    itemsBox.appendChild(row);
+    row.appendChild(del);itemsBox.appendChild(row);
   }
   card.appendChild(itemsBox);
-
-  const addRow = document.createElement('div');
-  addRow.className = 'add-item-row';
-  const inp = document.createElement('input');
-  inp.type = 'text';
-  inp.placeholder = 'Новый пункт…';
-  const addB = document.createElement('button');
-  addB.className = 'icon-btn';
-  addB.textContent = '+';
-  const add = () => {
-    const v = inp.value.trim();
-    if (!v) return;
-    view.items.push({ id: makeId('ci'), text: v, done: false,
-      notify: { ...DEFAULT_NOTIFY } });
-    inp.value = '';
-    saveState(); renderCustomView(body, view); haptic();
-  };
-  addB.addEventListener('click', add);
-  inp.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); add(); } });
-  addRow.appendChild(inp); addRow.appendChild(addB);
-  card.appendChild(addRow);
-
+  const addRow=document.createElement('div');addRow.className='add-item-row';
+  const inp=document.createElement('input');inp.type='text';inp.placeholder='Новый пункт…';
+  const addB=document.createElement('button');addB.className='icon-btn';addB.textContent='+';
+  const add=()=>{const v=inp.value.trim();if(!v)return;
+    view.items.push({id:makeId('ci'),text:v,done:false});
+    inp.value='';saveState();renderCustomView(body,view);haptic();};
+  addB.addEventListener('click',add);
+  inp.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();add();}});
+  addRow.appendChild(inp);addRow.appendChild(addB);card.appendChild(addRow);
   body.appendChild(card);
-  body.insertAdjacentHTML('beforeend',
-    `<p class="hint">Тап по тексту — редактировать. 🔔 — напоминание.</p>`);
+  body.insertAdjacentHTML('beforeend','<p class="hint">Тап по тексту — редактировать. 🔔 — напоминания.</p>');
 }
 
-/* ---------- Заглушки ---------- */
-function renderPlaceholder(root, id) {
-  const meta = BASE_VIEWS[id];
-  const msgs = {
-    notes: 'Заметки с папками и поиском — скоро.',
-    reminders: 'Быстрые напоминания с повтором — скоро.',
-    words: 'Карточки слов по системе Лейтнера — скоро.',
-  };
-  root.innerHTML = `
+/* ---------- Placeholder ---------- */
+function renderPlaceholder(root,id){
+  const meta=BASE_VIEWS[id];
+  const msgs={notes:'Заметки с папками и поиском — скоро.',reminders:'Напоминания с повтором — скоро.',words:'Карточки слов по системе Лейтнера — скоро.'};
+  root.innerHTML=`
     <div class="placeholder">
       <div class="placeholder-icon">${meta.icon}</div>
       <div class="placeholder-title">${meta.title}</div>
-      <div class="placeholder-sub">${msgs[id] || 'Скоро'}</div>
+      <div class="placeholder-sub">${msgs[id]||'Скоро'}</div>
     </div>`;
 }
 
-/* ---------- Модалки ---------- */
-function openModal(m) {
-  m.classList.add('open');
-  document.body.style.overflow = 'hidden';
-  updateBackButton();
-}
-function closeModal(m) {
-  m.classList.remove('open');
-  if (!$$('.modal.open').length) document.body.style.overflow = '';
-  updateBackButton();
-}
-function updateBackButton() {
-  if (!tg?.BackButton) return;
-  if ($$('.modal.open').length) tg.BackButton.show();
-  else tg.BackButton.hide();
-}
+/* ---------- Modals ---------- */
+function openModal(m){m.classList.add('open');document.body.style.overflow='hidden';updateBack();}
+function closeModal(m){m.classList.remove('open');
+  if(!$$('.modal.open').length)document.body.style.overflow='';updateBack();}
+function updateBack(){if(!tg?.BackButton)return;
+  if($$('.modal.open').length)tg.BackButton.show();else tg.BackButton.hide();}
 
-/* ---------- Палитры ---------- */
-function openCardColorPicker(current, onPick) {
-  const modal = $('#colorModal');
-  const wrap = $('#swatches');
-  wrap.innerHTML = '';
-  for (const c of CARD_PALETTE) {
-    const b = document.createElement('button');
-    b.className = 'swatch' + (c === current ? ' active' : '');
-    b.style.background = c;
-    b.style.color = c;
-    b.addEventListener('click', () => { onPick(c); closeModal(modal); });
-    wrap.appendChild(b);
+/* ---------- Palettes ---------- */
+function openCardColorPicker(current,onPick){
+  const m=$('#colorModal'),w=$('#swatches');w.innerHTML='';
+  for(const c of CARD_PALETTE){
+    const b=document.createElement('button');
+    b.className='swatch'+(c===current?' active':'');b.style.background=c;b.style.color=c;
+    b.addEventListener('click',()=>{onPick(c);closeModal(m);});
+    w.appendChild(b);
   }
-  openModal(modal);
+  openModal(m);
 }
-function openAccentPicker() {
-  const modal = $('#accentModal');
-  const wrap = $('#accentSwatches');
-  wrap.innerHTML = '';
-  for (const c of ACCENT_PALETTE) {
-    const b = document.createElement('button');
-    b.className = 'swatch' + (c === state.accent ? ' active' : '');
-    b.style.background = c;
-    b.style.color = c;
-    b.addEventListener('click', () => {
-      state.accent = c; saveState(); applyAccent(); closeModal(modal);
-    });
-    wrap.appendChild(b);
+function openAccentPicker(){
+  const m=$('#accentModal'),w=$('#accentSwatches');w.innerHTML='';
+  for(const c of ACCENT_PALETTE){
+    const b=document.createElement('button');
+    b.className='swatch'+(c===state.accent?' active':'');b.style.background=c;b.style.color=c;
+    b.addEventListener('click',()=>{state.accent=c;saveState();applyAccent();closeModal(m);});
+    w.appendChild(b);
   }
-  openModal(modal);
+  openModal(m);
 }
 
-/* ---------- Напоминание ---------- */
-function openNotifyModal(target) {
-  currentNotifyTarget = target;
-  const n = target.item.notify || (target.item.notify = { ...DEFAULT_NOTIFY });
-  $('#notifyToggle').classList.toggle('on', !!n.enabled);
-  $('#notifyWhen').style.display = n.enabled ? 'block' : 'none';
-  $('#notifyOnDay').checked = !!n.onDay;
-  $('#notifyHourBefore').checked = !!n.hourBefore;
-  $('#notifyDayBefore').checked = !!n.dayBefore;
-  $('#notifyTime').value = n.time || '';
-  $('#notifyCustomAt').value = n.customAt || '';
-  openModal($('#notifyModal'));
-}
-function saveNotifyFromModal() {
-  if (!currentNotifyTarget) return;
-  const n = currentNotifyTarget.item.notify;
-  n.onDay = $('#notifyOnDay').checked;
-  n.hourBefore = $('#notifyHourBefore').checked;
-  n.dayBefore = $('#notifyDayBefore').checked;
-  n.time = $('#notifyTime').value || null;
-  n.customAt = $('#notifyCustomAt').value || null;
-  saveState();
-  renderContent();
-}
-
-/* ---------- Библиотека шаблонов ---------- */
-function renderTemplateLibrary() {
-  const wrap = $('#templateLibrary');
-  wrap.innerHTML = '';
-  for (const [id, meta] of Object.entries(BASE_VIEWS)) {
-    if (!meta.removable) continue;
-    const enabled = state.enabledViews.includes(id);
-    const tile = document.createElement('button');
-    tile.className = 'tpl-tile' + (enabled ? ' enabled' : '');
-    tile.innerHTML = `<span class="tpl-tile-icon">${meta.icon}</span><span>${meta.title}</span>`;
-    tile.addEventListener('click', () => {
-      if (enabled) {
-        if (currentView === id) { toast('Сначала переключитесь на другой'); return; }
-        state.enabledViews = state.enabledViews.filter(v => v !== id);
-      } else {
-        state.enabledViews.push(id);
-      }
-      saveState(); renderTemplateLibrary(); renderDock(); haptic();
-    });
-    wrap.appendChild(tile);
-  }
-  state.customViews.forEach(v => {
-    const tile = document.createElement('button');
-    tile.className = 'tpl-tile enabled';
-    tile.innerHTML = `<span class="tpl-tile-icon">${v.icon}</span><span>${escapeHtml(v.title)}</span>`;
-    tile.addEventListener('click', () => {
-      if (currentView === v.id) { toast('Сначала переключитесь на другой'); return; }
-      askConfirm(`Удалить «${v.title}»?`, () => {
-        state.customViews = state.customViews.filter(x => x.id !== v.id);
-        state.enabledViews = state.enabledViews.filter(x => x !== v.id);
-        saveState(); renderTemplateLibrary(); renderDock();
-      });
-    });
-    wrap.appendChild(tile);
-  });
-}
-function createCustomTemplate() {
-  const name = $('#customTplName').value.trim();
-  const icon = $('#customTplIcon').value.trim() || '✨';
-  if (!name) { toast('Введите название'); return; }
-  const id = makeId('view');
-  state.customViews.push({ id, title: name, icon, items: [] });
-  state.enabledViews.push(id);
-  $('#customTplName').value = '';
-  $('#customTplIcon').value = '✨';
-  saveState(); renderTemplateLibrary(); renderDock();
-  toast('Шаблон «' + name + '» добавлен');
-  haptic();
-}
-
-/* ---------- Подтверждение ---------- */
-function askConfirm(text, cb) {
-  $('#confirmText').textContent = text;
-  confirmCallback = cb;
-  openModal($('#confirmModal'));
-}
-
-/* ---------- Поиск ---------- */
-function openSearch() {
-  $('#searchOverlay').classList.add('open');
-  setTimeout(() => $('#globalSearch').focus(), 100);
-}
-function closeSearch() {
-  $('#searchOverlay').classList.remove('open');
-  $('#globalSearch').value = '';
-  if (searchQuery) {
-    searchQuery = '';
-    if (currentView === 'planner') renderWeekGrid();
-  }
-}
-
-/* ---------- Настройки ---------- */
-function renderSettings() {
-  $$('[data-setting="theme"] button').forEach(b =>
-    b.classList.toggle('active', b.dataset.value === state.theme));
-  $$('[data-setting="weekColumns"] button').forEach(b =>
-    b.classList.toggle('active', Number(b.dataset.value) === state.weekColumns));
-  $$('[data-setting="showWeekend"] button').forEach(b =>
-    b.classList.toggle('active', (b.dataset.value === 'true') === state.showWeekend));
-}
-function handleSettingClick(e) {
-  const btn = e.target.closest('[data-value]');
-  if (!btn) return;
-  const grp = btn.closest('[data-setting]');
-  if (!grp) return;
-  const s = grp.dataset.setting, v = btn.dataset.value;
-  if (s === 'theme') { state.theme = v; applyTheme(); }
-  else if (s === 'weekColumns') { state.weekColumns = Number(v); if (currentView === 'planner') renderWeekGrid(); }
-  else if (s === 'showWeekend') { state.showWeekend = v === 'true'; if (currentView === 'planner') renderWeekGrid(); }
-  saveState(); renderSettings(); haptic();
-}
-
-/* ---------- Обработчики ---------- */
-$('#searchBtn').addEventListener('click', openSearch);
-$('#searchClose').addEventListener('click', closeSearch);
-$('#globalSearch').addEventListener('input', (e) => {
-  searchQuery = e.target.value.trim().toLowerCase();
-  if (currentView === 'planner') renderWeekGrid();
-});
-$('#settingsBtn').addEventListener('click', () => {
-  renderSettings();
-  openModal($('#settingsModal'));
-});
-$('#settingsModal').addEventListener('click', handleSettingClick);
-$('#openAccentPicker').addEventListener('click', () => {
-  closeModal($('#settingsModal'));
-  setTimeout(openAccentPicker, 150);
-});
-$('#resetOrderBtn').addEventListener('click', () => {
-  const byId = Object.fromEntries(state.week.map(d => [d.id, d]));
-  state.week = WEEK_ORDER.map(base => {
-    const old = byId[base.id];
-    return old ? { ...base, color: old.color, tasks: old.tasks } : { ...base, tasks: [] };
-  });
-  saveState();
-  if (currentView === 'planner') renderWeekGrid();
-  toast('Порядок восстановлен');
-});
-$('#resetAllBtn').addEventListener('click', () => {
-  askConfirm('Сбросить все настройки и задачи?', () => {
-    localStorage.removeItem(STORAGE_KEY);
-    location.reload();
-  });
-});
-$('#warnClose').addEventListener('click', () => {
-  state.warnDismissed = true; saveState();
-  $('#swipeWarn').classList.add('hidden');
-});
-$$('[data-close]').forEach(b =>
-  b.addEventListener('click', () => closeModal(b.closest('.modal'))));
-$$('.modal').forEach(m => {
-  m.addEventListener('click', (e) => { if (e.target === m) closeModal(m); });
-});
-$('#dayClose').addEventListener('click', () => closeModal($('#dayModal')));
-$('#addTaskBtn').addEventListener('click', () => {
-  const inp = $('#newTask');
-  const text = inp.value.trim();
-  if (!text) return;
-  const day = state.week.find(d => d.id === currentDayId);
-  if (!day) return;
-  day.tasks.push(makeTask(text));
-  inp.value = '';
-  saveState(); renderTasks(); renderWeekGrid(); haptic();
-});
-$('#newTask').addEventListener('keydown', (e) => {
-  if (e.key === 'Enter') { e.preventDefault(); $('#addTaskBtn').click(); }
-});
-$('#notifyToggle').addEventListener('click', () => {
-  const on = !$('#notifyToggle').classList.contains('on');
-  $('#notifyToggle').classList.toggle('on', on);
-  $('#notifyWhen').style.display = on ? 'block' : 'none';
-  if (currentNotifyTarget) {
-    currentNotifyTarget.item.notify.enabled = on;
-    saveState();
-  }
-  haptic();
-});
-['notifyOnDay','notifyHourBefore','notifyDayBefore','notifyTime','notifyCustomAt']
-  .forEach(id => $('#'+id).addEventListener('change', saveNotifyFromModal));
-$('#createCustomTpl').addEventListener('click', createCustomTemplate);
-$('#confirmYes').addEventListener('click', () => {
-  const cb = confirmCallback;
-  confirmCallback = null;
-  closeModal($('#confirmModal'));
-  if (typeof cb === 'function') cb();
-});
-if (tg?.BackButton) {
-  tg.BackButton.onClick(() => {
-    const open = $$('.modal.open');
-    if (open.length) { open.forEach(closeModal); return; }
-    if (searchQuery) closeSearch();
-  });
-}
-
-/* ---------- Старт ---------- */
-(function init() {
-  console.log('MiniApp v4.0 loaded');
-  applyTheme();
-  applyAccent();
-  renderDock();
-  switchView('planner');
-  if (!window.__swipeBlocked && !state.warnDismissed) {
-    $('#swipeWarn').classList.remove('hidden');
-  }
-  updateBackButton();
-})();
-</script>
-</body>
-</html>
+/* ---------- Notify modal ---------- */
+const DAY_LABELS=['Пн','Вт','Ср','Чт','Пт','Сб','Вс'];
+function openNotifyModal(target){
+  currentNotifyTarget=target;
+  const n=target.ref.notify||(target.ref.notify={...DEFAULT_NOTIFY_CAT});
+  $('#notifyTitle').textContent=target.type==='day'
+    ?'Уведомления «'+target.ref.full+'»'
+    :'Уведомления «'+target.ref.name+'"';
+  $('#not
