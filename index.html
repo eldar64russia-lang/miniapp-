@@ -22,7 +22,7 @@ font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif;
 font-size:15px;line-height:1.35;min-height:100vh;overscroll-behavior-y:contain;
 transition:background .2s,color .2s}
 .day-card,.task-row,.task-text,.icon-btn,.mini-btn,.dock-item,.swatch,.btn,.checkbox,
-.check-item,.check-text,.category-name,.day-name,.day-body,.picker-item,.notify-check{
+.check-item,.check-text,.day-name,.day-body,.cell-name,.num-value,.notify-check{
 -webkit-user-select:none;user-select:none;-webkit-user-drag:none}
 .app{max-width:720px;margin:0 auto;padding:12px 16px calc(120px + env(safe-area-inset-bottom));
 padding-top:calc(12px + env(safe-area-inset-top))}
@@ -33,7 +33,7 @@ white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:text}
 .header-actions{display:flex;gap:8px}
 .icon-btn{min-width:var(--tap);min-height:var(--tap);border:none;background:var(--bg-3);
 color:var(--text);border-radius:var(--radius-sm);font-size:18px;display:inline-flex;
-align-items:center;justify-content:center;cursor:pointer;padding:0;transition:background .15s}
+align-items:center;justify-content:center;cursor:pointer;padding:0}
 .icon-btn:active{background:var(--accent-soft);transform:scale(.94)}
 .search-overlay{max-height:0;overflow:hidden;margin-bottom:0;transition:max-height .2s,margin-bottom .2s}
 .search-overlay.open{max-height:60px;margin-bottom:12px}
@@ -51,46 +51,65 @@ cursor:pointer;padding:4px;min-width:32px;min-height:32px}
 background:var(--bg-3);color:var(--text-dim);font-size:13px;font-weight:500;
 white-space:nowrap;cursor:pointer;font-family:inherit}
 .filters button.active{background:var(--accent);color:#fff}
-.week-grid{display:grid;gap:var(--gap)}
-.week-grid.calendar .day-card{padding:8px;min-height:70px}
-.week-grid.calendar .day-name{font-size:13px}
-.week-grid.calendar .day-body{display:none}
-.week-grid.calendar .task-preview{display:none}
-.day-card{background:var(--bg-2);border-radius:var(--radius);padding:12px 14px;
-min-height:96px;display:flex;flex-direction:column;gap:6px;cursor:pointer;
-box-shadow:var(--shadow-sm);position:relative;overflow:hidden;
-transition:transform .12s,box-shadow .15s}
-.day-card::before{content:'';position:absolute;top:12px;left:0;bottom:12px;width:3px;
+.week-grid{display:grid;gap:var(--gap);overflow-x:auto;padding-bottom:4px;scrollbar-width:thin}
+.day-card{background:var(--bg-2);border-radius:var(--radius);padding:10px 12px;
+display:flex;flex-direction:column;gap:6px;cursor:pointer;box-shadow:var(--shadow-sm);
+position:relative;overflow:hidden;transition:transform .12s,box-shadow .15s;min-width:0}
+.day-card::before{content:'';position:absolute;top:10px;left:0;bottom:10px;width:3px;
 background:var(--card-color,var(--accent));border-radius:0 2px 2px 0}
-.day-card:active{transform:scale(.98);box-shadow:var(--shadow-md)}
-.day-card.dragging{opacity:.45;transform:scale(.96)}
+.day-card:active{box-shadow:var(--shadow-md)}
+.day-card.dragging{opacity:.45}
 .day-card.drag-target{box-shadow:0 0 0 2px var(--accent)}
-.day-head{display:flex;align-items:center;justify-content:space-between;gap:2px;padding-left:8px}
-.day-name{font-weight:700;font-size:17px;letter-spacing:-.3px;flex:1;
-white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+.day-head{display:flex;align-items:center;justify-content:space-between;gap:2px;padding-left:6px}
+.day-name{font-weight:700;font-size:15px;letter-spacing:-.2px;flex:1;
+white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0;padding:2px 0}
+.day-name.empty-name{color:var(--text-muted);font-weight:500;font-style:italic}
 .day-actions{display:flex;gap:0;flex:none}
 .mini-btn{position:relative;width:26px;height:26px;border:none;background:transparent;
-color:var(--text-dim);border-radius:8px;font-size:14px;display:inline-flex;
+color:var(--text-dim);border-radius:8px;font-size:13px;display:inline-flex;
 align-items:center;justify-content:center;cursor:pointer;padding:0;font-family:inherit}
 .mini-btn::before{content:'';position:absolute;inset:-9px}
 .mini-btn:active{background:var(--accent-soft);color:var(--accent)}
 .mini-btn.bell-active{color:var(--accent);opacity:1}
 .drag-handle{cursor:grab;touch-action:none}
-.day-body{font-size:12px;color:var(--text-dim);padding-left:8px;margin-top:auto}
-.task-count{color:var(--text);font-size:13px;font-weight:500}
-.task-preview{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:2px}
+.resize-handle{position:absolute;right:0;bottom:0;width:20px;height:20px;
+cursor:nwse-resize;touch-action:none;z-index:2}
+.resize-handle::after{content:'';position:absolute;right:3px;bottom:3px;
+width:10px;height:10px;border-right:2px solid var(--text-muted);
+border-bottom:2px solid var(--text-muted);border-radius:0 0 3px 0;opacity:.5}
+.cell-tasks{display:flex;flex-direction:column;gap:2px;padding-left:6px;
+flex:1;overflow:hidden;min-height:0}
+.cell-task{display:flex;align-items:flex-start;gap:6px;padding:2px 0;
+font-size:12px;line-height:1.3;min-width:0}
+.cell-task-text{flex:1;word-break:break-word;transition:opacity .15s;
+white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cell-task-text.done{text-decoration:line-through;opacity:.55;color:var(--text-dim)}
+.cell-checkbox{width:16px;height:16px;min-width:16px;border-radius:50%;
+border:1.5px solid var(--text-muted);background:transparent;cursor:pointer;padding:0;
+display:inline-flex;align-items:center;justify-content:center;position:relative;
+color:var(--cb-color,var(--accent));margin-top:1px}
+.cell-checkbox.checked{background:var(--cb-color,var(--accent));
+border-color:var(--cb-color,var(--accent))}
+.cell-checkbox svg{width:10px;height:10px;display:block}
+.cell-checkbox::before{content:'';position:absolute;inset:-10px}
+.cell-empty{font-size:11px;color:var(--text-muted);padding:2px 0;font-style:italic}
+.cell-add{font-size:16px;color:var(--text-muted);cursor:pointer;padding:2px 6px;
+align-self:flex-start;background:transparent;border:none;font-family:inherit;
+line-height:1;min-width:24px;min-height:20px;text-align:left}
+.cell-add:active{color:var(--accent)}
 .empty{text-align:center;color:var(--text-dim);padding:40px 20px;font-size:14px;
 grid-column:1/-1;margin:0}
 .dock{position:fixed;bottom:calc(12px + env(safe-area-inset-bottom));left:50%;
 transform:translateX(-50%);background:var(--dock-bg);backdrop-filter:blur(20px) saturate(180%);
 -webkit-backdrop-filter:blur(20px) saturate(180%);border:1px solid var(--dock-border);
 border-radius:var(--radius-lg);padding:8px;display:flex;gap:6px;align-items:center;
-box-shadow:var(--shadow-lg);z-index:100}
-.dock-scroll{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;max-width:180px;min-width:0}
+box-shadow:var(--shadow-lg);z-index:100;max-width:calc(100vw - 24px)}
+.dock-scroll{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;
+max-width:calc(100vw - 110px);min-width:0}
 .dock-scroll::-webkit-scrollbar{display:none}
 .dock-item{width:56px;height:56px;border:none;background:transparent;border-radius:16px;
 cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:24px;
-flex:none;transition:background .15s;position:relative;padding:0}
+flex:none;position:relative;padding:0}
 .dock-item:active{transform:scale(.92)}
 .dock-item.active{background:var(--accent-soft)}
 .dock-item.active::after{content:'';position:absolute;bottom:4px;left:50%;
@@ -111,36 +130,46 @@ max-height:88vh;display:flex;flex-direction:column;overflow-y:auto;animation:up 
 .modal-head{display:flex;align-items:center;justify-content:space-between;
 margin-bottom:14px;gap:12px}
 .modal-head h2{margin:0}
-.swatches{display:grid;grid-template-columns:repeat(8,1fr);gap:8px;margin-bottom:18px}
+.swatches{display:grid;grid-template-columns:repeat(8,1fr);gap:8px;margin-bottom:14px}
 @media (max-width:340px){.swatches{grid-template-columns:repeat(4,1fr)}}
 .swatch{aspect-ratio:1;border:none;border-radius:50%;cursor:pointer;padding:0;position:relative}
 .swatch:active{transform:scale(.88)}
 .swatch.active{box-shadow:0 0 0 2px var(--bg-2),0 0 0 4px currentColor}
+.color-row{display:flex;align-items:center;gap:10px;margin-bottom:14px}
+.color-input{width:44px;height:44px;border:2px solid var(--border);border-radius:12px;
+cursor:pointer;padding:0;background:transparent;overflow:hidden}
+.color-input::-webkit-color-swatch-wrapper{padding:2px}
+.color-input::-webkit-color-swatch{border:none;border-radius:8px}
 .setting-block{padding:12px 0;border-bottom:1px solid var(--border)}
 .setting-block:last-of-type{border-bottom:none}
 .setting-label{font-size:12px;color:var(--text-dim);text-transform:uppercase;
 letter-spacing:.4px;font-weight:600;margin-bottom:10px}
-.setting-options{display:flex;gap:8px;flex-wrap:wrap}
-.setting-options button{flex:1;min-width:60px;min-height:44px;border:1px solid var(--border);
-background:var(--bg-3);color:var(--text);border-radius:var(--radius-sm);font-size:14px;
-font-weight:500;cursor:pointer;font-family:inherit}
-.setting-options button.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+.counter-row{display:flex;align-items:center;gap:12px;padding:4px 0}
+.counter-btn{width:44px;height:44px;border:1px solid var(--border);background:var(--bg-3);
+color:var(--text);border-radius:12px;font-size:22px;font-weight:600;cursor:pointer;
+font-family:inherit;display:flex;align-items:center;justify-content:center;padding:0}
+.counter-btn:active{background:var(--accent-soft);color:var(--accent);border-color:var(--accent)}
+.counter-btn:disabled{opacity:.3;cursor:not-allowed}
+.num-value{flex:1;text-align:center;font-size:22px;font-weight:700;
+padding:10px;border-radius:12px;background:var(--bg-3);cursor:pointer;
+min-height:44px;display:flex;align-items:center;justify-content:center}
+.num-value:active{background:var(--accent-soft);color:var(--accent)}
 .btn{width:100%;min-height:50px;border:none;background:var(--bg-3);color:var(--text);
 border-radius:var(--radius-sm);font-size:16px;font-weight:600;cursor:pointer;font-family:inherit}
 .btn.primary{background:var(--accent);color:#fff}
 .btn.danger{background:rgba(255,59,48,.12);color:#ff3b30}
 .btn:active{opacity:.8}
 .btn+.btn{margin-top:8px}
-.task-list{max-height:50vh;overflow-y:auto;overscroll-behavior:contain;margin-bottom:12px;
+.task-list{max-height:40vh;overflow-y:auto;overscroll-behavior:contain;margin-bottom:12px;
 display:flex;flex-direction:column;gap:8px}
-.task-row,.check-item{display:flex;align-items:center;gap:8px;background:var(--bg-3);
-border-radius:var(--radius-sm);padding:4px 4px 4px 8px;min-height:52px}
-.task-text,.check-text{flex:1;font-size:15px;word-break:break-word;padding:8px 4px;
-cursor:text;transition:opacity .15s}
-.task-text.done,.check-text.done{text-decoration:line-through;opacity:.55;color:var(--text-dim)}
-.task-edit-input,.name-edit-input{flex:1;background:transparent;border:none;color:var(--text);
-font-size:15px;font-family:inherit;outline:none;padding:8px 0;border-bottom:2px solid var(--accent)}
-.name-edit-input{font-weight:700;font-size:16px;letter-spacing:-.2px}
+.task-row{display:flex;align-items:center;gap:8px;background:var(--bg-3);
+border-radius:var(--radius-sm);padding:4px 4px 4px 8px;min-height:48px}
+.task-text{flex:1;font-size:15px;word-break:break-word;padding:8px 4px;cursor:text}
+.task-text.done{text-decoration:line-through;opacity:.55;color:var(--text-dim)}
+.task-edit-input,.name-edit-input,.view-title-input,.view-icon-input{flex:1;
+background:transparent;border:none;color:var(--text);font-size:15px;font-family:inherit;
+outline:none;padding:8px 0;border-bottom:2px solid var(--accent)}
+.name-edit-input{font-weight:700;font-size:15px}
 .checkbox{width:26px;height:26px;min-width:26px;border-radius:50%;
 border:2px solid var(--text-muted);background:transparent;cursor:pointer;padding:0;
 display:inline-flex;align-items:center;justify-content:center;position:relative;
@@ -153,26 +182,7 @@ color:var(--cb-color,var(--accent))}
 color:var(--text);font-size:15px;font-family:inherit;padding:12px 14px;
 border-radius:var(--radius-sm);min-height:var(--tap);outline:none;width:100%}
 .add-row input:focus,.modal-input:focus{border-color:var(--accent)}
-.training-tabs{display:flex;gap:6px;background:var(--bg-3);padding:4px;
-border-radius:var(--radius-sm);margin-bottom:14px}
-.training-tabs button{flex:1;min-height:40px;border:none;background:transparent;
-color:var(--text-dim);border-radius:8px;font-size:14px;font-weight:600;
-cursor:pointer;font-family:inherit}
-.training-tabs button.active{background:var(--bg-2);color:var(--text)}
-.category-card{background:var(--bg-2);border-radius:var(--radius);padding:14px;
-margin-bottom:10px;box-shadow:var(--shadow-sm)}
-.category-header{display:flex;align-items:center;gap:8px;margin-bottom:10px}
-.category-name{font-weight:700;font-size:16px;letter-spacing:-.2px;flex:1;padding:4px 0;cursor:text}
-.category-meta{font-size:12px;color:var(--text-dim)}
-.category-items{display:flex;flex-direction:column;gap:6px}
-.check-item{background:var(--bg-3);padding:4px 4px 4px 8px;min-height:46px}
-.add-item-row{display:flex;gap:6px;margin-top:8px}
-.add-item-row input{flex:1;background:var(--bg-3);border:1px solid var(--border);
-color:var(--text);font-size:14px;font-family:inherit;padding:10px 12px;
-border-radius:var(--radius-sm);min-height:42px;outline:none}
-.add-category-btn{width:100%;min-height:44px;border:2px dashed var(--border);
-background:transparent;color:var(--text-dim);border-radius:var(--radius);font-size:14px;
-font-weight:600;cursor:pointer;font-family:inherit;margin-bottom:10px}
+.modal-input{margin-bottom:10px}
 .toggle{width:51px;height:31px;border-radius:16px;background:var(--bg-3);border:none;
 cursor:pointer;position:relative;padding:0;transition:background .2s;flex:none}
 .toggle::after{content:'';position:absolute;top:2px;left:2px;width:27px;height:27px;
@@ -188,19 +198,6 @@ font-weight:600;cursor:pointer;font-family:inherit;flex:1}
 .day-select button.on{background:var(--accent);color:#fff;border-color:var(--accent)}
 .notify-info{background:var(--accent-soft);color:var(--accent);padding:10px 12px;
 border-radius:var(--radius-sm);font-size:12px;line-height:1.4;margin:12px 0}
-.picker-wheel{position:relative;height:200px;overflow-y:scroll;scroll-snap-type:y mandatory;
-scrollbar-width:none;margin:8px 0 16px;
-mask-image:linear-gradient(transparent 0,black 30%,black 70%,transparent 100%);
--webkit-mask-image:linear-gradient(transparent 0,black 30%,black 70%,transparent 100%)}
-.picker-wheel::-webkit-scrollbar{display:none}
-.picker-item{height:40px;line-height:40px;text-align:center;scroll-snap-align:center;
-font-size:20px;font-weight:500;color:var(--text-dim);transition:color .15s,font-weight .15s}
-.picker-item.active{color:var(--text);font-weight:700}
-.picker-spacer{height:80px}
-.picker-indicator{position:absolute;top:50%;left:16px;right:16px;height:40px;
-margin-top:-20px;border-top:1.5px solid var(--accent);border-bottom:1.5px solid var(--accent);
-border-radius:4px;pointer-events:none;z-index:2}
-.picker-hint{text-align:center;color:var(--text-dim);font-size:12px;margin-bottom:8px}
 .toast{position:fixed;bottom:calc(100px + env(safe-area-inset-bottom));left:50%;
 transform:translate(-50%,20px);background:rgba(0,0,0,.85);color:#fff;padding:10px 18px;
 border-radius:20px;font-size:13px;font-weight:500;opacity:0;pointer-events:none;
@@ -209,9 +206,6 @@ transition:opacity .2s,transform .2s;z-index:300;max-width:90vw}
 .hint{color:var(--text-dim);font-size:12px;margin:16px 0 0;text-align:center;line-height:1.5}
 .version-tag{text-align:center;color:var(--text-dim);font-size:11px;
 margin-top:20px;padding-top:12px;border-top:1px solid var(--border)}
-.sync-status{font-size:13px;padding:8px 0;color:var(--text-dim)}
-.sync-status.ok{color:#34c759}
-.sync-status.err{color:#ff3b30}
 </style>
 </head>
 <body>
@@ -236,96 +230,82 @@ margin-top:20px;padding-top:12px;border-top:1px solid var(--border)}
 </div>
 <nav class="dock" id="dock"></nav>
 
-<div class="modal" id="colorModal"><div class="modal-card">
-<h2>Цвет карточки</h2><div class="swatches" id="swatches"></div>
-<button class="btn" data-close>Отмена</button></div></div>
-
-<div class="modal" id="accentModal"><div class="modal-card">
-<h2>Акцентный цвет</h2><div class="swatches" id="accentSwatches"></div>
-<button class="btn" data-close>Готово</button></div></div>
-
 <div class="modal" id="settingsModal"><div class="modal-card">
 <h2>Настройки</h2>
-<div id="viewSettingsSection"></div>
+<div id="moduleSettings"></div>
 <div class="setting-block">
   <div class="setting-label">Тема</div>
-  <div class="setting-options" data-setting="theme">
-    <button data-value="light">☀️ Светлая</button>
-    <button data-value="dark">🌙 Тёмная</button>
+  <div class="setting-options" style="display:flex;gap:8px">
+    <button class="btn" data-theme-set="light" style="flex:1">☀️ Светлая</button>
+    <button class="btn" data-theme-set="dark" style="flex:1">🌙 Тёмная</button>
   </div>
 </div>
-<div class="setting-block">
-  <div class="setting-label">Акцент</div>
-  <div class="setting-options"><button id="openAccentPicker">🎨 Выбрать цвет</button></div>
-</div>
-<div class="setting-block">
-  <div class="setting-label">Telegram-бот (опционально)</div>
-  <input type="url" id="backendUrl" class="modal-input" placeholder="https://ваш-бот.up.railway.app" style="margin-bottom:8px">
-  <input type="text" id="userId" class="modal-input" placeholder="Ваш ID из бота" style="margin-bottom:8px">
-  <button class="btn" id="syncNowBtn">Синхронизировать</button>
-  <div class="sync-status" id="syncStatus">Не подключён</div>
-</div>
-<div class="setting-block">
-  <div class="setting-label">Данные</div>
-  <div class="setting-options" style="flex-direction:column">
-    <button id="resetAllBtn" class="btn danger">Сбросить всё</button>
-  </div>
-</div>
-<div id="deleteViewSection"></div>
+<div id="moduleDelete"></div>
 <button class="btn primary" data-close style="margin-top:16px">Готово</button>
-<div class="version-tag">Версия 6.0</div>
+<div class="version-tag">Версия 7.0</div>
 </div></div>
 
-<div class="modal" id="dayModal"><div class="modal-card">
-<div class="modal-head"><h2 id="dayTitle">Ячейка</h2>
-<button class="icon-btn" id="dayClose">✕</button></div>
-<div class="task-list" id="taskList"></div>
-<div class="add-row">
-  <input type="text" id="newTask" placeholder="Новая задача..." autocomplete="off">
-  <button class="icon-btn" id="addTaskBtn">+</button>
-</div></div></div>
-
-<div class="modal" id="notifyModal"><div class="modal-card">
-<h2 id="notifyTitle">Напоминание</h2>
-<div class="notify-toggle-row"><span style="font-weight:500">Включить</span>
-<button class="toggle" id="notifyToggle"></button></div>
-<div id="notifyWhen" style="display:none">
-  <div class="setting-block">
-    <div class="setting-label">Время отправки</div>
-    <input type="time" id="notifyTime" class="modal-input">
-  </div>
-  <div class="setting-block">
-    <div class="setting-label">Повторять по дням недели</div>
-    <div class="day-select" id="daySelect"></div>
+<div class="modal" id="cellModal"><div class="modal-card">
+<div class="modal-head">
+  <h2 id="cellTitle">Ячейка</h2>
+  <button class="icon-btn" data-close>✕</button>
+</div>
+<div class="setting-block">
+  <div class="setting-label">Название</div>
+  <input type="text" id="cellNameInput" class="modal-input" placeholder="Назовите ячейку">
+</div>
+<div class="setting-block">
+  <div class="setting-label">Цвет</div>
+  <div class="swatches" id="cellSwatches"></div>
+  <div class="color-row">
+    <input type="color" id="cellColorCustom" class="color-input">
+    <span style="font-size:13px;color:var(--text-dim)">Свой цвет</span>
   </div>
 </div>
-<div class="notify-info">Бот присылает сводку со всеми пунктами этой ячейки.
-Нажмите ✅ в боте — отметится и в приложении.</div>
-<button class="btn primary" data-close>Готово</button></div></div>
+<div class="setting-block">
+  <div class="setting-label">Размер</div>
+  <div style="font-size:13px;color:var(--text-dim);margin-bottom:6px">Ширина (столбцов)</div>
+  <div class="counter-row" style="margin-bottom:12px">
+    <button class="counter-btn" data-size="span-minus">−</button>
+    <div class="num-value" id="spanValue" data-size="span-input">1</div>
+    <button class="counter-btn" data-size="span-plus">+</button>
+  </div>
+  <div style="font-size:13px;color:var(--text-dim);margin-bottom:6px">Высота (px)</div>
+  <div class="counter-row">
+    <button class="counter-btn" data-size="height-minus">−</button>
+    <div class="num-value" id="heightValue" data-size="height-input">96</div>
+    <button class="counter-btn" data-size="height-plus">+</button>
+  </div>
+</div>
+<div class="setting-block">
+  <div class="setting-label">Уведомления</div>
+  <div class="notify-toggle-row">
+    <span style="font-weight:500">Включить</span>
+    <button class="toggle" id="cellNotifyToggle"></button>
+  </div>
+  <div id="cellNotifyFields" style="display:none">
+    <div style="font-size:13px;color:var(--text-dim);margin-bottom:6px">Время</div>
+    <input type="time" id="cellNotifyTime" class="modal-input">
+    <div style="font-size:13px;color:var(--text-dim);margin-bottom:6px;margin-top:8px">Дни</div>
+    <div class="day-select" id="cellDaySelect"></div>
+  </div>
+</div>
+<button class="btn danger" id="cellDeleteBtn">Удалить ячейку</button>
+<button class="btn primary" data-close style="margin-top:8px">Готово</button>
+</div></div>
 
 <div class="modal" id="createViewModal"><div class="modal-card">
 <h2>Назовите шаблон</h2>
 <div class="setting-block">
   <div class="setting-label">Название</div>
-  <input type="text" id="newViewName" class="modal-input" placeholder="Например: Календарь, Учёба…" autocomplete="off">
+  <input type="text" id="newViewName" class="modal-input" placeholder="Календарь, Дневник, Учёба…" autocomplete="off">
 </div>
 <div class="setting-block">
-  <div class="setting-label">Иконка (эмодзи)</div>
+  <div class="setting-label">Иконка</div>
   <input type="text" id="newViewIcon" class="modal-input" value="📆" maxlength="2" style="text-align:center;font-size:24px">
 </div>
-<button class="btn primary" id="createViewBtn">Создать шаблон</button>
+<button class="btn primary" id="createViewBtn">Создать</button>
 <button class="btn" data-close style="margin-top:8px">Отмена</button>
-</div></div>
-
-<div class="modal" id="pickerModal"><div class="modal-card">
-<h2>Сколько ячеек?</h2>
-<div class="picker-hint" id="pickerHint"></div>
-<div style="position:relative;margin:8px 0 16px">
-  <div class="picker-wheel" id="pickerWheel"></div>
-  <div class="picker-indicator"></div>
-</div>
-<button class="btn primary" id="pickerApply">Готово</button>
-<button class="btn" data-close>Отмена</button>
 </div></div>
 
 <div class="modal" id="confirmModal"><div class="modal-card">
@@ -340,62 +320,39 @@ margin-top:20px;padding-top:12px;border-top:1px solid var(--border)}
 <script>
 'use strict';
 const tg = window.Telegram?.WebApp;
-if (tg) {
-  tg.ready(); tg.expand();
-  if (typeof tg.disableVerticalSwipes === 'function') { try { tg.disableVerticalSwipes(); } catch(e){} }
-}
+if (tg) { tg.ready(); tg.expand();
+  if (typeof tg.disableVerticalSwipes === 'function') { try { tg.disableVerticalSwipes(); } catch(e){} } }
 document.addEventListener('contextmenu', e => e.preventDefault());
 
-/* ---------- Константы ---------- */
-const STORAGE_KEY = 'miniapp-constructor-v6';
+const BOT_API = '';
+const STORAGE_KEY = 'miniapp-constructor-v7';
 const CARD_PALETTE = ['#5ac8fa','#af52de','#ff2d55','#ff9500','#34c759','#30b0c7','#5856d6','#ffcc00'];
 const ACCENT_PALETTE = ['#007aff','#5856d6','#af52de','#ff2d55','#ff9500','#34c759','#30b0c7','#8e8e93'];
 const DAY_NAMES = ['Пн','Вт','Ср','Чт','Пт','Сб','Вс'];
 const DEFAULT_NOTIFY = {enabled:false,time:'08:00',days:[]};
+const DEFAULT_HEIGHT = 96;
+const MIN_HEIGHT = 60;
+const MAX_HEIGHT = 800;
 
 function makeId(p='id'){return p+'_'+Date.now().toString(36)+Math.random().toString(36).slice(2,6);}
 function makeTask(text){return {id:makeId('t'),text,done:false};}
-function makeCell(name,idx,notifyDays){
-  return {id:makeId('c'),name,color:CARD_PALETTE[idx % CARD_PALETTE.length],
-    tasks:[],notify:{...DEFAULT_NOTIFY,days:notifyDays||[]}};
+function makeCell(name,idx,days){
+  return {id:makeId('c'),name:name||'',color:CARD_PALETTE[idx%8],
+    span:1,height:DEFAULT_HEIGHT,tasks:[],notify:{...DEFAULT_NOTIFY,days:days||[]}};
 }
 function makeWeekCells(){
   return DAY_NAMES.map((n,i)=>makeCell(n,i,[i]));
 }
-
 function makeDefaultViews(){
-  return [
-    {id:'v_planner',type:'planner',title:'Планировщик',icon:'📅',removable:false,
-      columns:7,showWeekend:true,cells:makeWeekCells()},
-    {id:'v_training',type:'training',title:'Тренировки',icon:'💪',removable:false,
-      training:{
-        activeTab:'workouts',
-        workouts:[
-          {id:'w1',name:'Утро',days:[0,1,2,3,4],notify:{...DEFAULT_NOTIFY,days:[0,1,2,3,4]},
-            items:[{id:'wi1',text:'Отжимания 3×15',done:false},{id:'wi2',text:'Приседания 3×20',done:false}]},
-          {id:'w2',name:'Вечер',days:[0,1,2,3,4],notify:{...DEFAULT_NOTIFY,days:[0,1,2,3,4]},
-            items:[{id:'wi3',text:'Растяжка 10 мин',done:false}]},
-        ],
-        nutrition:[
-          {id:'n1',name:'Завтрак',days:[0,1,2,3,4,5,6],notify:{...DEFAULT_NOTIFY},
-            items:[{id:'ni1',text:'Овсянка с ягодами',meta:'350 ккал',done:false},
-                   {id:'ni2',text:'Кофе',meta:'50 ккал',done:false}]},
-          {id:'n2',name:'Обед',days:[0,1,2,3,4,5,6],notify:{...DEFAULT_NOTIFY},
-            items:[{id:'ni3',text:'Курица с рисом',meta:'550 ккал',done:false}]},
-          {id:'n3',name:'Ужин',days:[0,1,2,3,4,5,6],notify:{...DEFAULT_NOTIFY},
-            items:[{id:'ni4',text:'Салат с рыбой',meta:'400 ккал',done:false}]},
-        ],
-      }},
-  ];
+  return [{id:'v_planner',type:'planner',title:'Планировщик',icon:'📅',removable:false,
+    columns:7,cells:makeWeekCells()}];
 }
-
 function makeDefaultState(){
-  return {theme:'light',accent:'#007aff',backendUrl:'',userId:null,views:makeDefaultViews()};
+  return {theme:'light',accent:'#007aff',currentViewId:'v_planner',views:makeDefaultViews()};
 }
-
 function loadState(){
   try{const s=JSON.parse(localStorage.getItem(STORAGE_KEY));
-    if(s&&typeof s==='object'&&Array.isArray(s.views))return s;}catch(e){}
+    if(s&&typeof s==='object'&&Array.isArray(s.views)&&s.views.length)return s;}catch(e){}
   return makeDefaultState();
 }
 let state = loadState();
@@ -403,16 +360,12 @@ function saveState(){
   try{localStorage.setItem(STORAGE_KEY,JSON.stringify(state));}catch(e){}
   pushToBackend();
 }
-let currentViewId = 'v_planner';
-let searchQuery = '';
-let currentCellId = null;
-let currentView = null;
-let dragState = null;
-let currentNotifyTarget = null;
-let confirmCallback = null;
-let lastSyncTime = 0;
-let pickerValue = 7;
-let pickerScrollTimer = null;
+let currentViewId = state.currentViewId || state.views[0].id;
+let searchQuery='';
+let dragState=null;
+let resizeState=null;
+let currentCellId=null;
+let confirmCallback=null;
 
 const $=(s,r=document)=>r.querySelector(s);
 const $$=(s,r=document)=>[...r.querySelectorAll(s)];
@@ -421,57 +374,36 @@ let toastTimer=null;
 function toast(msg){const el=$('#toast');el.textContent=msg;el.classList.add('show');
   clearTimeout(toastTimer);toastTimer=setTimeout(()=>el.classList.remove('show'),2000);}
 function haptic(t='light'){try{tg?.HapticFeedback?.impactOccurred(t);}catch(e){}}
-function hasAnyNotify(n){return n&&n.enabled&&(n.days?.length||true);}
-function getView(id){return state.views.find(v=>v.id===id);}
-function getCurrentView(){return getView(currentViewId);}
 
-/* ---------- Backend ---------- */
+function getUserId(){return tg?.initDataUnsafe?.user?.id||null;}
 async function pushToBackend(){
-  if(!state.backendUrl||!state.userId)return;
-  try{
-    await fetch(state.backendUrl.replace(/\/$/,'')+'/api/sync',{
-      method:'POST',headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({userId:state.userId,state})
-    });
-    lastSyncTime=Date.now();
-  }catch(e){}
+  if(!BOT_API)return;
+  const uid=getUserId();if(!uid)return;
+  try{await fetch(BOT_API.replace(/\/$/,'')+'/api/sync',{method:'POST',
+    headers:{'Content-Type':'application/json'},body:JSON.stringify({userId:uid,state})});}catch(e){}
 }
 async function pullFromBackend(){
-  if(!state.backendUrl||!state.userId)return false;
+  if(!BOT_API)return false;
+  const uid=getUserId();if(!uid)return false;
   try{
-    const r=await fetch(state.backendUrl.replace(/\/$/,'')+'/api/state/'+state.userId);
+    const r=await fetch(BOT_API.replace(/\/$/,'')+'/api/state/'+uid);
     if(!r.ok)return false;
     const data=await r.json();
     if(!data.ok||!data.state)return false;
-    mergeDoneFlags(state,data.state);
+    mergeDone(state,data.state);
     try{localStorage.setItem(STORAGE_KEY,JSON.stringify(state));}catch(e){}
     return true;
   }catch(e){return false;}
 }
-function mergeDoneFlags(local,remote){
+function mergeDone(local,remote){
   const lookup={};
-  (remote.views||[]).forEach(v=>{
-    (v.cells||[]).forEach(c=>(c.tasks||[]).forEach(t=>{lookup[t.id]=t;}));
-    if(v.training){
-      ['workouts','nutrition'].forEach(k=>(v.training[k]||[]).forEach(cat=>
-        (cat.items||[]).forEach(it=>{lookup[it.id]=it;})));
-    }
-  });
-  (local.views||[]).forEach(v=>{
-    (v.cells||[]).forEach(c=>(c.tasks||[]).forEach(t=>{
-      if(lookup[t.id]&&typeof lookup[t.id].done==='boolean')t.done=lookup[t.id].done;
-    }));
-    if(v.training){
-      ['workouts','nutrition'].forEach(k=>(v.training[k]||[]).forEach(cat=>
-        (cat.items||[]).forEach(it=>{
-          if(lookup[it.id]&&typeof lookup[it.id].done==='boolean')it.done=lookup[it.id].done;
-        })));
-    }
-  });
+  (remote.views||[]).forEach(v=>(v.cells||[]).forEach(c=>(c.tasks||[]).forEach(t=>{lookup[t.id]=t;})));
+  (local.views||[]).forEach(v=>(v.cells||[]).forEach(c=>(c.tasks||[]).forEach(t=>{
+    if(lookup[t.id]&&typeof lookup[t.id].done==='boolean')t.done=lookup[t.id].done;
+  })));
 }
 setInterval(async()=>{if(await pullFromBackend()){renderContent();}},30000);
 
-/* ---------- Тема ---------- */
 function applyTheme(){
   document.documentElement.dataset.theme=state.theme;
   try{const c=state.theme==='dark'?'#1c1c1e':'#f5f5f7';
@@ -483,14 +415,12 @@ function applyAccent(){
   document.documentElement.style.setProperty('--accent-soft',`rgba(${r},${g},${b},0.16)`);
 }
 
-/* ---------- Dock ---------- */
 function renderDock(){
   const dock=$('#dock');dock.innerHTML='';
   const scroll=document.createElement('div');scroll.className='dock-scroll';
   for(const v of state.views){
     const btn=document.createElement('button');
     btn.className='dock-item'+(v.id===currentViewId?' active':'');
-    btn.dataset.view=v.id;
     btn.innerHTML=`<span aria-hidden="true">${v.icon}</span>`;
     btn.addEventListener('click',()=>{if(v.id===currentViewId)return;haptic();switchView(v.id);});
     scroll.appendChild(btn);
@@ -499,164 +429,162 @@ function renderDock(){
   const addBtn=document.createElement('button');
   addBtn.className='dock-add';addBtn.textContent='+';
   addBtn.addEventListener('click',()=>{
-    haptic();
-    $('#newViewName').value='';$('#newViewIcon').value='📆';
+    haptic();$('#newViewName').value='';$('#newViewIcon').value='📆';
     openModal($('#createViewModal'));
     setTimeout(()=>$('#newViewName').focus(),150);
   });
   dock.appendChild(addBtn);
 }
 
-/* ---------- Router ---------- */
 function switchView(viewId){
   currentViewId=viewId;
-  const v=getCurrentView();
+  state.currentViewId=viewId;
+  saveState();
+  const v=state.views.find(x=>x.id===viewId);
   $('#pageTitle').textContent=v?.title||'';
   renderDock();renderContent();closeSearch();
   window.scrollTo({top:0,behavior:'instant'});
 }
 function renderContent(){
   const c=$('#content');c.innerHTML='';
-  const v=getCurrentView();
+  const v=state.views.find(x=>x.id===currentViewId);
   if(!v){switchView(state.views[0].id);return;}
-  if(v.type==='planner')renderPlannerView(c,v);
-  else if(v.type==='training')renderTrainingView(c,v);
+  renderPlanner(c,v);
 }
-function renderPlannerView(root,view){
+
+function renderPlanner(root,view){
   root.innerHTML=`
     <div class="filters" id="plannerFilters"></div>
     <div class="week-grid" id="weekGrid"></div>
-    <p class="hint">Удерживайте ☰ — перетащить. 🎨 — цвет. 🔔 — напоминания. Тап на карточку — задачи.</p>
-  `;
+    <p class="hint">Тап по имени — переименовать. Тап по ⚙️ на карточке — настройки ячейки. ☰ — перетащить. Уголок справа снизу — растянуть.</p>`;
   renderFilters(view);
   $('#plannerFilters').addEventListener('click',e=>{
     const b=e.target.closest('[data-filter]');if(!b)return;
     view.filter=b.dataset.filter;saveState();
-    renderFilters(view);renderWeekGrid(view);haptic();
+    renderFilters(view);renderGrid(view);haptic();
   });
-  renderWeekGrid(view);
+  renderGrid(view);
 }
 function renderFilters(view){
-  const filters=$('#plannerFilters');
-  if(!filters)return;
-  const isWeek=view.columns===7;
-  const items=[
-    {k:'all',t:'Все'},
-    {k:'busy',t:'С задачами'},
-    {k:'empty',t:'Свободные'},
-  ];
-  if(isWeek)items.push({k:'today',t:'Сегодня'});
-  filters.innerHTML='';
-  for(const f of items){
+  const f=$('#plannerFilters');if(!f)return;
+  const items=[{k:'all',t:'Все'},{k:'busy',t:'С задачами'},{k:'empty',t:'Свободные'}];
+  if(view.columns===7)items.push({k:'today',t:'Сегодня'});
+  f.innerHTML='';
+  for(const it of items){
     const b=document.createElement('button');
-    b.dataset.filter=f.k;b.textContent=f.t;
-    b.className=(view.filter||'all')===f.k?'active':'';
-    filters.appendChild(b);
+    b.dataset.filter=it.k;b.textContent=it.t;
+    b.className=(view.filter||'all')===it.k?'active':'';
+    f.appendChild(b);
   }
 }
-function renderWeekGrid(view){
-  const grid=$('#weekGrid');
-  if(!grid)return;
+function renderGrid(view){
+  const grid=$('#weekGrid');if(!grid)return;
   grid.innerHTML='';
-  const isCalendar=view.columns>7;
-  grid.style.gridTemplateColumns=`repeat(${isCalendar?7:view.columns}, minmax(0,1fr))`;
-  grid.classList.toggle('calendar',isCalendar);
-
+  grid.style.gridTemplateColumns=`repeat(${view.columns}, minmax(80px, 1fr))`;
   const q=searchQuery;
   const todayIdx=(new Date().getDay()+6)%7;
-  let visible=view.cells.filter(c=>{
+  const visible=view.cells.filter((c,idx)=>{
     const mq=!q||c.name.toLowerCase().includes(q)
       ||c.tasks.some(t=>t.text.toLowerCase().includes(q));
     const f=view.filter||'all';
     const mf=f==='all'?true
       :f==='busy'?c.tasks.length>0
       :f==='empty'?c.tasks.length===0
-      :f==='today'?(view.columns===7&&view.cells.indexOf(c)===todayIdx)
+      :f==='today'?(view.columns===7&&idx===todayIdx)
       :true;
     return mq&&mf;
   });
   if(!visible.length){grid.innerHTML='<p class="empty">Нет подходящих</p>';return;}
   for(const cell of visible){
     const card=document.createElement('div');
-    card.className='day-card';card.dataset.cellId=cell.id;card.dataset.draggable='true';
-    card.draggable=false;card.style.setProperty('--card-color',cell.color);
-    const done=cell.tasks.filter(t=>t.done).length,total=cell.tasks.length;
-    const word=total===1?'задача':(total>=2&&total<=4)?'задачи':'задач';
+    card.className='day-card';
+    card.dataset.cellId=cell.id;card.dataset.draggable='true';
+    card.draggable=false;
+    card.style.setProperty('--card-color',cell.color);
+    card.style.gridColumn=`span ${Math.min(cell.span||1,view.columns)}`;
+    card.style.minHeight=(cell.height||DEFAULT_HEIGHT)+'px';
+    card.style.maxHeight=(cell.height||DEFAULT_HEIGHT)+'px';
     card.innerHTML=`
       <div class="day-head">
-        <div class="day-name">${escapeHtml(cell.name)}</div>
+        <div class="day-name${cell.name?'':' empty-name'}" data-name>${cell.name?escapeHtml(cell.name):'Назовите'}</div>
         <div class="day-actions">
-          <button class="mini-btn ${hasAnyNotify(cell.notify)?'bell-active':''}" data-bell="1">🔔</button>
-          <button class="mini-btn palette-btn">🎨</button>
-          <button class="mini-btn drag-handle">☰</button>
+          <button class="mini-btn bell-btn${cell.notify?.enabled?' bell-active':''}" data-bell>🔔</button>
+          <button class="mini-btn" data-settings>⚙️</button>
+          <button class="mini-btn drag-handle" data-drag>☰</button>
         </div>
       </div>
-      <div class="day-body">
-        <div class="task-count">${total?`${done}/${total} ${word}`:'Свободно'}</div>
-        ${total?`<div class="task-preview">${escapeHtml(cell.tasks[0].text)}${total>1?'…':''}</div>`:''}
-      </div>`;
+      <div class="cell-tasks" data-tasks>
+        ${cell.tasks.length?cell.tasks.map(t=>`
+          <div class="cell-task" data-task="${t.id}">
+            <button class="cell-checkbox${t.done?' checked':''}" data-toggle="${t.id}" style="--cb-color:${cell.color}">
+              ${t.done?'<svg viewBox="0 0 20 20" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M4 10l4 4 8-8"/></svg>':''}
+            </button>
+            <span class="cell-task-text${t.done?' done':''}" data-text="${t.id}">${escapeHtml(t.text)}</span>
+          </div>
+        `).join(''):'<div class="cell-empty">Пусто</div>'}
+      </div>
+      <button class="cell-add" data-add>+</button>
+      <div class="resize-handle" data-resize></div>`;
     card.addEventListener('click',e=>{
-      if(e.target.closest('.palette-btn,.drag-handle,[data-bell]'))return;
+      if(e.target.closest('[data-bell],[data-settings],[data-drag],[data-resize],[data-toggle],[data-text],[data-add],[data-name]'))return;
       openCell(view,cell);
     });
-    card.querySelector('[data-bell]').addEventListener('click',e=>{
-      e.stopPropagation();openNotifyModal(cell,cell.name);
-    });
-    card.querySelector('.palette-btn').addEventListener('click',e=>{
+    card.querySelector('[data-name]').addEventListener('click',e=>{
       e.stopPropagation();
-      openCardColorPicker(cell.color,c=>{cell.color=c;saveState();renderWeekGrid(view);});
+      const el=e.currentTarget;
+      startInlineEdit(el,cell.name||'',true,n=>{
+        cell.name=n||'';
+        saveState();
+        el.textContent=cell.name||'Назовите';
+        el.classList.toggle('empty-name',!cell.name);
+      });
     });
-    card.querySelector('.drag-handle').addEventListener('pointerdown',e=>startDrag(e,card,view));
+    card.querySelector('[data-bell]').addEventListener('click',e=>{
+      e.stopPropagation();openCell(view,cell,'notify');
+    });
+    card.querySelector('[data-settings]').addEventListener('click',e=>{
+      e.stopPropagation();openCell(view,cell);
+    });
+    card.querySelector('[data-drag]').addEventListener('pointerdown',e=>startDrag(e,card,view));
+    card.querySelector('[data-resize]').addEventListener('pointerdown',e=>startResize(e,card,cell,view));
+    card.querySelectorAll('[data-toggle]').forEach(btn=>{
+      btn.addEventListener('click',e=>{
+        e.stopPropagation();
+        const task=cell.tasks.find(t=>t.id===btn.dataset.toggle);
+        if(task){task.done=!task.done;saveState();haptic();renderGrid(view);}
+      });
+    });
+    card.querySelectorAll('[data-text]').forEach(span=>{
+      span.addEventListener('click',e=>{
+        e.stopPropagation();
+        const task=cell.tasks.find(t=>t.id===span.dataset.text);
+        if(!task)return;
+        startInlineEdit(span,task.text,false,n=>{
+          task.text=n||task.text;saveState();renderGrid(view);
+        });
+      });
+    });
+    card.querySelector('[data-add]').addEventListener('click',e=>{
+      e.stopPropagation();
+      openCell(view,cell,'add');
+    });
     grid.appendChild(card);
   }
 }
-function openCell(view,cell){
-  currentCellId=cell.id;
-  $('#dayTitle').textContent=cell.name;
-  $('#newTask').value='';
-  renderCellTasks(view,cell);
-  openModal($('#dayModal'));
-}
-function renderCellTasks(view,cell){
-  const list=$('#taskList');list.innerHTML='';
-  if(!cell.tasks.length){list.innerHTML='<p class="empty">Задач нет</p>';return;}
-  cell.tasks.forEach(task=>{
-    const row=document.createElement('div');row.className='task-row';
-    row.appendChild(makeCheckbox(task.done,()=>{
-      task.done=!task.done;saveState();renderCellTasks(view,cell);renderWeekGrid(view);
-    },cell.color));
-    const txt=document.createElement('span');
-    txt.className='task-text'+(task.done?' done':'');txt.textContent=task.text;
-    txt.addEventListener('click',()=>editInline(txt,task.text,false,n=>{
-      task.text=n;saveState();renderCellTasks(view,cell);renderWeekGrid(view);
-    }));
-    row.appendChild(txt);
-    const del=document.createElement('button');
-    del.className='mini-btn';del.textContent='✕';
-    del.addEventListener('click',()=>{
-      const i=cell.tasks.indexOf(task);if(i>=0)cell.tasks.splice(i,1);
-      saveState();renderCellTasks(view,cell);renderWeekGrid(view);
-    });
-    row.appendChild(del);list.appendChild(row);
-  });
-}
-function makeCheckbox(checked,onToggle,color){
-  const btn=document.createElement('button');btn.type='button';
-  btn.className='checkbox'+(checked?' checked':'');
-  if(color)btn.style.setProperty('--cb-color',color);
-  btn.innerHTML=checked?'<svg viewBox="0 0 20 20" fill="none" stroke="#fff" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 10l4 4 8-8"/></svg>':'';
-  btn.addEventListener('click',e=>{e.stopPropagation();haptic();onToggle();});
-  return btn;
-}
-function editInline(el,oldText,isName,onSave){
+
+function startInlineEdit(el,oldText,isName,onSave){
   const input=document.createElement('input');
   input.type='text';input.value=oldText;
   input.className=isName?'name-edit-input':'task-edit-input';
   el.replaceWith(input);input.focus();
   input.setSelectionRange(input.value.length,input.value.length);
   let done=false;
-  const finish=save=>{if(done)return;done=true;
-    const v=input.value.trim();onSave(save&&v?v:oldText);};
+  const finish=save=>{
+    if(done)return;done=true;
+    const v=input.value.trim();
+    input.replaceWith(el);
+    onSave(save?v:oldText);
+  };
   input.addEventListener('blur',()=>finish(true));
   input.addEventListener('keydown',e=>{
     if(e.key==='Enter'){e.preventDefault();input.blur();}
@@ -664,7 +592,6 @@ function editInline(el,oldText,isName,onSave){
   });
 }
 
-/* ---------- Drag ---------- */
 function startDrag(e,card,view){
   if(e.button&&e.button!==0)return;
   e.preventDefault();e.stopPropagation();haptic();
@@ -672,9 +599,7 @@ function startDrag(e,card,view){
   document.addEventListener('pointermove',onDragMove);
   document.addEventListener('pointerup',endDrag);
   document.addEventListener('pointercancel',endDrag);
-  document.addEventListener('touchmove',preventDrag,{passive:false});
 }
-function preventDrag(e){if(dragState)e.preventDefault();}
 function onDragMove(e){
   if(!dragState)return;
   $$('.drag-target').forEach(el=>el.classList.remove('drag-target'));
@@ -691,7 +616,7 @@ function endDrag(){
     const f=cells.findIndex(c=>c.id===sId);
     const t=cells.findIndex(c=>c.id===tId);
     if(f>=0&&t>=0){const[m]=cells.splice(f,1);cells.splice(t,0,m);saveState();haptic('medium');}
-    renderWeekGrid(dragState.view);
+    renderGrid(dragState.view);
   }
   dragState?.card?.classList.remove('dragging');
   $$('.drag-target').forEach(el=>el.classList.remove('drag-target'));
@@ -699,405 +624,366 @@ function endDrag(){
   document.removeEventListener('pointermove',onDragMove);
   document.removeEventListener('pointerup',endDrag);
   document.removeEventListener('pointercancel',endDrag);
-  document.removeEventListener('touchmove',preventDrag);
 }
 
-/* ---------- Training ---------- */
-function renderTrainingView(root,view){
-  const t=view.training;
-  root.innerHTML=`
-    <div class="training-tabs">
-      <button data-tab="workouts" class="${t.activeTab==='workouts'?'active':''}">💪 Тренировки</button>
-      <button data-tab="nutrition" class="${t.activeTab==='nutrition'?'active':''}">🥗 Питание</button>
-    </div>
-    <div id="trainingBody"></div>`;
-  $$('.training-tabs button').forEach(b=>b.addEventListener('click',()=>{
-    t.activeTab=b.dataset.tab;saveState();renderTrainingView(root,view);
-  }));
-  renderTrainingBody(view);
+function startResize(e,card,cell,view){
+  if(e.button&&e.button!==0)return;
+  e.preventDefault();e.stopPropagation();
+  const startX=e.clientX,startY=e.clientY;
+  const startSpan=cell.span||1;
+  const startHeight=cell.height||DEFAULT_HEIGHT;
+  const cardRect=card.getBoundingClientRect();
+  const colWidth=cardRect.width/startSpan+10;
+  resizeState={card,cell,view};
+  const move=ev=>{
+    if(!resizeState)return;
+    const dx=ev.clientX-startX,dy=ev.clientY-startY;
+    const spanDelta=Math.round(dx/(colWidth+10));
+    const newSpan=Math.max(1,Math.min(view.columns,startSpan+spanDelta));
+    const newHeight=Math.max(MIN_HEIGHT,Math.min(MAX_HEIGHT,startHeight+dy));
+    cell.span=newSpan;cell.height=newHeight;
+    card.style.gridColumn=`span ${newSpan}`;
+    card.style.minHeight=newHeight+'px';
+    card.style.maxHeight=newHeight+'px';
+  };
+  const up=()=>{
+    resizeState=null;
+    saveState();
+    document.removeEventListener('pointermove',move);
+    document.removeEventListener('pointerup',up);
+    document.removeEventListener('pointercancel',up);
+    renderGrid(view);
+  };
+  document.addEventListener('pointermove',move);
+  document.addEventListener('pointerup',up);
+  document.addEventListener('pointercancel',up);
 }
-function renderTrainingBody(view){
-  const body=$('#trainingBody');if(!body)return;
-  const t=view.training;
-  const cats=t.activeTab==='workouts'?t.workouts:t.nutrition;
-  body.innerHTML='';
-  for(const cat of cats){
-    const card=document.createElement('div');card.className='category-card';
-    const done=cat.items.filter(i=>i.done).length;
-    const head=document.createElement('div');head.className='category-header';
-    head.innerHTML=`<span class="category-name">${escapeHtml(cat.name)}</span>
-      <span class="category-meta">${done}/${cat.items.length}</span>`;
-    const bell=document.createElement('button');
-    bell.className='mini-btn'+(hasAnyNotify(cat.notify)?' bell-active':'');
-    bell.textContent='🔔';
-    bell.addEventListener('click',()=>openNotifyModal(cat,cat.name,cat.days));
-    head.appendChild(bell);
-    const delCat=document.createElement('button');
-    delCat.className='mini-btn';delCat.textContent='✕';
-    delCat.addEventListener('click',()=>{
-      askConfirm(`Удалить «${cat.name}»?`,()=>{
-        const arr=t.activeTab==='workouts'?t.workouts:t.nutrition;
-        const i=arr.indexOf(cat);if(i>=0)arr.splice(i,1);
-        saveState();renderTrainingBody(view);
-      });
-    });
-    head.appendChild(delCat);
-    head.querySelector('.category-name').addEventListener('click',function(){
-      editInline(this,cat.name,true,n=>{cat.name=n;saveState();renderTrainingBody(view);});
-    });
-    card.appendChild(head);
-    const itemsBox=document.createElement('div');itemsBox.className='category-items';
-    for(const item of cat.items){
-      const row=document.createElement('div');row.className='check-item';
-      row.appendChild(makeCheckbox(item.done,()=>{
-        item.done=!item.done;saveState();renderTrainingBody(view);
-      }));
-      const txt=document.createElement('span');
-      txt.className='check-text'+(item.done?' done':'');txt.textContent=item.text;
-      txt.addEventListener('click',()=>editInline(txt,item.text,false,n=>{
-        item.text=n;saveState();renderTrainingBody(view);
-      }));
-      row.appendChild(txt);
-      const del=document.createElement('button');
-      del.className='mini-btn';del.textContent='✕';
-      del.addEventListener('click',()=>{
-        const i=cat.items.indexOf(item);if(i>=0)cat.items.splice(i,1);
-        saveState();renderTrainingBody(view);
-      });
-      row.appendChild(del);itemsBox.appendChild(row);
-    }
-    card.appendChild(itemsBox);
-    const addRow=document.createElement('div');addRow.className='add-item-row';
-    const inp=document.createElement('input');inp.type='text';
-    inp.placeholder=t.activeTab==='workouts'?'Упражнение…':'Блюдо…';
-    const addB=document.createElement('button');addB.className='icon-btn';addB.textContent='+';
-    const add=()=>{const v=inp.value.trim();if(!v)return;
-      cat.items.push({id:makeId('i'),text:v,meta:'',done:false});
-      inp.value='';saveState();renderTrainingBody(view);haptic();};
-    addB.addEventListener('click',add);
-    inp.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();add();}});
-    addRow.appendChild(inp);addRow.appendChild(addB);card.appendChild(addRow);
-    body.appendChild(card);
+
+function openCell(view,cell,focus){
+  currentCellId=cell.id;
+  $('#cellTitle').textContent=cell.name||'Ячейка';
+  $('#cellNameInput').value=cell.name||'';
+  renderCellSwatches(cell);
+  $('#cellColorCustom').value=cell.color;
+  $('#spanValue').textContent=cell.span||1;
+  $('#heightValue').textContent=cell.height||DEFAULT_HEIGHT;
+  const n=cell.notify||DEFAULT_NOTIFY;
+  $('#cellNotifyToggle').classList.toggle('on',!!n.enabled);
+  $('#cellNotifyFields').style.display=n.enabled?'block':'none';
+  $('#cellNotifyTime').value=n.time||'08:00';
+  renderCellDaySelect(cell);
+  openModal($('#cellModal'));
+  if(focus==='add'){
+    setTimeout(()=>{
+      const input=$('#cellAddTask');
+      if(input)input.focus();
+    },200);
   }
-  const addCat=document.createElement('button');
-  addCat.className='add-category-btn';addCat.textContent='+ Добавить категорию';
-  addCat.addEventListener('click',()=>{
-    const n=prompt('Название:');if(!n||!n.trim())return;
-    const arr=t.activeTab==='workouts'?t.workouts:t.nutrition;
-    arr.push({id:makeId('c'),name:n.trim(),days:[0,1,2,3,4,5,6],
-      notify:{...DEFAULT_NOTIFY,days:[0,1,2,3,4,5,6]},items:[]});
-    saveState();renderTrainingBody(view);
+}
+function renderCellSwatches(cell){
+  const wrap=$('#cellSwatches');wrap.innerHTML='';
+  for(const c of CARD_PALETTE){
+    const b=document.createElement('button');
+    b.className='swatch'+(c===cell.color?' active':'');
+    b.style.background=c;b.style.color=c;
+    b.addEventListener('click',()=>{
+      cell.color=c;saveState();
+      renderCellSwatches(cell);
+      $('#cellColorCustom').value=c;
+      renderGrid(getCurrentView());
+    });
+    wrap.appendChild(b);
+  }
+}
+function renderCellDaySelect(cell){
+  const sel=$('#cellDaySelect');sel.innerHTML='';
+  const days=cell.notify?.days||[];
+  DAY_NAMES.forEach((lbl,i)=>{
+    const b=document.createElement('button');
+    b.textContent=lbl;b.className=days.includes(i)?'on':'';
+    b.addEventListener('click',()=>{
+      if(!cell.notify.days)cell.notify.days=[];
+      const idx=cell.notify.days.indexOf(i);
+      if(idx>=0)cell.notify.days.splice(idx,1);else cell.notify.days.push(i);
+      b.classList.toggle('on',cell.notify.days.includes(i));
+      saveState();
+    });
+    sel.appendChild(b);
   });
-  body.appendChild(addCat);
 }
 
-/* ---------- Модалки ---------- */
+function getCurrentView(){return state.views.find(v=>v.id===currentViewId);}
+function getCurrentCell(){const v=getCurrentView();return v?.cells.find(c=>c.id===currentCellId);}
+
 function openModal(m){m.classList.add('open');document.body.style.overflow='hidden';updateBack();}
 function closeModal(m){m.classList.remove('open');
   if(!$$('.modal.open').length)document.body.style.overflow='';updateBack();}
 function updateBack(){if(!tg?.BackButton)return;
   if($$('.modal.open').length)tg.BackButton.show();else tg.BackButton.hide();}
 
-/* ---------- Палитры ---------- */
-function openCardColorPicker(current,onPick){
-  const m=$('#colorModal'),w=$('#swatches');w.innerHTML='';
-  for(const c of CARD_PALETTE){
-    const b=document.createElement('button');
-    b.className='swatch'+(c===current?' active':'');b.style.background=c;b.style.color=c;
-    b.addEventListener('click',()=>{onPick(c);closeModal(m);});
-    w.appendChild(b);
-  }
-  openModal(m);
-}
-function openAccentPicker(){
-  const m=$('#accentModal'),w=$('#accentSwatches');w.innerHTML='';
-  for(const c of ACCENT_PALETTE){
-    const b=document.createElement('button');
-    b.className='swatch'+(c===state.accent?' active':'');b.style.background=c;b.style.color=c;
-    b.addEventListener('click',()=>{state.accent=c;saveState();applyAccent();closeModal(m);});
-    w.appendChild(b);
-  }
-  openModal(m);
-}
-
-/* ---------- Notify ---------- */
-function openNotifyModal(ref,name,defaultDays){
-  currentNotifyTarget={ref,name};
-  const n=ref.notify||(ref.notify={...DEFAULT_NOTIFY});
-  $('#notifyTitle').textContent='🔔 '+name;
-  $('#notifyToggle').classList.toggle('on',!!n.enabled);
-  $('#notifyWhen').style.display=n.enabled?'block':'none';
-  $('#notifyTime').value=n.time||'08:00';
-  const sel=$('#daySelect');sel.innerHTML='';
-  const days=n.days||[];
-  DAY_NAMES.forEach((lbl,i)=>{
-    const b=document.createElement('button');
-    b.textContent=lbl;b.className=days.includes(i)?'on':'';
-    b.addEventListener('click',()=>{
-      if(!n.days)n.days=[];
-      const idx=n.days.indexOf(i);
-      if(idx>=0)n.days.splice(idx,1);else n.days.push(i);
-      b.classList.toggle('on',n.days.includes(i));
-      saveState();
-    });
-    sel.appendChild(b);
-  });
-  openModal($('#notifyModal'));
-}
-function saveNotifyFromModal(){
-  if(!currentNotifyTarget)return;
-  const n=currentNotifyTarget.ref.notify;
-  n.time=$('#notifyTime').value||'08:00';
-  saveState();
-  renderContent();
-}
-
-/* ---------- Создание шаблона ---------- */
-function createView(){
-  const name=$('#newViewName').value.trim();
-  const icon=$('#newViewIcon').value.trim()||'📆';
-  if(!name){toast('Введите название');return;}
-  const newView={
-    id:makeId('v'),type:'planner',title:name,icon,removable:true,
-    columns:7,showWeekend:false,filter:'all',cells:makeWeekCells(),
-  };
-  state.views.push(newView);
-  saveState();
-  closeModal($('#createViewModal'));
-  switchView(newView.id);
-  toast('Шаблон «'+name+'» создан');haptic();
-}
-
-/* ---------- Удаление шаблона ---------- */
-function deleteView(viewId){
-  const v=getView(viewId);
-  if(!v||!v.removable)return;
-  state.views=state.views.filter(x=>x.id!==viewId);
-  saveState();
-  if(currentViewId===viewId)switchView(state.views[0].id);
-  else{renderDock();renderContent();}
-  closeModal($('#settingsModal'));
-  toast('Удалено');
-}
-
-/* ---------- Picker (iOS-крутилка) ---------- */
-function openPicker(view){
-  currentView=view;
-  pickerValue=view.columns;
-  const wheel=$('#pickerWheel');
-  wheel.innerHTML='';
-  const topSpacer=document.createElement('div');topSpacer.className='picker-spacer';
-  wheel.appendChild(topSpacer);
-  for(let i=1;i<=31;i++){
-    const d=document.createElement('div');
-    d.className='picker-item';d.textContent=i;d.dataset.value=i;
-    wheel.appendChild(d);
-  }
-  const botSpacer=document.createElement('div');botSpacer.className='picker-spacer';
-  wheel.appendChild(botSpacer);
-  updatePickerHint(view.columns);
-  // прокрутить к текущему
-  requestAnimationFrame(()=>{
-    const el=wheel.querySelector(`[data-value="${view.columns}"]`);
-    if(el)el.scrollIntoView({block:'center',behavior:'instant'});
-    setTimeout(()=>{
-      wheel.querySelectorAll('.picker-item').forEach(e=>{
-        e.classList.toggle('active',parseInt(e.dataset.value)===view.columns);
-      });
-    },50);
-  });
-  wheel.onscroll=()=>{
-    clearTimeout(pickerScrollTimer);
-    pickerScrollTimer=setTimeout(()=>{
-      const wheelRect=wheel.getBoundingClientRect();
-      const wheelCenter=wheelRect.top+wheelRect.height/2;
-      let closest=null,minDist=Infinity;
-      wheel.querySelectorAll('.picker-item').forEach(el=>{
-        const r=el.getBoundingClientRect();
-        const ec=r.top+r.height/2;
-        const d=Math.abs(ec-wheelCenter);
-        if(d<minDist){minDist=d;closest=el;}
-      });
-      if(closest){
-        wheel.querySelectorAll('.picker-item').forEach(e=>e.classList.remove('active'));
-        closest.classList.add('active');
-        pickerValue=parseInt(closest.dataset.value);
-        updatePickerHint(pickerValue);
-      }
-    },80);
-  };
-  openModal($('#pickerModal'));
-}
-function updatePickerHint(v){
-  let hint='';
-  if(v===1)hint='Список';
-  else if(v===7)hint='Неделя (Пн-Вс)';
-  else if(v===31)hint='Месяц (календарь)';
-  else if(v<=7)hint=v+' ячеек';
-  else if(v<=14)hint=v+' ячеек · 2 недели';
-  else if(v<=21)hint=v+' ячеек · 3 недели';
-  else if(v<=28)hint=v+' ячеек · 4 недели';
-  else hint=v+' ячеек · календарь';
-  $('#pickerHint').textContent=hint;
-}
-function applyPicker(){
-  if(!currentView)return;
-  const oldN=currentView.cells.length;
-  const newN=pickerValue;
-  if(newN<oldN){
-    // урезаем с конца
-    currentView.cells=currentView.cells.slice(0,newN);
-  } else if(newN>oldN){
-    for(let i=oldN;i<newN;i++){
-      const isWeek=newN===7;
-      const name=isWeek?DAY_NAMES[i]:String(i+1);
-      currentView.cells.push(makeCell(name,i,isWeek?[i]:[]));
-    }
-  }
-  currentView.columns=newN;
-  saveState();
-  closeModal($('#pickerModal'));
-  renderContent();
-  haptic();
-}
-
-/* ---------- Настройки ---------- */
 function renderSettings(){
   const v=getCurrentView();
-  $$('[data-setting="theme"] button').forEach(b=>b.classList.toggle('active',b.dataset.value===state.theme));
-  $('#backendUrl').value=state.backendUrl||'';
-  $('#userId').value=state.userId||'';
-  updateSyncStatus();
-
-  const vs=$('#viewSettingsSection');
-  if(v&&v.type==='planner'){
-    vs.innerHTML=`
-      <div class="setting-block">
-        <div class="setting-label">Название шаблона</div>
-        <input type="text" class="modal-input" id="viewTitleInput" value="${escapeHtml(v.title)}" style="margin-bottom:8px">
-        <div class="setting-label">Иконка (эмодзи)</div>
-        <input type="text" class="modal-input" id="viewIconInput" value="${escapeHtml(v.icon)}" maxlength="2" style="text-align:center;font-size:20px">
+  $$('[data-theme-set]').forEach(b=>{
+    b.style.background=b.dataset.themeSet===state.theme?'var(--accent)':'var(--bg-3)';
+    b.style.color=b.dataset.themeSet===state.theme?'#fff':'var(--text)';
+  });
+  const ms=$('#moduleSettings');
+  ms.innerHTML=`
+    <div class="setting-block">
+      <div class="setting-label">Название модуля</div>
+      <input type="text" class="modal-input" id="moduleTitleInput" value="${escapeHtml(v.title)}">
+      <div class="setting-label">Иконка</div>
+      <input type="text" class="modal-input" id="moduleIconInput" value="${escapeHtml(v.icon)}" maxlength="2" style="text-align:center;font-size:22px">
+    </div>
+    <div class="setting-block">
+      <div class="setting-label">Акцентный цвет</div>
+      <div class="swatches" id="accentSwatches"></div>
+      <div class="color-row">
+        <input type="color" id="accentCustom" class="color-input" value="${state.accent}">
+        <span style="font-size:13px;color:var(--text-dim)">Свой цвет</span>
       </div>
-      <div class="setting-block">
-        <div class="setting-label">Ячеек: ${v.columns} ${v.columns===7?'(неделя)':v.columns===31?'(месяц)':''}</div>
-        <div class="setting-options"><button id="openPickerBtn">📅 Изменить количество</button></div>
+    </div>
+    <div class="setting-block">
+      <div class="setting-label">Количество ячеек</div>
+      <div class="counter-row">
+        <button class="counter-btn" id="cellsMinus">−</button>
+        <div class="num-value" id="cellsValue">${v.cells.length}</div>
+        <button class="counter-btn" id="cellsPlus">+</button>
       </div>
-    `;
-    $('#openPickerBtn').addEventListener('click',()=>{
-      closeModal($('#settingsModal'));
-      setTimeout(()=>openPicker(v),150);
-    });
-    $('#viewTitleInput').addEventListener('change',e=>{
-      const t=e.target.value.trim();if(!t)return;
-      v.title=t;saveState();$('#pageTitle').textContent=t;renderDock();
-    });
-    $('#viewIconInput').addEventListener('change',e=>{
-      const t=e.target.value.trim()||'📆';
-      v.icon=t;saveState();renderDock();
-    });
-  } else if(v&&v.type==='training'){
-    vs.innerHTML=`
-      <div class="setting-block">
-        <div class="setting-label">Название</div>
-        <input type="text" class="modal-input" id="viewTitleInput" value="${escapeHtml(v.title)}" style="margin-bottom:8px">
-        <div class="setting-label">Иконка</div>
-        <input type="text" class="modal-input" id="viewIconInput" value="${escapeHtml(v.icon)}" maxlength="2" style="text-align:center;font-size:20px">
+    </div>
+    <div class="setting-block">
+      <div class="setting-label">Количество столбцов</div>
+      <div class="counter-row">
+        <button class="counter-btn" id="colsMinus">−</button>
+        <div class="num-value" id="colsValue">${v.columns}</div>
+        <button class="counter-btn" id="colsPlus">+</button>
       </div>
-    `;
-    $('#viewTitleInput').addEventListener('change',e=>{
-      const t=e.target.value.trim();if(!t)return;
-      v.title=t;saveState();$('#pageTitle').textContent=t;renderDock();
+    </div>
+    <div class="setting-block">
+      <div class="setting-label">Сброс модуля</div>
+      <button class="btn danger" id="resetModuleBtn">Сбросить «${escapeHtml(v.title)}»</button>
+    </div>`;
+  const sw=$('#accentSwatches');sw.innerHTML='';
+  for(const c of ACCENT_PALETTE){
+    const b=document.createElement('button');
+    b.className='swatch'+(c===state.accent?' active':'');
+    b.style.background=c;b.style.color=c;
+    b.addEventListener('click',()=>{state.accent=c;saveState();applyAccent();renderSettings();});
+    sw.appendChild(b);
+  }
+  $('#accentCustom').addEventListener('input',e=>{
+    state.accent=e.target.value;saveState();applyAccent();
+  });
+  $('#moduleTitleInput').addEventListener('change',e=>{
+    const t=e.target.value.trim();if(!t)return;
+    v.title=t;saveState();$('#pageTitle').textContent=t;renderDock();
+  });
+  $('#moduleIconInput').addEventListener('change',e=>{
+    const t=e.target.value.trim()||'📆';
+    v.icon=t;saveState();renderDock();
+  });
+  $('#cellsMinus').addEventListener('click',()=>{changeCellCount(v,-1);renderSettings();});
+  $('#cellsPlus').addEventListener('click',()=>{changeCellCount(v,1);renderSettings();});
+  $('#cellsValue').addEventListener('click',()=>{
+    const n=prompt('Сколько ячеек?',v.cells.length);
+    if(n===null)return;
+    const num=parseInt(n);if(isNaN(num)||num<1)return;
+    setCellCount(v,num);renderSettings();
+  });
+  $('#colsMinus').addEventListener('click',()=>{changeColumns(v,-1);renderSettings();});
+  $('#colsPlus').addEventListener('click',()=>{changeColumns(v,1);renderSettings();});
+  $('#colsValue').addEventListener('click',()=>{
+    const n=prompt('Сколько столбцов?',v.columns);
+    if(n===null)return;
+    const num=parseInt(n);if(isNaN(num)||num<1)return;
+    setColumns(v,num);renderSettings();
+  });
+  $('#resetModuleBtn').addEventListener('click',()=>{
+    askConfirm(`Сбросить модуль «${v.title}»?`,`reset:${v.id}`);
+  });
+  const del=$('#moduleDelete');
+  if(v.removable){
+    del.innerHTML=`<div class="setting-block">
+      <div class="setting-label">Удалить модуль</div>
+      <button class="btn danger" id="deleteModuleBtn">Удалить «${escapeHtml(v.title)}»</button>
+    </div>`;
+    $('#deleteModuleBtn').addEventListener('click',()=>{
+      askConfirm(`Удалить модуль «${v.title}»?`,`delete:${v.id}`);
     });
-    $('#viewIconInput').addEventListener('change',e=>{
-      const t=e.target.value.trim()||'💪';
-      v.icon=t;saveState();renderDock();
-    });
-  } else vs.innerHTML='';
-
-  const delSection=$('#deleteViewSection');
-  if(v&&v.removable){
-    delSection.innerHTML=`
-      <div class="setting-block">
-        <div class="setting-label">Удалить шаблон</div>
-        <button class="btn danger" id="deleteViewBtn">Удалить «${escapeHtml(v.title)}»</button>
-      </div>`;
-    $('#deleteViewBtn').addEventListener('click',()=>{
-      askConfirm(`Удалить «${v.title}»?`,()=>deleteView(v.id));
-    });
-  } else delSection.innerHTML='';
+  } else del.innerHTML='';
 }
-function updateSyncStatus(){
-  const el=$('#syncStatus');if(!el)return;
-  if(!state.backendUrl||!state.userId){el.className='sync-status';el.textContent='Не подключён (опционально)';return;}
-  el.className='sync-status ok';
-  el.textContent='✓ Подключён · '+(lastSyncTime?new Date(lastSyncTime).toLocaleTimeString('ru'):'—');
+function changeCellCount(v,delta){
+  const newCount=Math.max(1,v.cells.length+delta);
+  setCellCount(v,newCount);
 }
-function handleSettingClick(e){
-  const btn=e.target.closest('[data-value]');if(!btn)return;
-  const grp=btn.closest('[data-setting]');if(!grp)return;
-  if(grp.dataset.setting==='theme'){state.theme=btn.dataset.value;applyTheme();}
-  saveState();renderSettings();haptic();
+function setCellCount(v,newCount){
+  if(newCount<1)newCount=1;
+  if(newCount<v.cells.length){
+    v.cells=v.cells.slice(0,newCount);
+  } else if(newCount>v.cells.length){
+    for(let i=v.cells.length;i<newCount;i++){
+      const isWeek=newCount===7;
+      const name=isWeek?DAY_NAMES[i]:'';
+      v.cells.push(makeCell(name,i,isWeek?[i]:[]));
+    }
+  }
+  if(v.columns>v.cells.length)v.columns=v.cells.length;
+  saveState();renderGrid(v);renderFilters(v);
+}
+function changeColumns(v,delta){
+  const newCols=Math.max(1,Math.min(v.cells.length,v.columns+delta));
+  v.columns=newCols;
+  saveState();renderGrid(v);
+}
+function setColumns(v,newCols){
+  if(newCols<1)newCols=1;
+  if(newCols>v.cells.length)newCols=v.cells.length;
+  v.columns=newCols;
+  saveState();renderGrid(v);
 }
 
-/* ---------- Confirm ---------- */
-function askConfirm(text,cb){$('#confirmText').textContent=text;confirmCallback=cb;openModal($('#confirmModal'));}
+function askConfirm(text,action){
+  $('#confirmText').textContent=text;
+  confirmCallback=action;
+  openModal($('#confirmModal'));
+}
 
-/* ---------- Search ---------- */
 function openSearch(){$('#searchOverlay').classList.add('open');
   setTimeout(()=>$('#globalSearch').focus(),100);}
 function closeSearch(){$('#searchOverlay').classList.remove('open');
   $('#globalSearch').value='';if(searchQuery){searchQuery='';renderContent();}}
 
-/* ---------- События ---------- */
+function createView(){
+  const name=$('#newViewName').value.trim();
+  const icon=$('#newViewIcon').value.trim()||'📆';
+  if(!name){toast('Введите название');return;}
+  const newView={id:makeId('v'),type:'planner',title:name,icon,removable:true,
+    columns:7,filter:'all',cells:makeWeekCells()};
+  state.views.push(newView);
+  saveState();
+  closeModal($('#createViewModal'));
+  switchView(newView.id);
+  toast('Модуль «'+name+'» создан');haptic();
+}
+
 $('#searchBtn').addEventListener('click',openSearch);
 $('#searchClose').addEventListener('click',closeSearch);
 $('#globalSearch').addEventListener('input',e=>{
   searchQuery=e.target.value.trim().toLowerCase();renderContent();
 });
 $('#settingsBtn').addEventListener('click',()=>{renderSettings();openModal($('#settingsModal'));});
-$('#settingsModal').addEventListener('click',handleSettingClick);
-$('#openAccentPicker').addEventListener('click',()=>{closeModal($('#settingsModal'));setTimeout(openAccentPicker,150);});
-$('#backendUrl').addEventListener('change',e=>{state.backendUrl=e.target.value.trim();saveState();updateSyncStatus();});
-$('#userId').addEventListener('change',e=>{
-  const v=parseInt(e.target.value.trim());state.userId=isNaN(v)?null:v;
-  saveState();updateSyncStatus();
+$('#settingsModal').addEventListener('click',e=>{
+  const t=e.target.closest('[data-theme-set]');
+  if(t){state.theme=t.dataset.themeSet;applyTheme();saveState();renderSettings();}
 });
-$('#syncNowBtn').addEventListener('click',async()=>{
-  if(!state.backendUrl||!state.userId){toast('Заполните URL и ID');return;}
-  await pushToBackend();
-  const ok=await pullFromBackend();
-  updateSyncStatus();
-  if(ok){toast('✓ Синхронизировано');renderContent();}
-  else toast('Сервер не ответил');
+$('#cellNameInput').addEventListener('input',e=>{
+  const cell=getCurrentCell();if(!cell)return;
+  cell.name=e.target.value;saveState();
+  $('#cellTitle').textContent=cell.name||'Ячейка';
 });
-$('#resetAllBtn').addEventListener('click',()=>{
-  askConfirm('Сбросить все данные?',()=>{localStorage.removeItem(STORAGE_KEY);location.reload();});
+$('#cellColorCustom').addEventListener('input',e=>{
+  const cell=getCurrentCell();if(!cell)return;
+  cell.color=e.target.value;saveState();renderCellSwatches(cell);renderGrid(getCurrentView());
 });
+$('#cellModal').addEventListener('click',e=>{
+  const t=e.target.closest('[data-size]');
+  if(!t)return;
+  const cell=getCurrentCell();if(!cell)return;
+  const action=t.dataset.size;
+  if(action==='span-minus'){
+    cell.span=Math.max(1,(cell.span||1)-1);
+    $('#spanValue').textContent=cell.span;
+  } else if(action==='span-plus'){
+    cell.span=Math.min(getCurrentView().columns,(cell.span||1)+1);
+    $('#spanValue').textContent=cell.span;
+  } else if(action==='span-input'){
+    const n=prompt('Сколько столбцов занять?',cell.span||1);
+    if(n!==null){
+      const num=parseInt(n);
+      if(!isNaN(num)&&num>=1){
+        cell.span=Math.min(getCurrentView().columns,num);
+        $('#spanValue').textContent=cell.span;
+      }
+    }
+  } else if(action==='height-minus'){
+    cell.height=Math.max(MIN_HEIGHT,(cell.height||DEFAULT_HEIGHT)-20);
+    $('#heightValue').textContent=cell.height;
+  } else if(action==='height-plus'){
+    cell.height=Math.min(MAX_HEIGHT,(cell.height||DEFAULT_HEIGHT)+20);
+    $('#heightValue').textContent=cell.height;
+  } else if(action==='height-input'){
+    const n=prompt('Высота в пикселях?',cell.height||DEFAULT_HEIGHT);
+    if(n!==null){
+      const num=parseInt(n);
+      if(!isNaN(num)&&num>=MIN_HEIGHT&&num<=MAX_HEIGHT){
+        cell.height=num;
+        $('#heightValue').textContent=cell.height;
+      }
+    }
+  }
+  saveState();renderGrid(getCurrentView());
+});
+$('#cellNotifyToggle').addEventListener('click',()=>{
+  const cell=getCurrentCell();if(!cell)return;
+  const on=!$('#cellNotifyToggle').classList.contains('on');
+  $('#cellNotifyToggle').classList.toggle('on',on);
+  $('#cellNotifyFields').style.display=on?'block':'none';
+  if(!cell.notify)cell.notify={...DEFAULT_NOTIFY};
+  cell.notify.enabled=on;
+  saveState();haptic();
+});
+$('#cellNotifyTime').addEventListener('change',e=>{
+  const cell=getCurrentCell();if(!cell)return;
+  if(!cell.notify)cell.notify={...DEFAULT_NOTIFY};
+  cell.notify.time=e.target.value||'08:00';saveState();
+});
+$('#cellDeleteBtn').addEventListener('click',()=>{
+  const v=getCurrentView();const cell=getCurrentCell();if(!v||!cell)return;
+  askConfirm(`Удалить ячейку «${cell.name||'без имени'}»?`,`deleteCell:${cell.id}`);
+});
+$('#createViewBtn').addEventListener('click',createView);
+$('#confirmYes').addEventListener('click',()=>{
+  const action=confirmCallback;confirmCallback=null;
+  closeModal($('#confirmModal'));
+  if(!action)return;
+  if(action.startsWith('delete:')){
+    const id=action.slice(7);
+    state.views=state.views.filter(v=>v.id!==id);
+    if(currentViewId===id)currentViewId=state.views[0].id;
+    state.currentViewId=currentViewId;
+    saveState();renderDock();renderContent();
+  } else if(action.startsWith('reset:')){
+    const id=action.slice(6);
+    const v=state.views.find(x=>x.id===id);
+    if(v){
+      v.columns=7;v.filter='all';
+      v.cells=makeWeekCells();
+      saveState();renderGrid(v);renderFilters(v);
+    }
+    closeModal($('#settingsModal'));
+  } else if(action.startsWith('deleteCell:')){
+    const id=action.slice(11);
+    const v=getCurrentView();if(!v)return;
+    v.cells=v.cells.filter(c=>c.id!==id);
+    if(v.columns>v.cells.length)v.columns=v.cells.length;
+    if(!v.cells.length)v.cells=[makeCell('',0,[])];
+    saveState();closeModal($('#cellModal'));
+    renderGrid(v);renderFilters(v);
+  }
+});
+
 $$('[data-close]').forEach(b=>b.addEventListener('click',()=>closeModal(b.closest('.modal'))));
 $$('.modal').forEach(m=>m.addEventListener('click',e=>{if(e.target===m)closeModal(m);}));
-$('#dayClose').addEventListener('click',()=>closeModal($('#dayModal')));
-$('#addTaskBtn').addEventListener('click',()=>{
-  const inp=$('#newTask');const text=inp.value.trim();if(!text)return;
-  const v=getCurrentView();
-  const cell=v?.cells.find(c=>c.id===currentCellId);if(!cell)return;
-  cell.tasks.push(makeTask(text));inp.value='';
-  saveState();renderCellTasks(v,cell);renderWeekGrid(v);haptic();
+
+$('#pageTitle').addEventListener('click',function(){
+  const v=getCurrentView();if(!v)return;
+  startInlineEdit(this,v.title,true,n=>{
+    v.title=n||v.title;
+    this.textContent=v.title;
+    saveState();renderDock();
+  });
 });
-$('#newTask').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();$('#addTaskBtn').click();}});
-$('#notifyToggle').addEventListener('click',()=>{
-  const on=!$('#notifyToggle').classList.contains('on');
-  $('#notifyToggle').classList.toggle('on',on);
-  $('#notifyWhen').style.display=on?'block':'none';
-  if(currentNotifyTarget){currentNotifyTarget.ref.notify.enabled=on;saveState();}
-  haptic();
-});
-$('#notifyTime').addEventListener('change',saveNotifyFromModal);
-$('#createViewBtn').addEventListener('click',createView);
-$('#pickerApply').addEventListener('click',applyPicker);
-$('#confirmYes').addEventListener('click',()=>{
-  const cb=confirmCallback;confirmCallback=null;closeModal($('#confirmModal'));
-  if(typeof cb==='function')cb();
-});
+
 if(tg?.BackButton){
   tg.BackButton.onClick(()=>{
     const o=$$('.modal.open');
@@ -1105,38 +991,16 @@ if(tg?.BackButton){
     if(searchQuery)closeSearch();
   });
 }
-// Редактирование заголовка
-$('#pageTitle').addEventListener('click',function(){
-  const v=getCurrentView();if(!v)return;
-  const h1=this;
-  const old=h1.textContent;
-  const input=document.createElement('input');
-  input.type='text';input.value=old;input.className='name-edit-input';
-  h1.replaceWith(input);input.focus();
-  input.setSelectionRange(input.value.length,input.value.length);
-  let done=false;
-  const finish=save=>{
-    if(done)return;done=true;
-    const val=save?input.value.trim():old;
-    if(val&&val!==old){v.title=val;saveState();}
-    h1.textContent=v.title||old;
-    input.replaceWith(h1);
-    renderDock();
-  };
-  input.addEventListener('blur',()=>finish(true));
-  input.addEventListener('keydown',e=>{
-    if(e.key==='Enter'){e.preventDefault();input.blur();}
-    else if(e.key==='Escape'){e.preventDefault();finish(false);}
-  });
-});
 
-/* ---------- Init ---------- */
-(async function init(){
-  console.log('MiniApp v6.0');
-  applyTheme();applyAccent();renderDock();
-  try{await pullFromBackend();}catch(e){}
+(function init(){
+  applyTheme();applyAccent();
+  if(!state.views.find(v=>v.id===currentViewId)){
+    currentViewId=state.views[0].id;
+  }
+  renderDock();
   switchView(currentViewId);
   updateBack();
+  pullFromBackend().then(()=>renderContent());
 })();
 </script>
 </body>
