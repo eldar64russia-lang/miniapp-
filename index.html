@@ -27,11 +27,12 @@ font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif;
 font-size:15px;line-height:1.35;min-height:100vh;overscroll-behavior-y:contain;
 transition:background .2s,color .2s}
 .day-card,.task-row,.task-text,.icon-btn,.mini-btn,.dock-item,.swatch,.btn,.checkbox,
-.cell-task-text,.day-name,.num-value,.cell-checkbox,.drag-handle-h,.edit-tool-btn,.cal-day,.cal-nav{
+.cell-task-text,.day-name,.num-value,.cell-checkbox,.drag-handle-w,.drag-handle-h,
+.edit-tool-btn,.cal-day,.cal-nav{
 -webkit-user-select:none;user-select:none;-webkit-user-drag:none}
 mark{background:rgba(255,214,10,.5);color:inherit;padding:0;border-radius:2px}
 [data-theme=dark] mark{background:rgba(255,214,10,.35)}
-.app{max-width:720px;margin:0 auto;padding:12px 16px calc(160px + env(safe-area-inset-bottom));
+.app{max-width:720px;margin:0 auto;padding:12px 16px calc(170px + env(safe-area-inset-bottom));
 padding-top:calc(12px + env(safe-area-inset-top))}
 .app-header{display:flex;align-items:center;justify-content:space-between;gap:12px;
 margin-bottom:14px;min-height:44px}
@@ -69,15 +70,15 @@ border:1px solid var(--border);background:var(--bg-2);color:var(--text-dim);
 font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;flex:none}
 .col-nav button.active{background:var(--accent);color:#fff;border-color:var(--accent)}
 
-/* ЖЕЛЕЗОБЕТОННАЯ СЕТКА: columnCount × rowsPerColumn, без перестановок */
+/* GRID С colSpan: каждая карточка имеет grid-row/grid-column заданный из JS */
 .columns-container{display:grid;gap:10px;overflow-x:auto;padding-bottom:12px;
-align-items:stretch;scrollbar-width:thin;-webkit-overflow-scrolling:touch}
+align-items:start;scrollbar-width:thin;-webkit-overflow-scrolling:touch}
 .day-card{box-sizing:border-box;min-width:0;
 background:var(--card-bg);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
 border-radius:var(--radius);padding:12px 14px;display:flex;flex-direction:column;gap:8px;
 cursor:pointer;box-shadow:var(--shadow-sm);position:relative;overflow:visible;
 transition:box-shadow .15s;align-self:stretch}
-body.edit-mode .day-card{padding-right:32px}
+body.edit-mode .day-card{padding-right:38px}
 .day-card::before{content:'';position:absolute;top:12px;left:0;bottom:12px;width:3px;
 background:var(--card-color,var(--accent));border-radius:0 2px 2px 0}
 .day-card:active{box-shadow:var(--shadow-md)}
@@ -114,13 +115,17 @@ border-color:var(--cb-color,var(--accent))}
 .cell-checkbox::before{content:'';position:absolute;inset:-10px}
 .cell-empty{font-size:11px;color:var(--text-dim);padding:4px 0;font-style:italic}
 
-.drag-handle-h { display: none; position: absolute; z-index: 100;
-  background: var(--accent); color: #fff; border: 2px solid #fff;
-  box-shadow: 0 2px 8px rgba(0,0,0,.3); cursor: ns-resize;
-  font-weight: 700; font-size: 14px; line-height: 1;
-  align-items: center; justify-content: center; touch-action: none;
-  right: 2px; bottom: 2px; width: 26px; height: 26px; border-radius: 13px; }
-body.edit-mode .drag-handle-h { display: flex; }
+/* Ручки resize */
+.drag-handle-w, .drag-handle-h { display:none; position:absolute; z-index:100;
+  background:var(--accent); color:#fff; border:2px solid #fff;
+  box-shadow:0 2px 8px rgba(0,0,0,.3); cursor:pointer;
+  font-weight:700; line-height:1; align-items:center; justify-content:center;
+  touch-action:none; }
+body.edit-mode .drag-handle-w, body.edit-mode .drag-handle-h { display:flex; }
+.drag-handle-w { right:2px; top:50%; transform:translateY(-50%);
+  width:26px; height:52px; border-radius:13px; cursor:ew-resize; font-size:18px; }
+.drag-handle-h { right:2px; bottom:2px; width:26px; height:26px;
+  border-radius:13px; cursor:ns-resize; font-size:14px; }
 
 .empty{text-align:center;color:var(--text-dim);padding:40px 20px;font-size:14px;margin:0;width:100%}
 .dock{position:fixed;bottom:calc(12px + env(safe-area-inset-bottom));left:50%;
@@ -170,6 +175,9 @@ body.edit-mode .edit-toolbar { display: flex; }
 .edit-tool-btn:active { opacity: .7; }
 .edit-tool-btn:disabled { opacity: .35; cursor: not-allowed; }
 .edit-tool-btn.undo { background: rgba(255,149,0,.15); color: #ff9500; }
+.edit-tool-btn.apply-module { background: var(--accent); color: #fff; }
+.edit-tool-btn.apply-column { background: rgba(0,122,255,.15); color: var(--accent); }
+.edit-toolbar-sep { width: 1px; height: 24px; background: var(--border); flex: none; }
 
 .modal{position:fixed;inset:0;background:rgba(0,0,0,.4);display:none;
 align-items:flex-end;justify-content:center;z-index:200;
@@ -254,11 +262,10 @@ padding:8px 0 16px;border-bottom:1px solid var(--border);margin-bottom:12px}
 min-height:44px;cursor:pointer;font-size:15px}
 .check-row input{width:22px;height:22px;accent-color:var(--accent);cursor:pointer}
 
-/* Переключатель режима уведомлений */
 .notify-mode-tabs{display:flex;gap:6px;flex-wrap:wrap}
-.notify-mode-tabs button{flex:1;min-width:120px;min-height:42px;padding:0 10px;
+.notify-mode-tabs button{flex:1 1 calc(50% - 6px);min-width:100px;min-height:42px;padding:0 8px;
 border:2px solid var(--border);background:var(--bg-3);color:var(--text);
-border-radius:12px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;
+border-radius:12px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;
 transition:all .15s}
 .notify-mode-tabs button.active{border-color:var(--accent);background:var(--accent-soft);color:var(--accent)}
 
@@ -268,9 +275,7 @@ background:var(--bg-3);color:var(--text-dim);border-radius:12px;font-size:13px;
 font-weight:600;cursor:pointer;font-family:inherit;flex:1}
 .day-select button.on{background:var(--accent);color:#fff;border-color:var(--accent)}
 
-/* Календарь */
-.cal-header{display:flex;align-items:center;justify-content:space-between;
-margin-bottom:10px}
+.cal-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
 .cal-nav{width:40px;height:40px;border:1px solid var(--border);background:var(--bg-3);
 color:var(--text);border-radius:12px;font-size:15px;cursor:pointer;font-family:inherit}
 .cal-nav:active{background:var(--accent-soft);color:var(--accent)}
@@ -283,9 +288,7 @@ font-family:inherit;padding:0;display:flex;align-items:center;justify-content:ce
 .cal-day:hover{background:var(--bg-3)}
 .cal-day.cal-today{border-color:var(--accent-soft);color:var(--accent);font-weight:700}
 .cal-day.cal-selected{background:var(--accent);color:#fff;border-color:var(--accent);font-weight:700}
-.cal-day.cal-selected.cal-today{background:var(--accent);color:#fff}
 
-/* Список ячеек для применения уведомления */
 .cell-pick-list{display:flex;flex-direction:column;gap:6px;max-height:32vh;overflow-y:auto;
 padding:4px;background:var(--bg-3);border-radius:12px}
 .cell-pick-item{display:flex;align-items:center;gap:10px;padding:8px 12px;
@@ -302,6 +305,10 @@ color:#fff;font-size:12px;flex:none}
 background:var(--bg-3);color:var(--text);border-radius:10px;font-size:13px;
 font-weight:600;cursor:pointer;font-family:inherit}
 
+.smart-preview{font-size:12px;color:var(--text-dim);padding:10px 12px;
+background:var(--bg-3);border-radius:12px;line-height:1.5;margin-top:8px}
+.smart-preview.ok{background:var(--accent-soft);color:var(--accent)}
+
 .preset-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
 .preset-tile{padding:16px 12px;border:2px solid var(--border);background:var(--bg-3);
 color:var(--text);border-radius:var(--radius-sm);font-size:14px;font-weight:600;
@@ -314,7 +321,7 @@ align-items:center;gap:6px;min-height:80px;justify-content:center}
 .link-btn{background:transparent;border:none;color:var(--accent);font-size:13px;
 font-family:inherit;cursor:pointer;padding:8px 0;text-align:center;width:100%;font-weight:600}
 .link-btn:active{opacity:.6}
-.toast{position:fixed;bottom:calc(150px + env(safe-area-inset-bottom));left:50%;
+.toast{position:fixed;bottom:calc(160px + env(safe-area-inset-bottom));left:50%;
 transform:translate(-50%,20px);background:rgba(0,0,0,.9);color:#fff;padding:12px 20px;
 border-radius:20px;font-size:13px;font-weight:500;opacity:0;pointer-events:none;
 transition:opacity .2s,transform .2s;z-index:400;max-width:90vw;text-align:center;line-height:1.4}
@@ -353,6 +360,9 @@ margin-top:20px;padding-top:12px;border-top:1px solid var(--border)}
 
 <div class="edit-toolbar" id="editToolbar">
   <button class="edit-tool-btn undo" id="undoBtn" disabled>↶ Отменить</button>
+  <div class="edit-toolbar-sep"></div>
+  <button class="edit-tool-btn apply-module" id="applyModuleBtn" disabled>Всему модулю</button>
+  <button class="edit-tool-btn apply-column" id="applyColumnBtn" disabled>Столбцу</button>
 </div>
 
 <div class="modal" id="settingsModal"><div class="modal-card">
@@ -367,7 +377,7 @@ margin-top:20px;padding-top:12px;border-top:1px solid var(--border)}
 </div>
 <div id="moduleDelete"></div>
 <button class="btn primary" data-close style="margin-top:16px">Готово</button>
-<div class="version-tag">Версия 19.0</div>
+<div class="version-tag">Версия 20.0</div>
 </div></div>
 
 <div class="modal" id="cellModal"><div class="modal-card">
@@ -458,6 +468,7 @@ margin-top:20px;padding-top:12px;border-top:1px solid var(--border)}
       <button data-mode="daily">Каждый день</button>
       <button data-mode="weekly">По дням недели</button>
       <button data-mode="monthly">Каждый месяц</button>
+      <button data-mode="smart" style="flex-basis:100%">✨ Умный (даты из названий)</button>
     </div>
   </div>
   <div id="notifyModeContent"></div>
@@ -497,11 +508,11 @@ const tg = window.Telegram?.WebApp;
 if (tg) { tg.ready(); tg.expand();
   if (typeof tg.disableVerticalSwipes === 'function') { try { tg.disableVerticalSwipes(); } catch(e){} } }
 document.addEventListener('contextmenu', e => e.preventDefault());
-console.log('%cMiniApp v19.0','background:#007aff;color:#fff;padding:4px 8px;border-radius:4px;font-weight:bold');
+console.log('%cMiniApp v20.0','background:#007aff;color:#fff;padding:4px 8px;border-radius:4px;font-weight:bold');
 
 const BOT_API = '';
-const STORAGE_KEY = 'miniapp-constructor-v19';
-const OLD_STORAGE_KEYS = ['miniapp-constructor-v18','miniapp-constructor-v17','miniapp-constructor-v16'];
+const STORAGE_KEY = 'miniapp-constructor-v20';
+const OLD_STORAGE_KEYS = ['miniapp-constructor-v19','miniapp-constructor-v18','miniapp-constructor-v17'];
 const CARD_PALETTE = ['#5ac8fa','#af52de','#ff2d55','#ff9500','#34c759','#30b0c7','#5856d6','#ffcc00'];
 const ACCENT_PALETTE = ['#007aff','#5856d6','#af52de','#ff2d55','#ff9500','#34c759','#30b0c7','#8e8e93'];
 const DAY_NAMES = ['Пн','Вт','Ср','Чт','Пт','Сб','Вс'];
@@ -527,11 +538,11 @@ function makeId(p='id'){return p+'_'+Date.now().toString(36)+Math.random().toStr
 function makeTask(text){return {id:makeId('t'),text,done:false};}
 function makeNotify(){
   return {enabled:false,mode:'once',date:null,time:'08:00',days:[],monthDay:null,
-    hourBefore:false,dayBefore:false};
+    hourBefore:false,dayBefore:false,smartFallback:'skip'};
 }
-function makeCell(name,idx,days){
+function makeCell(name,idx){
   return {id:makeId('c'),name:name||'',color:CARD_PALETTE[idx%8],
-    height:DEFAULT_HEIGHT,tasks:[],notify:makeNotify()};
+    colSpan:1,height:DEFAULT_HEIGHT,tasks:[],notify:makeNotify()};
 }
 function hexToRgba(hex,alpha){
   let h=String(hex||'').replace('#','');
@@ -564,16 +575,40 @@ function isTodayCell(cell){
   return false;
 }
 
+function extractDateFromName(name){
+  if(!name)return null;
+  const m=name.match(/(\d{1,2})[.\-\/](\d{1,2})(?:[.\-\/](\d{2,4}))?/);
+  if(!m)return null;
+  const day=parseInt(m[1]);
+  const month=parseInt(m[2])-1;
+  let year;
+  if(m[3]){
+    year=m[3].length===2?2000+parseInt(m[3]):parseInt(m[3]);
+  } else {
+    const today=new Date();
+    year=today.getFullYear();
+    const testDate=new Date(year,month,day);
+    if(testDate<today&&(today-testDate)>86400000*30){
+      year++;
+    }
+  }
+  if(day<1||day>31||month<0||month>11)return null;
+  const testDate=new Date(year,month,day);
+  if(testDate.getMonth()!==month)return null;
+  return {day,month,year,dateStr:`${year}-${pad(month+1)}-${pad(day)}`};
+}
+
 function migrateNotify(n){
   const out=makeNotify();
   if(!n)return out;
   out.enabled=!!n.enabled;
   out.time=n.time||'08:00';
-  if(n.mode&&['once','daily','weekly','monthly'].includes(n.mode))out.mode=n.mode;
+  if(n.mode&&['once','daily','weekly','monthly','smart'].includes(n.mode))out.mode=n.mode;
   if(n.date)out.date=n.date;
   if(n.monthDay)out.monthDay=n.monthDay;
   if(typeof n.hourBefore==='boolean')out.hourBefore=n.hourBefore;
   if(typeof n.dayBefore==='boolean')out.dayBefore=n.dayBefore;
+  if(n.smartFallback)out.smartFallback=n.smartFallback;
   if(Array.isArray(n.days)&&n.days.length>0){
     out.days=n.days.slice();
     if(!n.mode)out.mode='weekly';
@@ -590,7 +625,11 @@ function migrateView(view){
   if(typeof view.columnCount!=='number')view.columnCount=DEFAULT_COLUMNS;
   if(!Array.isArray(view.cells))view.cells=[];
   view.cells.forEach(c=>{
-    delete c.colSpan; delete c.widthMultiplier;
+    if(typeof c.colSpan!=='number'){
+      c.colSpan=typeof c.widthMultiplier==='number'?Math.round(c.widthMultiplier):1;
+    }
+    delete c.widthMultiplier;
+    if(typeof c.colSpan!=='number')c.colSpan=1;
     if(typeof c.height!=='number')c.height=DEFAULT_HEIGHT;
     c.notify=migrateNotify(c.notify);
   });
@@ -599,7 +638,7 @@ function migrateView(view){
   }
   const target=view.columnCount*view.rowsPerColumn;
   if(view.cells.length<target){
-    while(view.cells.length<target)view.cells.push(makeCell('',view.cells.length,[]));
+    while(view.cells.length<target)view.cells.push(makeCell('',view.cells.length));
   } else if(view.cells.length>target){
     view.cells=view.cells.slice(0,target);
   }
@@ -607,7 +646,7 @@ function migrateView(view){
 }
 
 function makeDefaultView(){
-  const cells=DAY_NAMES.map((n,i)=>makeCell(n,i,[i]));
+  const cells=DAY_NAMES.map((n,i)=>makeCell(n,i));
   return {id:'v_planner',type:'planner',title:'Планировщик',icon:'📅',removable:false,
     columnCount:DEFAULT_COLUMNS,rowsPerColumn:1,cells,filter:'all'};
 }
@@ -646,21 +685,18 @@ let confirmCallback=null;
 let editMode=false;
 let selectedPreset='week';
 let lastResizedCellId=null;
-let lastResizedField=null;
-let pendingNotifyTarget=null;   // {type: 'module'|'cell', cellIds: []}
+let pendingNotifyTarget=null;
 let pendingNotifyData=null;
-let calViewDate=null;
+let cellLayouts=[]; // [{cell, row, col, span}]
 
-const undoStack=[];
-const UNDO_LIMIT=20;
+const undoStack=[]; const UNDO_LIMIT=20;
 function pushUndo(){
   undoStack.push(JSON.stringify(state));
   if(undoStack.length>UNDO_LIMIT)undoStack.shift();
   updateUndoBtn();
 }
 function updateUndoBtn(){
-  const btn=$('#undoBtn'); if(!btn)return;
-  btn.disabled=undoStack.length===0;
+  const b=$('#undoBtn'); if(!b)return; b.disabled=undoStack.length===0;
 }
 function doUndo(){
   if(!undoStack.length)return;
@@ -778,7 +814,6 @@ function renderDock(){
   dock.appendChild(addBtn);
   updateDockSize(); requestAnimationFrame(updateDockSize);
 }
-
 function updateTodayInfo(){
   const el=$('#todayInfo'); if(!el)return;
   el.textContent='Сегодня — '+formatDateFull(new Date());
@@ -800,12 +835,50 @@ function scrollToToday(view){
     const card=grid.querySelector(`[data-cell-id="${cell.id}"]`);
     if(!card)continue;
     const rect=card.getBoundingClientRect();
-    if(rect.top<20||rect.bottom>window.innerHeight-160){
+    if(rect.top<20||rect.bottom>window.innerHeight-170){
       card.scrollIntoView({behavior:'smooth',block:'center'});
     }
     return;
   }
 }
+
+function computeLayout(cells,physicalCols){
+  const occupied=new Set();
+  const result=[];
+  const isFree=(r,c,span)=>{
+    if(c+span>physicalCols)return false;
+    for(let i=c;i<c+span;i++)if(occupied.has(r+','+i))return false;
+    return true;
+  };
+  const mark=(r,c,span)=>{
+    for(let i=c;i<c+span;i++)occupied.add(r+','+i);
+  };
+  for(const cell of cells){
+    const span=Math.min(Math.max(1,cell.colSpan||1),physicalCols);
+    let placed=false;
+    for(let r=0;r<10000&&!placed;r++){
+      for(let c=0;c+span<=physicalCols;c++){
+        if(isFree(r,c,span)){
+          result.push({cell,row:r,col:c,span});
+          mark(r,c,span);
+          placed=true;
+          break;
+        }
+      }
+    }
+  }
+  return result;
+}
+
+function physicalColumns(view){
+  let maxSpan=1;
+  for(const c of view.cells){
+    const s=c.colSpan||1;
+    if(s>maxSpan)maxSpan=s;
+  }
+  return Math.max(view.columnCount, view.columnCount + (maxSpan-1));
+}
+
 function renderContent(){
   const c=$('#content'); c.innerHTML='';
   const v=state.views.find(x=>x.id===currentViewId);
@@ -813,12 +886,19 @@ function renderContent(){
   renderPlanner(c,v);
   document.body.classList.toggle('edit-mode',editMode);
   $('#editBtn').classList.toggle('active',editMode);
+  updateApplyButtons();
+}
+
+function updateApplyButtons(){
+  const hasLast=lastResizedCellId!==null;
+  const am=$('#applyModuleBtn'); if(am)am.disabled=!hasLast;
+  const ac=$('#applyColumnBtn'); if(ac)ac.disabled=!hasLast;
 }
 
 function renderPlanner(root,view){
   const hintText = editMode
-    ? '✏️ <b>↕</b> снизу — высота. Тащи карточку — переставить.'
-    : 'Тап на имя — переименовать. Тап на поле — задачи. 🔔 — уведомления. ✏️ — режим правки.';
+    ? '✏️ <b>↔</b> справа — ширина. <b>↕</b> снизу — высота. После изменения — «Всему модулю» / «Столбцу».'
+    : 'Тап на имя — переименовать. Тап на поле — задачи. 🔔 — уведомления. ✏️ — правка.';
   root.innerHTML=`
     <div class="filters" id="plannerFilters"></div>
     <div class="col-nav" id="colNav"></div>
@@ -861,9 +941,11 @@ function renderColNav(view){
   }
 }
 function scrollToColumn(idx){
-  const c=$('#columnsContainer'); if(!c)return;
-  const colW = (c.scrollWidth + 10) / Math.max(1,currentViewColumnCount());
-  c.scrollTo({left:colW*idx,behavior:'smooth'});
+  const container=$('#columnsContainer'); if(!container)return;
+  const totalScroll=container.scrollWidth-container.clientWidth;
+  if(totalScroll<=0)return;
+  const perCol=totalScroll/Math.max(1,currentViewColumnCount()-1);
+  container.scrollTo({left:perCol*idx,behavior:'smooth'});
 }
 function currentViewColumnCount(){
   const v=state.views.find(x=>x.id===currentViewId);
@@ -873,8 +955,8 @@ function currentViewColumnCount(){
 function renderGrid(view){
   const container=$('#columnsContainer'); if(!container)return;
   container.innerHTML='';
-  const N=Math.max(1,view.columnCount);
-  container.style.gridTemplateColumns=`repeat(${N}, minmax(80px, 1fr))`;
+  const physical=physicalColumns(view);
+  container.style.gridTemplateColumns=`repeat(${physical}, minmax(60px, 1fr))`;
   const words=getSearchWords();
   const visible=view.cells.filter(cell=>{
     const mq=matchCell(cell,words);
@@ -886,8 +968,12 @@ function renderGrid(view){
     container.innerHTML='<p class="empty">Нет подходящих</p>';
     return;
   }
-  visible.forEach(cell=>{
-    container.appendChild(buildCellCard(view,cell,words));
+  cellLayouts=computeLayout(visible,physical);
+  cellLayouts.forEach(({cell,row,col,span})=>{
+    const card=buildCellCard(view,cell,words);
+    card.style.gridRow=(row+1)+' / span 1';
+    card.style.gridColumn=(col+1)+' / span '+span;
+    container.appendChild(card);
   });
 }
 
@@ -896,6 +982,7 @@ function notifyHasSettings(n){
   if(n.mode==='once')return !!n.date;
   if(n.mode==='weekly')return n.days&&n.days.length>0;
   if(n.mode==='monthly')return !!n.monthDay;
+  if(n.mode==='smart')return true;
   return true;
 }
 
@@ -927,8 +1014,8 @@ function buildCellCard(view,cell,words){
         </div>
       `).join(''):'<div class="cell-empty">Нажмите, чтобы добавить задачи</div>'}
     </div>
+    <div class="drag-handle-w" data-width title="Ширина">↔</div>
     <div class="drag-handle-h" data-resize title="Высота">↕</div>`;
-
   card.querySelector('[data-name]').addEventListener('click',e=>{
     e.stopPropagation();
     const el=e.currentTarget;
@@ -940,8 +1027,7 @@ function buildCellCard(view,cell,words){
     });
   });
   card.querySelector('[data-notify]').addEventListener('click',e=>{
-    e.stopPropagation();
-    openNotifyForCell(cell);
+    e.stopPropagation(); openNotifyForCell(cell);
   });
   card.querySelector('[data-settings]').addEventListener('click',e=>{
     e.stopPropagation(); openCellModal(cell);
@@ -966,11 +1052,11 @@ function buildCellCard(view,cell,words){
   card.addEventListener('click',e=>{
     if(editMode)return;
     if(suppressClick){suppressClick=false; return;}
-    if(e.target.closest('[data-name],[data-settings],[data-notify],[data-toggle],[data-text],[data-resize]'))return;
+    if(e.target.closest('[data-name],[data-settings],[data-notify],[data-toggle],[data-text],[data-resize],[data-width]'))return;
     openTasksModal(cell);
   });
   card.addEventListener('pointerdown',e=>{
-    if(e.target.closest('[data-name],[data-settings],[data-notify],[data-toggle],[data-text],[data-resize]'))return;
+    if(e.target.closest('[data-name],[data-settings],[data-notify],[data-toggle],[data-text],[data-resize],[data-width]'))return;
     if(e.button&&e.button!==0)return;
     if(editMode){startDrag(card,cell,view);}
     else{longPressTimer=setTimeout(()=>startDrag(card,cell,view),LONG_PRESS_MS);}
@@ -984,18 +1070,22 @@ function buildCellCard(view,cell,words){
     e.stopPropagation(); e.preventDefault();
     startHeightResize(e,card,cell,view);
   });
+  card.querySelector('[data-width]').addEventListener('pointerdown',e=>{
+    if(e.button&&e.button!==0)return;
+    e.stopPropagation(); e.preventDefault();
+    startWidthResize(e,card,cell,view);
+  });
   return card;
 }
 
 function startHeightResize(e,card,cell,view){
   pushUndo();
-  const startY=e.clientY;
-  const startHeight=cell.height||DEFAULT_HEIGHT;
+  const startY=e.clientY; const startH=cell.height||DEFAULT_HEIGHT;
   haptic();
   const move=ev=>{
     if(ev.cancelable)ev.preventDefault();
     const dy=ev.clientY-startY;
-    cell.height=Math.max(MIN_HEIGHT,Math.min(MAX_HEIGHT,startHeight+dy));
+    cell.height=Math.max(MIN_HEIGHT,Math.min(MAX_HEIGHT,startH+dy));
     card.style.minHeight=cell.height+'px';
     card.style.maxHeight=cell.height+'px';
   };
@@ -1004,11 +1094,83 @@ function startHeightResize(e,card,cell,view){
     document.removeEventListener('pointerup',up);
     document.removeEventListener('pointercancel',up);
     saveState(); haptic('medium');
-    lastResizedCellId=cell.id; lastResizedField='height';
+    lastResizedCellId=cell.id;
+    updateApplyButtons();
   };
   document.addEventListener('pointermove',move,{passive:false});
   document.addEventListener('pointerup',up);
   document.addEventListener('pointercancel',up);
+}
+
+function startWidthResize(e,card,cell,view){
+  pushUndo();
+  const startX=e.clientX;
+  const startSpan=cell.colSpan||1;
+  const container=card.parentElement;
+  if(!container)return;
+  const containerW=container.getBoundingClientRect().width;
+  const physStart=physicalColumns(view);
+  const baseCellWidth=containerW/Math.max(1,physStart);
+  haptic();
+  let lastSpan=startSpan;
+  const move=ev=>{
+    if(ev.cancelable)ev.preventDefault();
+    const dx=ev.clientX-startX;
+    const delta=Math.round(dx/baseCellWidth);
+    let newSpan=startSpan+delta;
+    newSpan=Math.max(1,Math.min(view.columnCount,newSpan));
+    if(newSpan!==lastSpan){
+      lastSpan=newSpan;
+      cell.colSpan=newSpan;
+      const newPhys=physicalColumns(view);
+      container.style.gridTemplateColumns=`repeat(${newPhys}, minmax(60px, 1fr))`;
+      renderGrid(view);
+    }
+  };
+  const up=()=>{
+    document.removeEventListener('pointermove',move);
+    document.removeEventListener('pointerup',up);
+    document.removeEventListener('pointercancel',up);
+    saveState(); haptic('medium');
+    lastResizedCellId=cell.id;
+    renderContent();
+    updateApplyButtons();
+    toast('Ширина: '+cell.colSpan+' столбцов');
+  };
+  document.addEventListener('pointermove',move,{passive:false});
+  document.addEventListener('pointerup',up);
+  document.addEventListener('pointercancel',up);
+}
+
+function applySizeToAllModule(){
+  if(!lastResizedCellId)return;
+  const v=state.views.find(x=>x.id===currentViewId); if(!v)return;
+  const src=v.cells.find(c=>c.id===lastResizedCellId); if(!src)return;
+  pushUndo();
+  v.cells.forEach(c=>{
+    c.colSpan=src.colSpan;
+    c.height=src.height;
+  });
+  saveState(); renderContent(); haptic('medium');
+  toast('Применено ко всему модулю ('+v.cells.length+' ячеек)');
+}
+function applySizeToColumn(){
+  if(!lastResizedCellId)return;
+  const v=state.views.find(x=>x.id===currentViewId); if(!v)return;
+  const src=v.cells.find(c=>c.id===lastResizedCellId); if(!src)return;
+  const srcIdx=v.cells.indexOf(src);
+  const baseCol=srcIdx % v.columnCount;
+  pushUndo();
+  let count=0;
+  v.cells.forEach((c,i)=>{
+    if(i%v.columnCount===baseCol){
+      c.colSpan=src.colSpan;
+      c.height=src.height;
+      count++;
+    }
+  });
+  saveState(); renderContent(); haptic('medium');
+  toast('Применено к базовому столбцу '+(baseCol+1)+' ('+count+' ячеек)');
 }
 
 function refreshCard(card,cell,view){
@@ -1182,6 +1344,7 @@ function describeNotify(n){
   else if(n.mode==='weekly'&&n.days?.length){
     parts.push('Дни: '+n.days.map(i=>DAY_NAMES[i]).join(', '));
   } else if(n.mode==='monthly'&&n.monthDay){ parts.push('Каждое '+n.monthDay+' число'); }
+  else if(n.mode==='smart'){ parts.push('✨ Умный (даты из названий)'); }
   parts.push('в '+n.time);
   if(n.hourBefore)parts.push('· за час');
   if(n.dayBefore)parts.push('· за день');
@@ -1256,9 +1419,8 @@ function renderSettings(){
         <button class="counter-btn" id="cellsPlus">+</button>
       </div>
       <div class="setting-hint">
-        <b>Пример:</b> 7 столбцов × 10 ячеек = 70 ячеек, страница скроллится.
-        <br><b>Пример:</b> 2 столбца × 5 = 10 ячеек. 3 столбца × 3 = 9 ячеек.
-        <br><b>Пример:</b> 31 столбец × 1 = 31 ячейка (календарь месяц).
+        7 столбцов × 10 ячеек = 70 ячеек, страница скроллится.
+        <br>2 столбца × 5 = 10 ячеек. 3 столбца × 3 = 9 ячеек.
       </div>
     </div>
     <div class="setting-block">
@@ -1285,24 +1447,21 @@ function renderSettings(){
   $('#colsPlus').addEventListener('click',()=>setColumnsCount(v,v.columnCount+1));
   $('#colsValue').addEventListener('click',()=>{
     const n=prompt('Сколько столбцов?',v.columnCount);
-    if(n===null)return;
-    const num=parseInt(n); if(isNaN(num)||num<1)return;
+    if(n===null)return; const num=parseInt(n); if(isNaN(num)||num<1)return;
     setColumnsCount(v,num);
   });
   $('#rowsMinus').addEventListener('click',()=>setRowsCount(v,rows-1));
   $('#rowsPlus').addEventListener('click',()=>setRowsCount(v,rows+1));
   $('#rowsValue').addEventListener('click',()=>{
     const n=prompt('Сколько ячеек в столбце?',rows);
-    if(n===null)return;
-    const num=parseInt(n); if(isNaN(num)||num<1)return;
+    if(n===null)return; const num=parseInt(n); if(isNaN(num)||num<1)return;
     setRowsCount(v,num);
   });
   $('#cellsMinus').addEventListener('click',()=>setTotalCells(v,v.cells.length-1));
   $('#cellsPlus').addEventListener('click',()=>setTotalCells(v,v.cells.length+1));
   $('#cellsValue').addEventListener('click',()=>{
     const n=prompt('Сколько всего ячеек?',v.cells.length);
-    if(n===null)return;
-    const num=parseInt(n); if(isNaN(num)||num<1)return;
+    if(n===null)return; const num=parseInt(n); if(isNaN(num)||num<1)return;
     setTotalCells(v,num);
   });
   $('#resetModuleBtn').addEventListener('click',()=>{
@@ -1326,6 +1485,8 @@ function setTotalCells(v,newCount){
   resizeCellsTo(v,newCount);
   if(v.columnCount>v.cells.length)v.columnCount=Math.max(1,v.cells.length);
   v.rowsPerColumn=Math.max(1,Math.ceil(v.cells.length/v.columnCount));
+  const target=v.columnCount*v.rowsPerColumn;
+  resizeCellsTo(v,target);
   saveState(); renderContent(); renderSettings();
 }
 function setColumnsCount(v,newCols){
@@ -1334,6 +1495,8 @@ function setColumnsCount(v,newCols){
   if(newCols>v.cells.length)newCols=Math.max(1,v.cells.length);
   v.columnCount=newCols;
   v.rowsPerColumn=Math.max(1,Math.ceil(v.cells.length/v.columnCount));
+  const target=v.columnCount*v.rowsPerColumn;
+  resizeCellsTo(v,target);
   saveState(); renderContent(); renderSettings();
 }
 function setRowsCount(v,newRows){
@@ -1347,7 +1510,7 @@ function setRowsCount(v,newRows){
 function resizeCellsTo(v,target){
   if(target<1)target=1;
   if(target<v.cells.length){v.cells=v.cells.slice(0,target);}
-  else{while(v.cells.length<target)v.cells.push(makeCell('',v.cells.length,[]));}
+  else{while(v.cells.length<target)v.cells.push(makeCell('',v.cells.length));}
 }
 
 function askConfirm(text,action){$('#confirmText').textContent=text; confirmCallback=action; openModal($('#confirmModal'));}
@@ -1355,7 +1518,6 @@ function openSearch(){$('#searchOverlay').classList.add('open'); setTimeout(()=>
 function closeSearch(){$('#searchOverlay').classList.remove('open');
   $('#globalSearch').value=''; if(searchQuery){searchQuery=''; renderContent();}}
 
-/* ================= NOTIFICATIONS ================= */
 function openNotifyForModule(){
   const v=state.views.find(x=>x.id===currentViewId); if(!v)return;
   pendingNotifyTarget={type:'module',cellIds:new Set(v.cells.map(c=>c.id))};
@@ -1392,7 +1554,8 @@ function renderNotifyModeContent(n){
     block.innerHTML=`<div class="setting-label">Дата</div><div id="calContainer"></div>`;
     wrap.appendChild(block);
     renderCalendar($('#calContainer'),n.date,dateStr=>{
-      n.date=dateStr; renderCalendar($('#calContainer'),dateStr,dateStr2=>{n.date=dateStr2; renderNotifyModeContent(n);});
+      n.date=dateStr;
+      renderCalendar($('#calContainer'),dateStr,dateStr2=>{n.date=dateStr2;});
     });
   } else if(n.mode==='weekly'){
     const block=document.createElement('div'); block.className='setting-block';
@@ -1419,7 +1582,44 @@ function renderNotifyModeContent(n){
     $('#notifyMonthDay').addEventListener('input',e=>{
       const v=parseInt(e.target.value); if(!isNaN(v)&&v>=1&&v<=31)n.monthDay=v;
     });
+  } else if(n.mode==='smart'){
+    const block=document.createElement('div'); block.className='setting-block';
+    block.innerHTML=`
+      <div class="setting-label">✨ Умный режим</div>
+      <div style="font-size:13px;color:var(--text-dim);line-height:1.5;margin-bottom:10px">
+        Дата берётся из названия каждой ячейки: «01.11», «Пн 10.11», «15.11.2025».
+        Идеально для календарей месяца и недели с датами.
+      </div>
+      <div class="setting-label">Если дата не найдена</div>
+      <div class="notify-mode-tabs" id="smartFallbackTabs">
+        <button data-fallback="skip" style="flex-basis:100%">Пропустить ячейку</button>
+        <button data-fallback="today" style="flex-basis:100%">Поставить на сегодня</button>
+      </div>
+      <div id="smartPreview" class="smart-preview"></div>`;
+    wrap.appendChild(block);
+    $$('#smartFallbackTabs button').forEach(b=>{
+      b.classList.toggle('active',(n.smartFallback||'skip')===b.dataset.fallback);
+      b.addEventListener('click',()=>{
+        n.smartFallback=b.dataset.fallback;
+        $$('#smartFallbackTabs button').forEach(x=>x.classList.toggle('active',x===b));
+        updateSmartPreview(n);
+      });
+    });
+    updateSmartPreview(n);
   }
+}
+function updateSmartPreview(n){
+  const el=$('#smartPreview'); if(!el)return;
+  if(!pendingNotifyTarget)return;
+  const v=state.views.find(x=>x.id===currentViewId); if(!v)return;
+  let withDate=0,withoutDate=0;
+  v.cells.forEach(cell=>{
+    if(!pendingNotifyTarget.cellIds.has(cell.id))return;
+    if(extractDateFromName(cell.name))withDate++; else withoutDate++;
+  });
+  el.className='smart-preview'+(withDate?' ok':'');
+  el.innerHTML=`Найдено <b>${withDate}</b> дат из <b>${withDate+withoutDate}</b> выбранных ячеек.`+
+    (withoutDate?`<br>Без даты: ${withoutDate} ${n.smartFallback==='today'?'→ сегодня':'(пропущены)'}.`:'');
 }
 function renderNotifyCellList(v){
   const list=$('#notifyCellList'); list.innerHTML='';
@@ -1434,12 +1634,13 @@ function renderNotifyCellList(v){
       else checked.add(cell.id);
       btn.classList.toggle('checked',checked.has(cell.id));
       btn.querySelector('.cell-pick-check').textContent=checked.has(cell.id)?'✓':'';
+      if(pendingNotifyData)updateSmartPreview(pendingNotifyData);
     });
     list.appendChild(btn);
   });
 }
 function renderCalendar(container,selectedDate,onPick){
-  let viewDate=selectedDate?new Date(selectedDate):new Date();
+  let viewDate=selectedDate?new Date(selectedDate+'T00:00:00'):new Date();
   viewDate.setDate(1);
   function build(selected){
     const year=viewDate.getFullYear();
@@ -1505,6 +1706,7 @@ $('#pickAllCells').addEventListener('click',()=>{
   const v=state.views.find(x=>x.id===currentViewId); if(!v||!pendingNotifyTarget)return;
   v.cells.forEach(c=>pendingNotifyTarget.cellIds.add(c.id));
   renderNotifyCellList(v);
+  if(pendingNotifyData)updateSmartPreview(pendingNotifyData);
 });
 $('#pickNoneCells').addEventListener('click',()=>{
   const v=state.views.find(x=>x.id===currentViewId); if(!v||!pendingNotifyTarget)return;
@@ -1515,10 +1717,27 @@ $('#notifyApplyBtn').addEventListener('click',()=>{
   if(!pendingNotifyTarget||!pendingNotifyData)return;
   pushUndo();
   const v=state.views.find(x=>x.id===currentViewId); if(!v)return;
-  let count=0;
+  let count=0, skipped=0;
   v.cells.forEach(cell=>{
-    if(pendingNotifyTarget.cellIds.has(cell.id)){
-      cell.notify=JSON.parse(JSON.stringify(pendingNotifyData));
+    if(!pendingNotifyTarget.cellIds.has(cell.id))return;
+    const n=JSON.parse(JSON.stringify(pendingNotifyData));
+    if(n.mode==='smart'){
+      const d=extractDateFromName(cell.name);
+      if(d){
+        n.mode='once';
+        n.date=d.dateStr;
+        cell.notify=n;
+        count++;
+      } else if(n.smartFallback==='today'){
+        n.mode='once';
+        n.date=dateToStr(new Date());
+        cell.notify=n;
+        count++;
+      } else {
+        skipped++;
+      }
+    } else {
+      cell.notify=n;
       count++;
     }
   });
@@ -1526,18 +1745,20 @@ $('#notifyApplyBtn').addEventListener('click',()=>{
   if($('#cellModal').classList.contains('open'))updateCellNotifyStatus(getCurrentCell());
   closeModal($('#notifyModal'));
   haptic('medium');
-  toast('Уведомления применены к '+count+' ячейк'+(count===1?'е':'ам'));
+  let msg='Уведомления применены к '+count+' ячейк'+(count===1?'е':'ам');
+  if(skipped)msg+=' · пропущено '+skipped;
+  toast(msg);
 });
 
 function generatePresetCells(preset){
-  if(preset==='empty')return DAY_NAMES.slice(0,5).map((n,i)=>makeCell(n,i,[i]));
-  if(preset==='week')return DAY_NAMES.map((n,i)=>makeCell(n,i,[i]));
+  if(preset==='empty')return DAY_NAMES.slice(0,5).map((n,i)=>makeCell(n,i));
+  if(preset==='week')return DAY_NAMES.map((n,i)=>makeCell(n,i));
   if(preset==='week-dates'){
     const cells=[]; const today=new Date(); const dow=(today.getDay()+6)%7;
     const monday=new Date(today); monday.setDate(today.getDate()-dow);
     for(let i=0;i<7;i++){
       const d=new Date(monday); d.setDate(monday.getDate()+i);
-      cells.push(makeCell(DAY_NAMES[i]+' '+formatDate(d),i,[i]));
+      cells.push(makeCell(DAY_NAMES[i]+' '+formatDate(d),i));
     }
     return cells;
   }
@@ -1545,12 +1766,12 @@ function generatePresetCells(preset){
     const cells=[]; const now=new Date(); const year=now.getFullYear(); const month=now.getMonth();
     const daysInMonth=new Date(year,month+1,0).getDate();
     for(let i=1;i<=daysInMonth;i++){
-      const d=new Date(year,month,i); const dayIdx=(d.getDay()+6)%7;
-      cells.push(makeCell(formatDate(d),i-1,[dayIdx]));
+      const d=new Date(year,month,i);
+      cells.push(makeCell(formatDate(d),i-1));
     }
     return cells;
   }
-  return DAY_NAMES.map((n,i)=>makeCell(n,i,[i]));
+  return DAY_NAMES.map((n,i)=>makeCell(n,i));
 }
 
 function createView(){
@@ -1561,7 +1782,7 @@ function createView(){
   const columnCount=DEFAULT_COLUMNS;
   const rowsPerColumn=Math.max(1,Math.ceil(cells.length/columnCount));
   const target=columnCount*rowsPerColumn;
-  while(cells.length<target)cells.push(makeCell('',cells.length,[]));
+  while(cells.length<target)cells.push(makeCell('',cells.length));
   const newView={id:makeId('v'),type:'planner',title:name,icon,removable:true,
     filter:'all',columnCount,rowsPerColumn,cells};
   state.views.push(newView); saveState();
@@ -1582,9 +1803,11 @@ $('#editBtn').addEventListener('click',()=>{
   document.body.classList.toggle('edit-mode',editMode);
   $('#editBtn').classList.toggle('active',editMode);
   renderContent();
-  if(editMode)toast('✏️ Тяни ↕ для высоты. Тащи карточку для переноса.');
+  if(editMode)toast('✏️ ↔ ширина. ↕ высота. Потом «Всему модулю» / «Столбцу».');
 });
 $('#undoBtn').addEventListener('click',doUndo);
+$('#applyModuleBtn').addEventListener('click',applySizeToAllModule);
+$('#applyColumnBtn').addEventListener('click',applySizeToColumn);
 $('#settingsBtn').addEventListener('click',()=>{renderSettings(); openModal($('#settingsModal'));});
 $('#settingsModal').addEventListener('click',e=>{
   const t=e.target.closest('[data-theme-set]');
@@ -1635,7 +1858,6 @@ $('#confirmYes').addEventListener('click',()=>{
     if(v){
       pushUndo();
       v.cells=generatePresetCells('week');
-      while(v.cells.length<DEFAULT_COLUMNS)v.cells.push(makeCell('',v.cells.length,[]));
       v.columnCount=DEFAULT_COLUMNS;
       v.rowsPerColumn=1;
       saveState(); renderContent();
@@ -1646,7 +1868,7 @@ $('#confirmYes').addEventListener('click',()=>{
     const v=state.views.find(x=>x.id===currentViewId); if(!v)return;
     pushUndo();
     v.cells=v.cells.filter(c=>c.id!==id);
-    if(!v.cells.length)v.cells=[makeCell('',0,[])];
+    if(!v.cells.length)v.cells=[makeCell('',0)];
     v.rowsPerColumn=Math.max(1,Math.ceil(v.cells.length/v.columnCount));
     saveState(); closeModal($('#cellModal')); renderContent();
   }
