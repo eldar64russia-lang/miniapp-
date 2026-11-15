@@ -7,1382 +7,987 @@
 <title>Конструктор</title>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <style>
-:root{--bg:#f5f5f7;--bg-2:#fff;--bg-3:#ececf0;--text:#1d1d1f;--text-dim:#86868b;
---text-muted:#c7c7cc;--border:#e0e0e5;--accent:#007aff;--accent-soft:rgba(0,122,255,.12);
---shadow-sm:0 1px 3px rgba(0,0,0,.06);--shadow-md:0 4px 12px rgba(0,0,0,.08);
---shadow-lg:0 10px 30px rgba(0,0,0,.12);
---radius-sm:16px;--radius:24px;--radius-lg:30px;
---tap:44px;--gap:10px;
---dock-bg:rgba(255,255,255,.72);--dock-border:rgba(0,0,0,.06);
---card-bg:rgba(255,255,255,.82);--badge-bg:rgba(0,0,0,.06);--badge-color:#555;
---sheet-bg:rgba(255,255,255,.92);--sheet-border:rgba(0,0,0,.08)}
-[data-theme=dark]{--bg:#1c1c1e;--bg-2:#2c2c2e;--bg-3:#3a3a3c;--text:#f5f5f7;--text-dim:#98989d;
---text-muted:#48484a;--border:#38383a;--accent:#0a84ff;--accent-soft:rgba(10,132,255,.18);
---shadow-sm:0 1px 3px rgba(0,0,0,.2);--shadow-md:0 4px 12px rgba(0,0,0,.3);
---shadow-lg:0 10px 30px rgba(0,0,0,.4);
---dock-bg:rgba(44,44,46,.72);--dock-border:rgba(255,255,255,.08);
---card-bg:rgba(44,44,46,.82);--badge-bg:rgba(255,255,255,.1);--badge-color:#b0b0b8;
---sheet-bg:rgba(44,44,46,.92);--sheet-border:rgba(255,255,255,.1)}
+:root{
+--bg:#f5f5f7;--bg2:#fff;--bg3:#ececf0;--text:#1d1d1f;--dim:#86868b;--muted:#c7c7cc;
+--border:#e0e0e5;--accent:#007aff;--soft:rgba(0,122,255,.12);
+--sh1:0 1px 3px rgba(0,0,0,.06);--sh2:0 4px 12px rgba(0,0,0,.08);
+--sh3:0 10px 30px rgba(0,0,0,.12);
+--r-sm:12px;--r:16px;--r-lg:24px;
+--sheet:rgba(255,255,255,.94);--dock-bg:rgba(255,255,255,.85);
+--card:rgba(255,255,255,.85);--badge:rgba(0,0,0,.06);--badge-t:#555;
+}
+[data-theme="dark"]{
+--bg:#1c1c1e;--bg2:#2c2c2e;--bg3:#3a3a3c;--text:#f5f5f7;--dim:#98989d;--muted:#48484a;
+--border:#38383a;--accent:#0a84ff;--soft:rgba(10,132,255,.2);
+--sh1:0 1px 3px rgba(0,0,0,.2);--sh2:0 4px 12px rgba(0,0,0,.3);--sh3:0 10px 30px rgba(0,0,0,.4);
+--sheet:rgba(44,44,46,.95);--dock-bg:rgba(44,44,46,.9);
+--card:rgba(44,44,46,.85);--badge:rgba(255,255,255,.1);--badge-t:#b0b0b8;
+}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;-webkit-touch-callout:none}
 html,body{margin:0;padding:0;background:var(--bg);color:var(--text);
 font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif;
-font-size:15px;line-height:1.35;min-height:100vh;overscroll-behavior-y:contain;
-transition:background .2s,color .2s}
-.day-card,.task-row,.task-text,.icon-btn,.mini-btn,.dock-item,.swatch,.btn,.checkbox,
-.cell-task-text,.day-name,.num-value,.cell-checkbox,.drag-handle-w,.drag-handle-h,
-.edit-tool-btn,.cal-day,.cal-nav,.date-badge,.search-result{
--webkit-user-select:none;user-select:none;-webkit-user-drag:none}
-mark{background:rgba(255,214,10,.5);color:inherit;padding:0;border-radius:2px}
-[data-theme=dark] mark{background:rgba(255,214,10,.35)}
-.app{max-width:720px;margin:0 auto;padding:12px 16px calc(170px + env(safe-area-inset-bottom));
+font-size:15px;line-height:1.35;min-height:100vh;overscroll-behavior-y:contain}
+.app{max-width:720px;margin:0 auto;padding:12px 14px calc(140px + env(safe-area-inset-bottom));
 padding-top:calc(12px + env(safe-area-inset-top))}
-.app-header{display:flex;align-items:center;justify-content:space-between;gap:12px;
-margin-bottom:14px;min-height:44px}
-.app-title-block{flex:1;min-width:0}
-.app-header h1{margin:0;font-size:26px;font-weight:700;letter-spacing:-.5px;
-white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:text}
-.today-info{font-size:11px;color:var(--text-dim);margin-top:2px;letter-spacing:.1px}
-.header-actions{display:flex;gap:8px;flex:none}
-.icon-btn{min-width:var(--tap);min-height:var(--tap);border:none;background:var(--bg-3);
-color:var(--text);border-radius:var(--radius-sm);font-size:18px;display:inline-flex;
-align-items:center;justify-content:center;cursor:pointer;padding:0;transition:background .15s}
-.icon-btn:active{background:var(--accent-soft);transform:scale(.94)}
-.icon-btn.active{background:var(--accent-soft);color:var(--accent)}
-.search-overlay{max-height:0;overflow:hidden;margin-bottom:0;transition:max-height .2s,margin-bottom .2s}
-.search-overlay.open{max-height:60px;margin-bottom:12px}
-.search-field{display:flex;align-items:center;gap:8px;background:var(--bg-2);
-border:1px solid var(--border);border-radius:var(--radius-sm);padding:0 12px;
-min-height:var(--tap);box-shadow:var(--shadow-sm)}
-.search-field input{flex:1;background:transparent;border:none;color:var(--text);
-font-size:15px;outline:none;padding:10px 0;font-family:inherit}
-.search-field input::-webkit-search-cancel-button{-webkit-appearance:none}
-.close-search{background:transparent;border:none;color:var(--text-dim);font-size:16px;
-cursor:pointer;padding:4px;min-width:32px;min-height:32px}
-.search-results{padding:0 0 20px}
-.search-section-title{font-size:12px;color:var(--text-dim);text-transform:uppercase;
-letter-spacing:.4px;font-weight:700;margin:14px 0 8px;padding:0 4px}
-.search-section-title:first-child{margin-top:0}
-.search-divider{height:1px;background:var(--border);margin:20px 0 4px;
-display:flex;align-items:center;justify-content:center;position:relative}
-.search-divider::after{content:'в других модулях';position:absolute;
-background:var(--bg);color:var(--text-dim);font-size:11px;padding:0 12px;font-weight:600}
-.search-result{display:flex;flex-direction:column;gap:4px;
-padding:12px 14px;background:var(--bg-2);border-radius:14px;
-border:1px solid var(--border);margin-bottom:8px;cursor:pointer;
-font-family:inherit;text-align:left;color:var(--text);width:100%;font-size:14px;
-box-shadow:var(--shadow-sm);transition:transform .1s}
-.search-result:active{transform:scale(.98)}
-.search-result-head{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--text-dim)}
-.search-result-head b{color:var(--text);font-weight:700}
-.search-result-body{font-size:14px;color:var(--text);line-height:1.4;
-overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.search-result-module{font-weight:600;color:var(--accent)}
-.filters{display:flex;gap:8px;overflow-x:auto;padding-bottom:8px;margin-bottom:6px;scrollbar-width:none}
-.filters::-webkit-scrollbar{display:none}
-.filters button{min-height:34px;padding:0 14px;border-radius:17px;border:none;
-background:var(--bg-3);color:var(--text-dim);font-size:13px;font-weight:500;
-white-space:nowrap;cursor:pointer;font-family:inherit}
-.filters button.active{background:var(--accent);color:#fff}
-.col-nav{display:flex;gap:6px;overflow-x:auto;padding-bottom:12px;margin-bottom:12px;
-border-bottom:1px solid var(--border);scrollbar-width:none}
-.col-nav::-webkit-scrollbar{display:none}
-.col-nav button{min-width:36px;height:36px;padding:0 10px;border-radius:10px;
-border:1px solid var(--border);background:var(--bg-2);color:var(--text-dim);
-font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;flex:none}
-.col-nav button.active{background:var(--accent);color:#fff;border-color:var(--accent)}
-.columns-container{display:grid;gap:10px;overflow-x:auto;padding-bottom:12px;
-align-items:start;scrollbar-width:thin;-webkit-overflow-scrolling:touch}
-.day-card{box-sizing:border-box;min-width:0;
-background:var(--card-bg);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
-border-radius:var(--radius);padding:10px 10px 10px 14px;
-display:flex;flex-direction:column;gap:4px;
-cursor:pointer;box-shadow:var(--shadow-sm);position:relative;overflow:visible;
-transition:box-shadow .15s;align-self:stretch}
-.day-card::before{content:'';position:absolute;top:10px;left:0;bottom:10px;width:3px;
-background:var(--card-color,var(--accent));border-radius:0 2px 2px 0}
-.day-card:active{box-shadow:var(--shadow-md)}
-.day-card.dragging{opacity:.45}
-.day-card.drag-target{box-shadow:0 0 0 2px var(--accent)}
-.day-card.is-today{box-shadow:0 0 0 1.5px var(--accent),var(--shadow-sm)}
-.day-card.is-today::before{width:5px;background:var(--accent)}
-.day-card.flash{animation:flash 2s ease}
-@keyframes flash{
-  0%{box-shadow:0 0 0 3px var(--accent),var(--shadow-md)}
-  50%{box-shadow:0 0 0 3px var(--accent),var(--shadow-md)}
-  100%{box-shadow:var(--shadow-sm)}
-}
-body.edit-mode .day-card{outline:2px dashed var(--border);outline-offset:-2px;cursor:grab;touch-action:none}
-.day-head{display:flex;align-items:center;justify-content:space-between;gap:6px;
-padding-left:4px;height:32px;min-height:32px;flex-wrap:nowrap;overflow:hidden}
-.day-head-left{flex:1;min-width:0;display:flex;align-items:center;gap:6px;overflow:hidden}
-.date-badge{display:inline-flex;align-items:center;justify-content:center;
-background:var(--badge-bg);color:var(--badge-color);
-font-size:11px;font-weight:700;letter-spacing:.2px;
-padding:3px 6px;border-radius:7px;flex:none;
-white-space:nowrap;line-height:1;min-height:20px}
-.date-badge.is-today-badge{background:var(--accent);color:#fff}
-.day-name{font-weight:700;font-size:14px;letter-spacing:-.2px;
-white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
-min-width:0;flex:1;line-height:1.15}
-.day-name.empty-name{color:var(--text-muted);font-weight:500;font-style:italic;font-size:13px}
-.day-actions{display:flex;gap:2px;flex:none;align-items:center}
-.mini-btn{position:relative;width:26px;height:26px;border:none;background:transparent;
-color:var(--text-dim);border-radius:8px;font-size:13px;display:inline-flex;
-align-items:center;justify-content:center;cursor:pointer;padding:0;font-family:inherit}
+.top{display:flex;align-items:center;gap:10px;margin-bottom:14px;min-height:44px}
+.title-block{flex:1;min-width:0}
+#title{margin:0;font-size:24px;font-weight:700;letter-spacing:-.4px;
+white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:pointer}
+.today{font-size:11px;color:var(--dim);margin-top:2px}
+.top-actions{display:flex;gap:6px;flex:none}
+.icon-btn{width:44px;height:44px;border:none;background:var(--bg3);color:var(--text);
+border-radius:var(--r-sm);font-size:17px;cursor:pointer;padding:0;
+display:inline-flex;align-items:center;justify-content:center;transition:background .15s}
+.icon-btn:active{background:var(--soft);transform:scale(.94)}
+.icon-btn.active{background:var(--soft);color:var(--accent)}
+
+/* === Сетка === */
+.grid-wrap{overflow-x:auto;padding-bottom:12px;scrollbar-width:none}
+.grid-wrap::-webkit-scrollbar{display:none}
+.grid{display:grid;gap:10px;align-items:start}
+.card{background:var(--card);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
+border-radius:var(--r);padding:10px 10px 10px 14px;box-shadow:var(--sh1);
+position:relative;cursor:pointer;overflow:hidden;display:flex;flex-direction:column;
+gap:5px;min-width:0;min-height:96px;transition:box-shadow .15s}
+.card::before{content:'';position:absolute;top:10px;left:0;bottom:10px;width:3px;
+background:var(--accent);border-radius:0 2px 2px 0}
+.card:active{box-shadow:var(--sh2)}
+.card.today{box-shadow:0 0 0 1.5px var(--accent),var(--sh1)}
+.card.today::before{width:5px}
+.card.flash{animation:flash 1.8s ease}
+@keyframes flash{0%,60%{box-shadow:0 0 0 3px var(--accent),var(--sh2)}100%{box-shadow:var(--sh1)}}
+body.editing .card{outline:2px dashed var(--border);outline-offset:-2px;cursor:grab;touch-action:none}
+
+/* === Шапка карточки === */
+.card-head{display:flex;align-items:center;gap:6px;min-height:32px;max-height:32px;
+padding-left:4px;overflow:hidden;flex-wrap:nowrap}
+.badge{background:var(--badge);color:var(--badge-t);font-size:11px;font-weight:700;
+padding:3px 6px;border-radius:6px;flex:none;line-height:1;white-space:nowrap}
+.badge.is-today{background:var(--accent);color:#fff}
+.cell-name{font-weight:700;font-size:14px;flex:1;min-width:0;white-space:nowrap;
+overflow:hidden;text-overflow:ellipsis;line-height:1.2}
+.cell-name.empty{color:var(--muted);font-weight:500;font-style:italic;font-size:13px}
+.card-actions{display:flex;gap:2px;flex:none;align-items:center}
+.mini-btn{width:26px;height:26px;border:none;background:transparent;color:var(--dim);
+border-radius:6px;font-size:13px;cursor:pointer;padding:0;position:relative;
+display:inline-flex;align-items:center;justify-content:center}
 .mini-btn::before{content:'';position:absolute;inset:-9px}
-.mini-btn:active{background:var(--accent-soft);color:var(--accent)}
-.mini-btn.bell-on{color:var(--accent);opacity:1}
-.mini-btn.bell-on::after{content:'';position:absolute;top:3px;right:3px;
-width:6px;height:6px;background:var(--accent);border-radius:50%}
-.cell-tasks{display:flex;flex-direction:column;gap:2px;padding:4px 6px;border-radius:12px;
-overflow-y:auto;overflow-x:hidden;flex:1;min-height:0;-webkit-overflow-scrolling:touch}
-.cell-task{display:flex;align-items:flex-start;gap:6px;padding:2px 0;
-font-size:12px;line-height:1.3;min-width:0}
-.cell-task-text{flex:1;min-width:0;cursor:text;
-white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding:1px 0}
-.cell-task-text.done{text-decoration:line-through;opacity:.55;color:var(--text-dim)}
-.cell-checkbox{width:16px;height:16px;min-width:16px;border-radius:50%;
-border:1.5px solid var(--text-muted);background:transparent;cursor:pointer;padding:0;
-display:inline-flex;align-items:center;justify-content:center;position:relative;
-color:var(--cb-color,var(--accent));margin-top:1px}
-.cell-checkbox.checked{background:var(--cb-color,var(--accent));
-border-color:var(--cb-color,var(--accent))}
-.cell-checkbox svg{width:10px;height:10px;display:block}
-.cell-checkbox::before{content:'';position:absolute;inset:-10px}
-.cell-empty{font-size:11px;color:var(--text-dim);padding:4px 0;font-style:italic}
-.cell-count{font-size:13px;color:var(--text-dim);padding:6px 4px;font-weight:500}
-.drag-handle-w,.drag-handle-h{display:none;position:absolute;z-index:100;
-background:var(--accent);color:#fff;border:2px solid #fff;
-box-shadow:0 2px 8px rgba(0,0,0,.3);cursor:pointer;font-weight:700;line-height:1;
-align-items:center;justify-content:center;touch-action:none}
-body.edit-mode .drag-handle-w,body.edit-mode .drag-handle-h{display:flex}
-.drag-handle-w{right:2px;top:50%;transform:translateY(-50%);
-width:26px;height:52px;border-radius:13px;cursor:ew-resize;font-size:18px}
-.drag-handle-h{right:2px;bottom:2px;width:26px;height:26px;
-border-radius:13px;cursor:ns-resize;font-size:14px}
-.empty{text-align:center;color:var(--text-dim);padding:40px 20px;font-size:14px;margin:0;width:100%}
+.mini-btn:active{background:var(--soft);color:var(--accent)}
+.mini-btn.on{color:var(--accent)}
+.mini-btn.on::after{content:'';position:absolute;top:2px;right:2px;width:6px;height:6px;
+background:var(--accent);border-radius:50%}
+
+/* === Задачи в карточке === */
+.cell-tasks{display:flex;flex-direction:column;gap:2px;padding:4px 6px;
+border-radius:10px;background:var(--soft);flex:1;min-height:0;overflow-y:auto}
+.ctask{display:flex;align-items:flex-start;gap:6px;padding:1px 0;font-size:12px;
+line-height:1.3;min-width:0}
+.ctask-cb{width:15px;height:15px;min-width:15px;border-radius:50%;
+border:1.5px solid var(--muted);background:transparent;cursor:pointer;padding:0;
+position:relative;display:flex;align-items:center;justify-content:center;
+color:var(--accent);margin-top:1px}
+.ctask-cb.checked{background:var(--accent);border-color:var(--accent)}
+.ctask-cb::before{content:'';position:absolute;inset:-10px}
+.ctask-cb svg{width:9px;height:9px;display:block}
+.ctask-text{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:text}
+.ctask-text.done{text-decoration:line-through;opacity:.55}
+.empty-tasks{font-size:11px;color:var(--dim);font-style:italic;padding:4px 0}
+.count-tasks{font-size:13px;color:var(--dim);font-weight:500;padding:6px 4px}
+
+/* === Resize-ручки === */
+.resize-w,.resize-h{display:none;position:absolute;background:var(--accent);
+color:#fff;border:2px solid #fff;box-shadow:0 2px 8px rgba(0,0,0,.3);cursor:pointer;
+font-weight:700;font-size:14px;line-height:1;align-items:center;justify-content:center;
+touch-action:none;z-index:20}
+body.editing .resize-w,body.editing .resize-h{display:flex}
+.resize-w{right:2px;top:50%;transform:translateY(-50%);width:24px;height:48px;
+border-radius:12px;cursor:ew-resize;font-size:16px}
+.resize-h{right:2px;bottom:2px;width:24px;height:24px;border-radius:12px;cursor:ns-resize}
+
+/* === Dock === */
 .dock{position:fixed;bottom:calc(12px + env(safe-area-inset-bottom));left:50%;
 transform:translateX(-50%);background:var(--dock-bg);
-backdrop-filter:blur(20px) saturate(180%);-webkit-backdrop-filter:blur(20px) saturate(180%);
-border:1px solid var(--dock-border);border-radius:var(--radius-lg);
-padding:8px;display:flex;gap:6px;align-items:center;flex-wrap:nowrap;
-box-shadow:var(--shadow-lg);z-index:100}
-.dock-scroll{display:flex;gap:6px;overflow-x:auto;overflow-y:hidden;
-flex:0 1 auto;scrollbar-width:none;-webkit-overflow-scrolling:touch}
-.dock-scroll::-webkit-scrollbar{display:none}
-.dock-item{width:56px;height:56px;border:none;background:transparent;border-radius:20px;
-cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:24px;
-flex:0 0 56px;position:relative;padding:0}
-.dock-item:active{transform:scale(.92)}
-.dock-item.active{background:var(--accent-soft)}
-.dock-item.active::after{content:'';position:absolute;bottom:4px;left:50%;
+backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+border:1px solid var(--border);border-radius:var(--r-lg);
+padding:8px;display:flex;gap:6px;align-items:center;box-shadow:var(--sh3);
+z-index:100;max-width:calc(100vw - 24px);overflow-x:auto;scrollbar-width:none}
+.dock::-webkit-scrollbar{display:none}
+.dock-btn{width:52px;height:52px;border:none;background:transparent;
+border-radius:16px;font-size:22px;cursor:pointer;padding:0;flex:none;
+display:flex;align-items:center;justify-content:center;position:relative}
+.dock-btn.active{background:var(--soft)}
+.dock-btn.active::after{content:'';position:absolute;bottom:3px;left:50%;
 transform:translateX(-50%);width:4px;height:4px;background:var(--accent);border-radius:50%}
-.dock-item.dock-deletable{cursor:grab}
+.dock-btn.add{border:2px dashed var(--border);color:var(--dim);font-size:24px}
 .dock-delete{position:absolute;top:-4px;right:-4px;width:22px;height:22px;
-border-radius:11px;background:#ff3b30;color:#fff;border:2px solid var(--bg-2);
-font-size:12px;font-weight:700;cursor:pointer;display:none;
-align-items:center;justify-content:center;padding:0;z-index:2;
-font-family:inherit;box-shadow:0 2px 6px rgba(0,0,0,.3)}
-body.edit-mode .dock-delete{display:flex}
-.dock-delete:active{opacity:.7}
-.dock-add{width:56px;height:56px;border:2px dashed var(--border);background:transparent;
-color:var(--text-dim);border-radius:20px;font-size:26px;cursor:pointer;flex:0 0 56px;
-display:flex;align-items:center;justify-content:center}
-.dock-add:active{background:var(--accent-soft);color:var(--accent);border-color:var(--accent)}
-.edit-toolbar{display:none;position:fixed;
-bottom:calc(88px + env(safe-area-inset-bottom));left:50%;transform:translateX(-50%);
-background:var(--bg-2);border:1px solid var(--border);
-border-radius:var(--radius-lg);padding:6px;gap:6px;align-items:center;
-box-shadow:var(--shadow-lg);z-index:99;
-max-width:calc(100vw - 20px);flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none}
-.edit-toolbar::-webkit-scrollbar{display:none}
-body.edit-mode .edit-toolbar{display:flex}
-.edit-tool-btn{min-height:42px;padding:0 14px;border:none;border-radius:14px;
-background:var(--bg-3);color:var(--text);font-size:13px;font-weight:600;cursor:pointer;
-font-family:inherit;display:inline-flex;align-items:center;justify-content:center;
-gap:6px;white-space:nowrap;flex:none;transition:background .15s,opacity .15s}
-.edit-tool-btn:active{opacity:.7}
-.edit-tool-btn:disabled{opacity:.35;cursor:not-allowed}
-.edit-tool-btn.undo{background:rgba(255,149,0,.15);color:#ff9500}
-.edit-tool-btn.apply-module{background:var(--accent);color:#fff}
-.edit-tool-btn.apply-column{background:rgba(0,122,255,.15);color:var(--accent)}
-.edit-toolbar-sep{width:1px;height:24px;background:var(--border);flex:none}
+border-radius:11px;background:#ff3b30;color:#fff;border:2px solid var(--bg);
+font-size:11px;font-weight:700;cursor:pointer;padding:0;z-index:2;
+display:none;align-items:center;justify-content:center;font-family:inherit;
+box-shadow:0 2px 6px rgba(0,0,0,.3)}
+body.editing .dock-delete{display:flex}
+
+/* === Edit toolbar === */
+.edit-bar{display:none;position:fixed;bottom:calc(80px + env(safe-area-inset-bottom));
+left:50%;transform:translateX(-50%);background:var(--bg2);border:1px solid var(--border);
+border-radius:var(--r-lg);padding:6px;gap:6px;align-items:center;
+box-shadow:var(--sh3);z-index:99;max-width:calc(100vw - 20px);
+overflow-x:auto;scrollbar-width:none}
+.edit-bar::-webkit-scrollbar{display:none}
+body.editing .edit-bar{display:flex}
+.edit-bar-btn{min-height:42px;padding:0 12px;border:none;border-radius:12px;
+background:var(--bg3);color:var(--text);font-size:13px;font-weight:600;
+cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;
+justify-content:center;gap:5px;white-space:nowrap;flex:none}
+.edit-bar-btn:active{opacity:.7}
+.edit-bar-btn:disabled{opacity:.35;cursor:not-allowed}
+.edit-bar-btn.undo{background:rgba(255,149,0,.15);color:#ff9500}
+.edit-bar-btn.apply{background:var(--accent);color:#fff}
+.edit-bar-btn.apply-col{background:var(--soft);color:var(--accent)}
+
+/* === Модалки === */
 .modal{position:fixed;inset:0;background:rgba(0,0,0,.35);display:none;
 align-items:flex-end;justify-content:center;z-index:200;
 backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px)}
 .modal.open{display:flex}
-.modal-card{background:var(--sheet-bg);
-backdrop-filter:blur(30px) saturate(200%);-webkit-backdrop-filter:blur(30px) saturate(200%);
-border-radius:var(--radius-lg) var(--radius-lg) 0 0;
-border:1px solid var(--sheet-border);border-bottom:none;
-padding:18px 18px 20px;width:100%;max-width:500px;
-padding-bottom:calc(20px + env(safe-area-inset-bottom));
-max-height:90vh;display:flex;flex-direction:column;overflow-y:auto;
-animation:up .22s cubic-bezier(.2,.9,.3,1.1)}
+.sheet{background:var(--sheet);backdrop-filter:blur(30px) saturate(180%);
+-webkit-backdrop-filter:blur(30px) saturate(180%);
+border-radius:var(--r-lg) var(--r-lg) 0 0;border:1px solid var(--border);border-bottom:none;
+padding:18px 18px calc(20px + env(safe-area-inset-bottom));width:100%;max-width:520px;
+max-height:92vh;display:flex;flex-direction:column;overflow-y:auto;gap:10px;
+animation:up .2s cubic-bezier(.2,.9,.3,1.1)}
 @keyframes up{from{transform:translateY(24px);opacity:.4}to{transform:translateY(0);opacity:1}}
-.modal h2{margin:0 0 16px;font-size:20px;font-weight:700;letter-spacing:-.4px}
-.modal-head{display:flex;align-items:center;justify-content:space-between;
-margin-bottom:14px;gap:12px}
-.modal-head h2{margin:0;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.modal-head-actions{display:flex;gap:4px;flex:none}
-.tasks-head-title{display:flex;flex-direction:column;gap:2px;flex:1;min-width:0}
-.tasks-head-title .tasks-title-main{font-size:18px;font-weight:700;letter-spacing:-.3px;
-overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.tasks-head-title .tasks-title-sub{font-size:12px;color:var(--text-dim);
-overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.tasks-list-new{display:flex;flex-direction:column;gap:6px;margin-bottom:14px;
-max-height:50vh;overflow-y:auto;overscroll-behavior:contain}
-.task-item{display:flex;align-items:center;gap:10px;
-background:var(--bg-3);border-radius:14px;padding:8px 10px;min-height:52px}
-.task-item .checkbox{width:28px;height:28px;min-width:28px}
-.task-item .task-text{flex:1;font-size:15px;padding:0;cursor:text;
-word-break:break-word;line-height:1.35}
-.task-item .task-text.done{text-decoration:line-through;opacity:.55;color:var(--text-dim)}
-.task-add-row{display:flex;gap:8px;align-items:center;
-background:var(--bg-3);border-radius:14px;padding:4px 4px 4px 14px;min-height:52px;
-border:1px solid transparent;transition:border-color .15s}
-.task-add-row:focus-within{border-color:var(--accent)}
-.task-add-row input{flex:1;background:transparent;border:none;color:var(--text);
-font-size:15px;font-family:inherit;outline:none;padding:10px 0;min-width:0}
-.task-add-btn{width:44px;height:44px;border:none;border-radius:12px;
-background:var(--accent);color:#fff;font-size:22px;font-weight:400;
-cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center;
-flex:none;padding:0}
-.task-add-btn:active{opacity:.8}
-.swatches{display:grid;grid-template-columns:repeat(8,1fr);gap:8px;margin-bottom:14px}
-@media (max-width:340px){.swatches{grid-template-columns:repeat(4,1fr)}}
-.swatch{aspect-ratio:1;border:none;border-radius:50%;cursor:pointer;padding:0;position:relative}
-.swatch:active{transform:scale(.88)}
-.swatch.active{box-shadow:0 0 0 2px var(--bg-2),0 0 0 4px currentColor}
-.color-row{display:flex;align-items:center;gap:10px;margin-bottom:14px}
-.color-input{width:44px;height:44px;border:2px solid var(--border);border-radius:14px;
-cursor:pointer;padding:0;background:transparent;overflow:hidden}
-.color-input::-webkit-color-swatch-wrapper{padding:2px}
-.color-input::-webkit-color-swatch{border:none;border-radius:10px}
-.setting-block{padding:12px 0;border-bottom:1px solid var(--border)}
-.setting-block:last-of-type{border-bottom:none}
-.setting-label{font-size:12px;color:var(--text-dim);text-transform:uppercase;
-letter-spacing:.4px;font-weight:600;margin-bottom:10px}
-.setting-hint{font-size:11px;color:var(--text-dim);margin-top:8px;line-height:1.5}
-.total-display{font-size:14px;color:var(--text);padding:12px 14px;font-weight:500;
-background:var(--accent-soft);border-radius:12px;margin-bottom:14px;text-align:center;line-height:1.5}
-.total-display b{color:var(--accent);font-weight:800;font-size:16px}
-.grid-counter-label{font-size:13px;color:var(--text);margin-bottom:8px;margin-top:16px;
-font-weight:700;display:flex;align-items:center;gap:6px}
-.grid-counter-label span{font-size:11px;color:var(--text-dim);font-weight:400}
-.counter-row{display:flex;align-items:center;gap:12px;padding:4px 0}
-.counter-btn{width:48px;height:48px;border:1px solid var(--border);background:var(--bg-3);
-color:var(--text);border-radius:14px;font-size:24px;font-weight:700;cursor:pointer;
-font-family:inherit;display:flex;align-items:center;justify-content:center;padding:0}
-.counter-btn:active{background:var(--accent-soft);color:var(--accent);border-color:var(--accent)}
-.num-value{flex:1;text-align:center;font-size:24px;font-weight:800;
-padding:10px;border-radius:14px;background:var(--bg-3);cursor:pointer;
-min-height:48px;display:flex;align-items:center;justify-content:center}
-.num-value:active{background:var(--accent-soft);color:var(--accent)}
-.btn{width:100%;min-height:50px;border:none;background:var(--bg-3);color:var(--text);
-border-radius:14px;font-size:16px;font-weight:600;cursor:pointer;font-family:inherit}
+.sheet-head{display:flex;align-items:center;justify-content:space-between;
+gap:10px;margin-bottom:4px}
+.sheet-title{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+.sheet-title h2{margin:0;font-size:19px;font-weight:700;letter-spacing:-.3px;
+white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sheet-title .sub{font-size:12px;color:var(--dim);
+white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sheet-actions{display:flex;gap:2px;flex:none}
+.sheet h2{margin:0;font-size:19px;font-weight:700;letter-spacing:-.3px}
+.field{display:flex;flex-direction:column;gap:6px}
+.field label{font-size:12px;color:var(--dim);text-transform:uppercase;
+letter-spacing:.3px;font-weight:600}
+.field input,.field select{width:100%;padding:12px 14px;border:1px solid var(--border);
+background:var(--bg3);color:var(--text);font-size:15px;font-family:inherit;
+border-radius:12px;outline:none;min-height:44px}
+.field input:focus,.field select:focus{border-color:var(--accent)}
+.row{display:flex;gap:8px;align-items:center}
+.row>*{flex:1}
+.btn{min-height:48px;padding:0 16px;border:none;border-radius:12px;
+background:var(--bg3);color:var(--text);font-size:15px;font-weight:600;
+cursor:pointer;font-family:inherit;width:100%}
 .btn.primary{background:var(--accent);color:#fff}
 .btn.danger{background:rgba(255,59,48,.12);color:#ff3b30}
 .btn:active{opacity:.8}
-.btn+.btn{margin-top:8px}
-.task-edit-input,.name-edit-input{flex:1;background:transparent;border:none;
-color:var(--text);font-size:15px;font-family:inherit;outline:none;padding:6px 0;
-border-bottom:2px solid var(--accent)}
-.name-edit-input{font-weight:700;font-size:14px}
-.checkbox{width:26px;height:26px;min-width:26px;border-radius:50%;
-border:2px solid var(--text-muted);background:transparent;cursor:pointer;padding:0;
-display:inline-flex;align-items:center;justify-content:center;position:relative;
-color:var(--cb-color,var(--accent))}
-.checkbox::before{content:'';position:absolute;inset:-9px}
-.checkbox svg{width:15px;height:15px;display:block}
-.checkbox.checked{background:var(--cb-color,var(--accent));border-color:var(--cb-color,var(--accent))}
-.add-row{display:flex;gap:8px}
-.add-row input,.modal-input{flex:1;background:var(--bg-3);border:1px solid var(--border);
-color:var(--text);font-size:15px;font-family:inherit;padding:12px 14px;
-border-radius:14px;min-height:var(--tap);outline:none;width:100%}
-.add-row input:focus,.modal-input:focus{border-color:var(--accent)}
-.modal-input{margin-bottom:10px}
-.toggle{width:51px;height:31px;border-radius:16px;background:var(--bg-3);border:none;
-cursor:pointer;position:relative;padding:0;transition:background .2s;flex:none}
+.btn.sm{min-height:36px;padding:0 12px;font-size:13px;width:auto}
+
+.swatches{display:grid;grid-template-columns:repeat(8,1fr);gap:8px}
+.swatch{aspect-ratio:1;border:none;border-radius:50%;cursor:pointer;padding:0}
+.swatch.active{box-shadow:0 0 0 2px var(--bg2),0 0 0 4px var(--accent)}
+.toggle{width:51px;height:31px;border-radius:16px;background:var(--bg3);
+border:none;cursor:pointer;position:relative;padding:0;flex:none}
 .toggle::after{content:'';position:absolute;top:2px;left:2px;width:27px;height:27px;
-border-radius:50%;background:#fff;box-shadow:0 2px 4px rgba(0,0,0,.2);transition:transform .2s}
+border-radius:50%;background:#fff;box-shadow:0 2px 4px rgba(0,0,0,.2);
+transition:transform .2s}
 .toggle.on{background:var(--accent)}
 .toggle.on::after{transform:translateX(20px)}
-.notify-toggle-row{display:flex;justify-content:space-between;align-items:center;
-padding:8px 0 16px;border-bottom:1px solid var(--border);margin-bottom:12px}
-.check-row{display:flex;align-items:center;gap:10px;padding:10px 0;
-min-height:44px;cursor:pointer;font-size:15px}
-.check-row input{width:22px;height:22px;accent-color:var(--accent);cursor:pointer}
-.notify-mode-tabs{display:flex;gap:6px;flex-wrap:wrap}
-.notify-mode-tabs button{flex:1 1 calc(50% - 6px);min-width:100px;min-height:42px;padding:0 8px;
-border:2px solid var(--border);background:var(--bg-3);color:var(--text);
-border-radius:12px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;
-transition:all .15s}
-.notify-mode-tabs button.active{border-color:var(--accent);background:var(--accent-soft);color:var(--accent)}
+
+/* Задачи в модалке */
+.tasks-list{display:flex;flex-direction:column;gap:6px;max-height:45vh;
+overflow-y:auto;margin-bottom:6px}
+.task-item{display:flex;align-items:center;gap:10px;padding:10px 12px;
+background:var(--bg3);border-radius:12px;min-height:52px}
+.task-item .cb{width:26px;height:26px;min-width:26px;border-radius:50%;
+border:2px solid var(--muted);background:transparent;cursor:pointer;padding:0;
+display:inline-flex;align-items:center;justify-content:center;color:var(--accent);flex:none}
+.task-item .cb.checked{background:var(--accent);border-color:var(--accent)}
+.task-item .cb svg{width:14px;height:14px}
+.task-item .txt{flex:1;font-size:15px;cursor:text;word-break:break-word;min-width:0}
+.task-item .txt.done{text-decoration:line-through;opacity:.55}
+.task-item .del{width:28px;height:28px;border:none;background:transparent;
+color:var(--dim);cursor:pointer;padding:0;border-radius:8px;font-size:14px;flex:none}
+.task-item .del:active{background:rgba(255,59,48,.15);color:#ff3b30}
+.add-task{display:flex;gap:8px;align-items:center;background:var(--bg3);
+border-radius:12px;padding:4px 4px 4px 14px;min-height:52px;border:1px solid transparent}
+.add-task:focus-within{border-color:var(--accent)}
+.add-task input{flex:1;background:transparent;border:none;color:var(--text);
+font-size:15px;font-family:inherit;outline:none;padding:10px 0;min-width:0}
+.add-task button{width:44px;height:44px;border:none;border-radius:10px;
+background:var(--accent);color:#fff;font-size:22px;cursor:pointer;flex:none;padding:0}
+
+/* Режимы уведомлений */
+.notify-modes{display:flex;gap:6px;flex-wrap:wrap}
+.notify-modes button{flex:1 1 calc(50% - 6px);min-width:110px;min-height:42px;
+padding:0 10px;border:2px solid var(--border);background:var(--bg3);
+color:var(--text);border-radius:12px;font-size:12px;font-weight:600;
+cursor:pointer;font-family:inherit}
+.notify-modes button.active{border-color:var(--accent);background:var(--soft);color:var(--accent)}
 .day-select{display:flex;gap:6px;flex-wrap:wrap}
-.day-select button{min-width:40px;min-height:40px;border:1px solid var(--border);
-background:var(--bg-3);color:var(--text-dim);border-radius:12px;font-size:13px;
-font-weight:600;cursor:pointer;font-family:inherit;flex:1}
+.day-select button{flex:1;min-width:38px;min-height:38px;border:1px solid var(--border);
+background:var(--bg3);color:var(--dim);border-radius:10px;font-size:13px;
+font-weight:600;cursor:pointer;font-family:inherit}
 .day-select button.on{background:var(--accent);color:#fff;border-color:var(--accent)}
-.cal-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
-.cal-nav{width:40px;height:40px;border:1px solid var(--border);background:var(--bg-3);
-color:var(--text);border-radius:12px;font-size:15px;cursor:pointer;font-family:inherit}
-.cal-nav:active{background:var(--accent-soft);color:var(--accent)}
-.cal-month{font-weight:700;font-size:16px;text-transform:capitalize}
-.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-bottom:14px}
-.cal-dow{text-align:center;font-size:11px;color:var(--text-dim);font-weight:600;padding:4px 0}
-.cal-day{aspect-ratio:1;min-height:36px;border:2px solid transparent;background:transparent;
-color:var(--text);border-radius:10px;font-size:14px;font-weight:500;cursor:pointer;
-font-family:inherit;padding:0;display:flex;align-items:center;justify-content:center}
-.cal-day:hover{background:var(--bg-3)}
-.cal-day.cal-today{border-color:var(--accent-soft);color:var(--accent);font-weight:700}
-.cal-day.cal-selected{background:var(--accent);color:#fff;border-color:var(--accent);font-weight:700}
-.cell-pick-list{display:flex;flex-direction:column;gap:6px;max-height:36vh;overflow-y:auto;
-padding:4px;background:var(--bg-3);border-radius:12px}
-.cell-pick-item{display:flex;align-items:center;gap:10px;padding:8px 12px;
+
+/* Календарь */
+.cal-head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px}
+.cal-head button{width:36px;height:36px;border:1px solid var(--border);
+background:var(--bg3);color:var(--text);border-radius:10px;cursor:pointer;
+font-size:14px;padding:0}
+.cal-title{font-weight:700;font-size:15px;text-transform:capitalize}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
+.cal-dow{text-align:center;font-size:11px;color:var(--dim);font-weight:600;padding:4px 0}
+.cal-day{aspect-ratio:1;min-height:34px;border:2px solid transparent;background:transparent;
+color:var(--text);border-radius:8px;font-size:14px;font-weight:500;
+cursor:pointer;padding:0;font-family:inherit;display:flex;
+align-items:center;justify-content:center}
+.cal-day:hover{background:var(--bg3)}
+.cal-day.today{border-color:var(--soft);color:var(--accent);font-weight:700}
+.cal-day.sel{background:var(--accent);color:#fff;border-color:var(--accent)}
+
+/* Список выбора ячеек */
+.pick-list{display:flex;flex-direction:column;gap:6px;max-height:36vh;
+overflow-y:auto;padding:4px;background:var(--bg3);border-radius:12px}
+.pick-item{display:flex;align-items:center;gap:10px;padding:8px 12px;
 border-radius:10px;cursor:pointer;font-size:14px;font-family:inherit;
-background:var(--bg-2);border:none;color:var(--text);text-align:left;min-height:44px}
-.cell-pick-item.checked{background:var(--accent-soft);color:var(--accent)}
-.cell-pick-check{width:22px;height:22px;min-width:22px;border-radius:50%;
-border:2px solid var(--text-muted);display:flex;align-items:center;justify-content:center;
-color:#fff;font-size:12px;flex:none}
-.cell-pick-item.checked .cell-pick-check{background:var(--accent);border-color:var(--accent)}
-.cell-pick-label{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.cell-pick-actions{display:flex;gap:8px;margin:8px 0}
-.cell-pick-actions button{flex:1;min-height:38px;border:1px solid var(--border);
-background:var(--bg-3);color:var(--text);border-radius:10px;font-size:13px;
+background:var(--bg2);border:none;color:var(--text);text-align:left;min-height:44px}
+.pick-item.checked{background:var(--soft);color:var(--accent)}
+.pick-cb{width:22px;height:22px;min-width:22px;border-radius:50%;
+border:2px solid var(--muted);display:flex;align-items:center;
+justify-content:center;color:#fff;font-size:12px;flex:none}
+.pick-item.checked .pick-cb{background:var(--accent);border-color:var(--accent)}
+.pick-label{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+/* Пресеты */
+.presets{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
+.preset{padding:14px 10px;border:2px solid var(--border);background:var(--bg3);
+color:var(--text);border-radius:12px;font-size:13px;font-weight:600;
+cursor:pointer;font-family:inherit;text-align:center;display:flex;
+flex-direction:column;align-items:center;gap:4px;min-height:70px;
+justify-content:center}
+.preset.active{border-color:var(--accent);background:var(--soft);color:var(--accent)}
+.preset-icon{font-size:22px;line-height:1}
+.preset-sub{font-size:11px;font-weight:500;opacity:.7}
+.date-choices{display:flex;gap:6px;flex-wrap:wrap}
+.date-choices button{flex:1;min-height:40px;border:2px solid var(--border);
+background:var(--bg3);color:var(--text);border-radius:10px;font-size:12px;
 font-weight:600;cursor:pointer;font-family:inherit}
-.smart-preview{font-size:12px;color:var(--text-dim);padding:10px 12px;
-background:var(--bg-3);border-radius:12px;line-height:1.5;margin-top:8px}
-.smart-preview.ok{background:var(--accent-soft);color:var(--accent)}
-.preset-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
-.preset-tile{padding:16px 12px;border:2px solid var(--border);background:var(--bg-3);
-color:var(--text);border-radius:14px;font-size:14px;font-weight:600;
-cursor:pointer;font-family:inherit;text-align:center;display:flex;flex-direction:column;
-align-items:center;gap:6px;min-height:80px;justify-content:center}
-.preset-tile.active{border-color:var(--accent);background:var(--accent-soft);color:var(--accent)}
-.preset-tile-icon{font-size:24px;line-height:1}
-.preset-tile-label{font-size:13px}
-.preset-tile-sub{font-size:11px;font-weight:500;opacity:.7}
-.date-select-row{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
-.date-select-row button{flex:1;min-height:42px;border:2px solid var(--border);
-background:var(--bg-3);color:var(--text);border-radius:12px;font-size:12px;
-font-weight:600;cursor:pointer;font-family:inherit}
-.date-select-row button.active{border-color:var(--accent);background:var(--accent-soft);color:var(--accent)}
-.link-btn{background:transparent;border:none;color:var(--accent);font-size:13px;
-font-family:inherit;cursor:pointer;padding:8px 0;text-align:center;width:100%;font-weight:600}
-.link-btn:active{opacity:.6}
-.toast{position:fixed;bottom:calc(160px + env(safe-area-inset-bottom));left:50%;
-transform:translate(-50%,20px);background:rgba(0,0,0,.9);color:#fff;padding:12px 20px;
-border-radius:20px;font-size:13px;font-weight:500;opacity:0;pointer-events:none;
-transition:opacity .2s,transform .2s;z-index:400;max-width:90vw;text-align:center;line-height:1.4}
+.date-choices button.active{border-color:var(--accent);background:var(--soft);color:var(--accent)}
+
+/* Инфо-блоки */
+.info{padding:10px 12px;background:var(--bg3);border-radius:10px;
+font-size:12px;color:var(--dim);line-height:1.5}
+.info.accent{background:var(--soft);color:var(--accent)}
+
+/* Settings блоки */
+.set-block{padding:12px 0;border-bottom:1px solid var(--border)}
+.set-block:last-child{border-bottom:none}
+.set-label{font-size:12px;color:var(--dim);text-transform:uppercase;
+letter-spacing:.3px;font-weight:600;margin-bottom:8px}
+.total{font-size:14px;padding:12px 14px;background:var(--soft);color:var(--text);
+border-radius:12px;text-align:center;line-height:1.5;margin-bottom:12px}
+.total b{color:var(--accent);font-weight:800;font-size:16px}
+.counter{display:flex;align-items:center;gap:10px;padding:4px 0}
+.counter button{width:44px;height:44px;border:1px solid var(--border);
+background:var(--bg3);color:var(--text);border-radius:12px;font-size:22px;
+font-weight:600;cursor:pointer;font-family:inherit;padding:0}
+.counter button:active{background:var(--soft);color:var(--accent)}
+.counter .val{flex:1;text-align:center;font-size:20px;font-weight:800;
+padding:8px;border-radius:12px;background:var(--bg3);cursor:pointer;
+min-height:44px;display:flex;align-items:center;justify-content:center}
+.label-sm{font-size:12px;color:var(--dim);margin-bottom:6px;margin-top:12px}
+
+/* Toast */
+.toast{position:fixed;bottom:calc(140px + env(safe-area-inset-bottom));
+left:50%;transform:translate(-50%,20px);background:rgba(0,0,0,.88);
+color:#fff;padding:11px 18px;border-radius:20px;font-size:13px;font-weight:500;
+opacity:0;pointer-events:none;transition:opacity .2s,transform .2s;
+z-index:400;max-width:90vw;text-align:center;line-height:1.4}
 .toast.show{opacity:1;transform:translate(-50%,0)}
-.hint{color:var(--text-dim);font-size:12px;margin:16px 0 0;text-align:center;line-height:1.5}
-.version-tag{text-align:center;color:var(--text-dim);font-size:11px;
-margin-top:20px;padding-top:12px;border-top:1px solid var(--border)}
+
+/* Поиск */
+.search-overlay{max-height:0;overflow:hidden;transition:max-height .2s,margin-bottom .2s;margin-bottom:0}
+.search-overlay.open{max-height:60px;margin-bottom:10px}
+.search-field{display:flex;align-items:center;gap:8px;background:var(--bg2);
+border:1px solid var(--border);border-radius:12px;padding:0 12px;
+min-height:44px;box-shadow:var(--sh1)}
+.search-field input{flex:1;background:transparent;border:none;color:var(--text);
+font-size:15px;outline:none;padding:10px 0;font-family:inherit}
+.search-field input::-webkit-search-cancel-button{-webkit-appearance:none}
+.search-field button{background:transparent;border:none;color:var(--dim);
+font-size:15px;cursor:pointer;padding:4px;min-width:32px;min-height:32px}
+.results-section{font-size:12px;color:var(--dim);text-transform:uppercase;
+letter-spacing:.3px;font-weight:700;margin:14px 4px 8px}
+.results-div{height:1px;background:var(--border);margin:20px 0 4px;
+display:flex;align-items:center;justify-content:center;position:relative}
+.results-div::after{content:'в других модулях';position:absolute;
+background:var(--bg);color:var(--dim);font-size:11px;padding:0 12px;font-weight:600}
+.search-hit{padding:12px 14px;background:var(--bg2);border-radius:12px;
+border:1px solid var(--border);margin-bottom:8px;cursor:pointer;
+font-family:inherit;text-align:left;color:var(--text);width:100%;
+font-size:14px;box-shadow:var(--sh1);display:flex;flex-direction:column;gap:4px}
+.search-hit:active{transform:scale(.98)}
+.hit-meta{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--dim)}
+.hit-meta b{color:var(--text);font-weight:700}
+.hit-module{font-weight:600;color:var(--accent)}
+.hit-body{font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.empty{text-align:center;color:var(--dim);padding:40px 20px;font-size:14px;margin:0}
+.empty-sm{padding:16px;text-align:center;font-size:13px;color:var(--dim)}
 </style>
 </head>
 <body>
 <div class="app">
-  <header class="app-header">
-    <div class="app-title-block">
-      <h1 id="pageTitle">Планировщик</h1>
-      <div class="today-info" id="todayInfo"></div>
+  <div class="top">
+    <div class="title-block">
+      <h1 id="title">Планировщик</h1>
+      <div class="today" id="todayInfo"></div>
     </div>
-    <div class="header-actions">
-      <button class="icon-btn" id="searchBtn" aria-label="Поиск">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+    <div class="top-actions">
+      <button class="icon-btn" id="btnSearch">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
       </button>
-      <button class="icon-btn" id="editBtn" aria-label="Режим редактирования">✏️</button>
-      <button class="icon-btn" id="notifyBtn" aria-label="Уведомления">🔔</button>
-      <button class="icon-btn" id="settingsBtn" aria-label="Настройки сетки">⚙️</button>
+      <button class="icon-btn" id="btnEdit">✏️</button>
+      <button class="icon-btn" id="btnNotify">🔔</button>
+      <button class="icon-btn" id="btnSettings">⚙️</button>
     </div>
-  </header>
+  </div>
   <div class="search-overlay" id="searchOverlay">
     <div class="search-field">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--text-dim)" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
-      <input type="search" id="globalSearch" placeholder="Поиск по всем модулям..." autocomplete="off">
-      <button class="close-search" id="searchClose">✕</button>
+      <input type="search" id="searchInput" placeholder="Поиск по всем модулям..." autocomplete="off">
+      <button id="searchClose">✕</button>
     </div>
   </div>
   <div id="content"></div>
 </div>
 <nav class="dock" id="dock"></nav>
 
-<div class="edit-toolbar" id="editToolbar">
-  <button class="edit-tool-btn undo" id="undoBtn" disabled>↶ Отменить</button>
-  <div class="edit-toolbar-sep"></div>
-  <button class="edit-tool-btn apply-module" id="applyModuleBtn" disabled>Всему модулю</button>
-  <button class="edit-tool-btn apply-column" id="applyColumnBtn" disabled>Столбцу</button>
+<div class="edit-bar" id="editBar">
+  <button class="edit-bar-btn undo" id="btnUndo" disabled>↶ Отменить</button>
+  <button class="edit-bar-btn apply" id="btnApplyModule" disabled>Всему модулю</button>
+  <button class="edit-bar-btn apply-col" id="btnApplyColumn" disabled>Столбцу</button>
 </div>
 
-<div class="modal" id="settingsModal"><div class="modal-card">
-<h2>Настройки модуля</h2>
-<div id="moduleSettings"></div>
-<div class="setting-block">
-  <div class="setting-label">Тема</div>
-  <div style="display:flex;gap:8px">
-    <button class="btn" data-theme-set="light" style="flex:1">☀️ Светлая</button>
-    <button class="btn" data-theme-set="dark" style="flex:1">🌙 Тёмная</button>
+<!-- Модалка ячейки -->
+<div class="modal" id="mCell">
+<div class="sheet">
+  <div class="sheet-head">
+    <div class="sheet-title"><h2 id="cellTitle">Ячейка</h2></div>
+    <div class="sheet-actions">
+      <button class="icon-btn" id="cellNotifyBtn">🔔</button>
+      <button class="icon-btn" data-close>✕</button>
+    </div>
   </div>
+  <div class="field">
+    <label>Название</label>
+    <input id="cellName" placeholder="Назовите ячейку">
+  </div>
+  <div class="field">
+    <label>Дата</label>
+    <div class="row">
+      <input id="cellDate" type="date">
+      <button class="btn sm" id="cellDateClear">Сбросить</button>
+    </div>
+  </div>
+  <div class="field">
+    <label>Цвет</label>
+    <div class="swatches" id="cellSwatches"></div>
+  </div>
+  <div class="set-block">
+    <div class="row" style="justify-content:space-between">
+      <span style="font-weight:500">Уведомление</span>
+      <button class="toggle" id="cellNotifyToggle"></button>
+    </div>
+    <div id="cellNotifyFields" style="display:none;margin-top:10px;gap:8px;display:none;flex-direction:column">
+      <input type="time" id="cellNotifyTime">
+      <div class="info accent" id="cellNotifyHint"></div>
+    </div>
+  </div>
+  <button class="btn primary" id="cellSave">Сохранить</button>
+  <button class="btn danger" id="cellDelete">Удалить ячейку</button>
+  <button class="btn" data-close>Отмена</button>
 </div>
-<div id="moduleDelete"></div>
-<button class="btn primary" data-close style="margin-top:16px">Готово</button>
-<div class="version-tag">Версия 23.0</div>
-</div></div>
+</div>
 
-<div class="modal" id="cellModal"><div class="modal-card">
-<div class="modal-head">
-  <h2 id="cellTitle">Ячейка</h2>
-  <div class="modal-head-actions">
-    <button class="icon-btn" id="cellNotifyBtn" aria-label="Уведомления">🔔</button>
-    <button class="icon-btn" data-close aria-label="Закрыть">✕</button>
+<!-- Модалка задач -->
+<div class="modal" id="mTasks">
+<div class="sheet">
+  <div class="sheet-head">
+    <div class="sheet-title">
+      <h2 id="tasksTitle">Задачи</h2>
+      <div class="sub" id="tasksSub"></div>
+    </div>
+    <div class="sheet-actions">
+      <button class="icon-btn" id="tasksNotifyBtn">🔔</button>
+      <button class="icon-btn" id="tasksSettingsBtn">⚙️</button>
+      <button class="icon-btn" data-close>✕</button>
+    </div>
+  </div>
+  <div class="tasks-list" id="tasksList"></div>
+  <div class="add-task">
+    <input id="newTaskInput" placeholder="Новая задача..." autocomplete="off">
+    <button id="addTaskBtn">+</button>
   </div>
 </div>
-<div class="setting-block">
-  <div class="setting-label">Название</div>
-  <input type="text" id="cellNameInput" class="modal-input" placeholder="Назовите ячейку">
 </div>
-<div class="setting-block">
-  <div class="setting-label">Дата</div>
-  <input type="date" id="cellDateInput" class="modal-input">
-  <button class="link-btn" id="cellDateClear">Убрать дату</button>
-</div>
-<div class="setting-block">
-  <div class="setting-label">Цвет</div>
-  <div class="swatches" id="cellSwatches"></div>
-  <div class="color-row">
-    <input type="color" id="cellColorCustom" class="color-input">
-    <span style="font-size:13px;color:var(--text-dim)">Свой цвет</span>
+
+<!-- Модалка уведомлений -->
+<div class="modal" id="mNotify">
+<div class="sheet">
+  <div class="sheet-head">
+    <div class="sheet-title"><h2 id="notifyTitle">Уведомления</h2></div>
+    <button class="icon-btn" data-close>✕</button>
   </div>
-</div>
-<div class="setting-block">
-  <div class="setting-label">Уведомление</div>
-  <div class="notify-toggle-row">
+  <div class="row" style="justify-content:space-between;padding:8px 0 14px;border-bottom:1px solid var(--border)">
     <span style="font-weight:500">Включить</span>
-    <button class="toggle" id="cellNotifyToggle"></button>
+    <button class="toggle" id="notifyEnabled"></button>
   </div>
-  <div id="cellNotifyFields" style="display:none">
-    <div style="font-size:13px;color:var(--text-dim);margin-bottom:6px">Время</div>
-    <input type="time" id="cellNotifyTime" class="modal-input">
-    <div style="font-size:13px;color:var(--text-dim);margin-top:8px;line-height:1.4" id="cellNotifyHint"></div>
-  </div>
-</div>
-<button class="link-btn" id="openGridSettingsFromCell">⚙️ Настройки сетки</button>
-<button class="btn danger" id="cellDeleteBtn">Удалить ячейку</button>
-<button class="btn primary" data-close style="margin-top:8px">Готово</button>
-</div></div>
-
-<div class="modal" id="tasksModal"><div class="modal-card">
-<div class="modal-head">
-  <div class="tasks-head-title">
-    <div class="tasks-title-main" id="tasksTitle">Задачи</div>
-    <div class="tasks-title-sub" id="tasksSubtitle"></div>
-  </div>
-  <div class="modal-head-actions">
-    <button class="icon-btn" id="tasksNotifyBtn" aria-label="Уведомления">🔔</button>
-    <button class="icon-btn" id="tasksSettingsBtn" aria-label="Настройки">⚙️</button>
-    <button class="icon-btn" data-close aria-label="Закрыть">✕</button>
-  </div>
-</div>
-<div class="tasks-list-new" id="taskList"></div>
-<div class="task-add-row">
-  <input type="text" id="newTask" placeholder="Новая задача..." autocomplete="off">
-  <button class="task-add-btn" id="addTaskBtn" aria-label="Добавить">+</button>
-</div>
-</div></div>
-
-<div class="modal" id="createViewModal"><div class="modal-card">
-<h2>Новый модуль</h2>
-<div class="setting-block">
-  <div class="setting-label">Название</div>
-  <input type="text" id="newViewName" class="modal-input" placeholder="Календарь, Дневник…" autocomplete="off">
-</div>
-<div class="setting-block">
-  <div class="setting-label">Иконка</div>
-  <input type="text" id="newViewIcon" class="modal-input" value="📆" maxlength="2" style="text-align:center;font-size:24px">
-</div>
-<div class="setting-block">
-  <div class="setting-label">Шаблон</div>
-  <div class="preset-grid" id="presetGrid">
-    <button class="preset-tile" data-preset="empty">
-      <span class="preset-tile-icon">📋</span>
-      <span class="preset-tile-label">Пустой</span>
-      <span class="preset-tile-sub">5 ячеек</span>
-    </button>
-    <button class="preset-tile active" data-preset="week">
-      <span class="preset-tile-icon">🗓</span>
-      <span class="preset-tile-label">Неделя</span>
-      <span class="preset-tile-sub">7 дней</span>
-    </button>
-    <button class="preset-tile" data-preset="month">
-      <span class="preset-tile-icon">📆</span>
-      <span class="preset-tile-label">Месяц</span>
-      <span class="preset-tile-sub">30 дней</span>
-    </button>
-    <button class="preset-tile" data-preset="year">
-      <span class="preset-tile-icon">📅</span>
-      <span class="preset-tile-label">Год</span>
-      <span class="preset-tile-sub">12 месяцев</span>
-    </button>
-  </div>
-</div>
-<div class="setting-block" id="dateStartBlock">
-  <div class="setting-label">От какой даты</div>
-  <div class="date-select-row">
-    <button data-datestart="month1" class="active">С 1 числа</button>
-    <button data-datestart="today">С сегодня</button>
-    <button data-datestart="custom">Выбрать</button>
-  </div>
-  <div id="customDateRow" style="display:none;margin-top:10px">
-    <input type="date" id="customStartDate" class="modal-input">
-  </div>
-  <div class="setting-hint" id="dateStartHint"></div>
-</div>
-<button class="btn primary" id="createViewBtn">Создать</button>
-<button class="btn" data-close style="margin-top:8px">Отмена</button>
-</div></div>
-
-<div class="modal" id="dateBindingModal"><div class="modal-card">
-<div class="modal-head">
-  <h2>Привязка дат</h2>
-  <button class="icon-btn" data-close>✕</button>
-</div>
-<div class="setting-block">
-  <div class="setting-label">Стартовая дата</div>
-  <input type="date" id="bindingStartDate" class="modal-input">
-</div>
-<div class="setting-block">
-  <div class="setting-label">Шаг</div>
-  <div class="date-select-row" id="bindingStepRow">
-    <button data-step="1" class="active">Каждый день</button>
-    <button data-step="custom">Свой шаг</button>
-  </div>
-  <div id="customStepRow" style="display:none;margin-top:10px">
-    <input type="number" id="customStepInput" class="modal-input" min="1" max="30" value="2" placeholder="Шаг в днях">
-  </div>
-</div>
-<div class="setting-block">
-  <div class="setting-label">Применить к</div>
-  <div class="cell-pick-actions">
-    <button id="bindPickAll">Все</button>
-    <button id="bindPickNone">Снять</button>
-  </div>
-  <div class="cell-pick-list" id="bindCellList"></div>
-  <div class="smart-preview" id="bindPreview"></div>
-</div>
-<button class="btn primary" id="bindApplyBtn">Применить даты</button>
-<button class="btn" data-close style="margin-top:8px">Отмена</button>
-</div></div>
-
-<div class="modal" id="notifyModal"><div class="modal-card">
-<div class="modal-head">
-  <h2 id="notifyTitle">Уведомления</h2>
-  <button class="icon-btn" data-close>✕</button>
-</div>
-<div class="notify-toggle-row">
-  <span style="font-weight:500">Включить</span>
-  <button class="toggle" id="notifyEnabledToggle"></button>
-</div>
-<div id="notifyBody" style="display:none">
-  <div class="setting-block">
-    <div class="setting-label">Когда напомнить</div>
-    <div class="notify-mode-tabs" id="notifyModeTabs">
-      <button data-mode="celldate">📅 В дату ячейки</button>
-      <button data-mode="daily">Каждый день</button>
-      <button data-mode="weekly">По дням недели</button>
-      <button data-mode="monthly">Каждый месяц</button>
-      <button data-mode="once">Один раз</button>
+  <div id="notifyBody" style="display:none;flex-direction:column;gap:10px">
+    <div class="field">
+      <label>Когда напомнить</label>
+      <div class="notify-modes" id="notifyModes">
+        <button data-mode="celldate">📅 В дату ячейки</button>
+        <button data-mode="daily">Каждый день</button>
+        <button data-mode="weekly">По дням недели</button>
+        <button data-mode="monthly">Каждый месяц</button>
+        <button data-mode="once">Один раз</button>
+      </div>
+    </div>
+    <div id="notifyModeContent"></div>
+    <div class="field">
+      <label>Время</label>
+      <input type="time" id="notifyTime">
+    </div>
+    <div class="field">
+      <label>Дополнительно</label>
+      <label style="display:flex;align-items:center;gap:8px;font-size:14px;cursor:pointer;padding:6px 0">
+        <input type="checkbox" id="notifyHourBefore" style="width:20px;height:20px;accent-color:var(--accent)">
+        Напомнить за час до
+      </label>
+      <label style="display:flex;align-items:center;gap:8px;font-size:14px;cursor:pointer;padding:6px 0">
+        <input type="checkbox" id="notifyDayBefore" style="width:20px;height:20px;accent-color:var(--accent)">
+        Напомнить за день до
+      </label>
+    </div>
+    <div id="notifyApplySection">
+      <div class="field">
+        <label>Применить к ячейкам</label>
+        <div class="row" style="margin-bottom:8px">
+          <button class="btn sm" id="notifyPickAll">Все</button>
+          <button class="btn sm" id="notifyPickNone">Снять</button>
+        </div>
+        <div class="pick-list" id="notifyPickList"></div>
+      </div>
     </div>
   </div>
-  <div id="notifyModeContent"></div>
-  <div class="setting-block">
-    <div class="setting-label">Время</div>
-    <input type="time" id="notifyTime" class="modal-input">
-  </div>
-  <div class="setting-block">
-    <div class="setting-label">Дополнительно</div>
-    <label class="check-row"><input type="checkbox" id="notifyHourBefore"> Напомнить за час до</label>
-    <label class="check-row"><input type="checkbox" id="notifyDayBefore"> Напомнить за день до</label>
-  </div>
-  <div class="setting-block" id="notifyApplySection">
-    <div class="setting-label">Применить к ячейкам</div>
-    <div class="cell-pick-actions">
-      <button id="pickAllCells">Выбрать все</button>
-      <button id="pickNoneCells">Снять все</button>
-    </div>
-    <div class="cell-pick-list" id="notifyCellList"></div>
-  </div>
+  <button class="btn primary" id="notifyApply" style="margin-top:10px">Применить</button>
+  <button class="btn" data-close>Отмена</button>
 </div>
-<button class="btn primary" id="notifyApplyBtn" style="margin-top:16px">Применить</button>
-<button class="btn" data-close style="margin-top:8px">Отмена</button>
-</div></div>
+</div>
 
-<div class="modal" id="confirmModal"><div class="modal-card">
-<h2 id="confirmTitle">Удалить?</h2>
-<p id="confirmText" style="color:var(--text-dim);margin:0 0 16px;font-size:14px;line-height:1.5"></p>
-<button class="btn danger" id="confirmYes">Удалить</button>
-<button class="btn" data-close style="margin-top:8px">Отмена</button>
-</div></div>
+<!-- Модалка привязки дат -->
+<div class="modal" id="mBind">
+<div class="sheet">
+  <div class="sheet-head">
+    <div class="sheet-title"><h2>Привязка дат</h2></div>
+    <button class="icon-btn" data-close>✕</button>
+  </div>
+  <div class="field">
+    <label>Стартовая дата</label>
+    <input type="date" id="bindStart">
+  </div>
+  <div class="field">
+    <label>Шаг</label>
+    <div class="date-choices" id="bindSteps">
+      <button data-step="1" class="active">Каждый день</button>
+      <button data-step="custom">Свой шаг</button>
+    </div>
+    <div id="bindCustomWrap" style="display:none;margin-top:8px">
+      <input type="number" id="bindCustomStep" min="1" max="30" value="2" placeholder="Шаг в днях">
+    </div>
+  </div>
+  <div class="field">
+    <label>Применить к</label>
+    <div class="row" style="margin-bottom:8px">
+      <button class="btn sm" id="bindPickAll">Все</button>
+      <button class="btn sm" id="bindPickNone">Снять</button>
+    </div>
+    <div class="pick-list" id="bindPickList"></div>
+    <div class="info" id="bindPreview"></div>
+  </div>
+  <button class="btn primary" id="bindApply">Применить даты</button>
+  <button class="btn" data-close>Отмена</button>
+</div>
+</div>
+
+<!-- Модалка создания модуля -->
+<div class="modal" id="mCreate">
+<div class="sheet">
+  <div class="sheet-head">
+    <div class="sheet-title"><h2>Новый модуль</h2></div>
+    <button class="icon-btn" data-close>✕</button>
+  </div>
+  <div class="field">
+    <label>Название</label>
+    <input id="newTitle" placeholder="Календарь, Дневник…">
+  </div>
+  <div class="field">
+    <label>Иконка</label>
+    <input id="newIcon" value="📆" maxlength="2" style="text-align:center;font-size:22px">
+  </div>
+  <div class="field">
+    <label>Шаблон</label>
+    <div class="presets" id="newPresets">
+      <button class="preset" data-preset="empty"><span class="preset-icon">📋</span><span>Пустой</span><span class="preset-sub">5 ячеек</span></button>
+      <button class="preset active" data-preset="week"><span class="preset-icon">🗓</span><span>Неделя</span><span class="preset-sub">7 дней</span></button>
+      <button class="preset" data-preset="month"><span class="preset-icon">📆</span><span>Месяц</span><span class="preset-sub">с датами</span></button>
+      <button class="preset" data-preset="year"><span class="preset-icon">📅</span><span>Год</span><span class="preset-sub">12 месяцев</span></button>
+    </div>
+  </div>
+  <div class="field">
+    <label>От какой даты</label>
+    <div class="date-choices" id="newDateChoices">
+      <button data-choice="month1" class="active">С 1 числа</button>
+      <button data-choice="today">С сегодня</button>
+      <button data-choice="custom">Выбрать</button>
+    </div>
+    <div id="newCustomWrap" style="display:none;margin-top:8px">
+      <input type="date" id="newCustomDate">
+    </div>
+    <div class="info" id="newHint"></div>
+  </div>
+  <button class="btn primary" id="newCreate">Создать</button>
+  <button class="btn" data-close>Отмена</button>
+</div>
+</div>
+
+<!-- Модалка настроек модуля -->
+<div class="modal" id="mSettings">
+<div class="sheet">
+  <div class="sheet-head">
+    <div class="sheet-title"><h2>Настройки модуля</h2></div>
+    <button class="icon-btn" data-close>✕</button>
+  </div>
+  <div id="settingsBody"></div>
+  <button class="btn" data-close>Готово</button>
+</div>
+</div>
+
+<!-- Подтверждение -->
+<div class="modal" id="mConfirm">
+<div class="sheet">
+  <h2 id="confirmTitle">Подтверждение</h2>
+  <p id="confirmText" style="color:var(--dim);font-size:14px;line-height:1.5;margin:0"></p>
+  <button class="btn danger" id="confirmYes">Да</button>
+  <button class="btn" data-close>Отмена</button>
+</div>
+</div>
 
 <div class="toast" id="toast"></div>
 
 <script>
-console.log('%cMiniApp v23.0 LOADED','background:#007aff;color:#fff;padding:4px 8px;border-radius:4px;font-weight:bold');
+'use strict';
+console.log('%cv25 LOADED','background:#007aff;color:#fff;padding:3px 8px;border-radius:4px;font-weight:bold');
 
-const tg = window.Telegram?.WebApp;
-if (tg) { tg.ready(); tg.expand();
-  if (typeof tg.disableVerticalSwipes === 'function') { try { tg.disableVerticalSwipes(); } catch(e){} } }
-document.addEventListener('contextmenu', e => e.preventDefault());
-
-const BOT_API = '';
-const STORAGE_KEY = 'miniapp-constructor-v23';
-const OLD_STORAGE_KEYS = ['miniapp-constructor-v22','miniapp-constructor-v21','miniapp-constructor-v20'];
-const CARD_PALETTE = ['#5ac8fa','#af52de','#ff2d55','#ff9500','#34c759','#30b0c7','#5856d6','#ffcc00'];
-const ACCENT_PALETTE = ['#007aff','#5856d6','#af52de','#ff2d55','#ff9500','#34c759','#30b0c7','#8e8e93'];
-const DAY_NAMES = ['Пн','Вт','Ср','Чт','Пт','Сб','Вс'];
-const DAY_FULL = ['понедельник','вторник','среда','четверг','пятница','суббота','воскресенье'];
-const MONTH_FULL = ['Январь','Февраль','Март','Апрель','Май','Июнь','Июль','Август','Сентябрь','Октябрь','Ноябрь','Декабрь'];
-const MONTH_GEN = ['января','февраля','марта','апреля','мая','июня','июля','августа','сентября','октября','ноября','декабря'];
-const DEFAULT_HEIGHT = 96;
-const MIN_HEIGHT = 60;
-const MAX_HEIGHT = 800;
-const DEFAULT_COLUMNS = 7;
-const LONG_PRESS_MS = 400;
-
-function pad(n){return String(n).padStart(2,'0');}
-function todayStr(){return dateToStr(new Date());}
-function dateToStr(d){return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;}
-function strToDate(s){if(!s)return null; const [y,m,d]=s.split('-').map(Number); if(!y)return null; return new Date(y,m-1,d);}
-function formatDateShort(d){return pad(d.getDate())+'.'+pad(d.getMonth()+1);}
-function formatDateBadge(dateStr){const d=strToDate(dateStr); return d?formatDateShort(d):'';}
-function formatDateFull(d){return d.getDate()+' '+MONTH_GEN[d.getMonth()]+', '+DAY_FULL[(d.getDay()+6)%7];}
-function daysInMonth(year,month){return new Date(year,month+1,0).getDate();}
-function addDays(d,n){const r=new Date(d); r.setDate(r.getDate()+n); return r;}
-
-function makeId(p='id'){return p+'_'+Date.now().toString(36)+Math.random().toString(36).slice(2,6);}
-function makeTask(text){return {id:makeId('t'),text,done:false};}
-function makeNotify(){
-  return {enabled:false,mode:'celldate',date:null,time:'09:00',days:[],monthDay:null,
-    hourBefore:false,dayBefore:false};
+var tg = window.Telegram && window.Telegram.WebApp;
+if (tg) {
+  tg.ready(); tg.expand();
+  if (typeof tg.disableVerticalSwipes === 'function') { try { tg.disableVerticalSwipes(); } catch(e){} }
 }
-function makeCell(name,idx,date){
-  return {id:makeId('c'),name:name||'',date:date||null,color:CARD_PALETTE[idx%8],
-    colSpan:1,height:DEFAULT_HEIGHT,tasks:[],notify:makeNotify()};
-}
-function hexToRgba(hex,alpha){
-  let h=String(hex||'').replace('#','');
-  if(h.length===3)h=h.split('').map(c=>c+c).join('');
-  const r=parseInt(h.substring(0,2),16)||0;
-  const g=parseInt(h.substring(2,4),16)||0;
-  const b=parseInt(h.substring(4,6),16)||0;
-  return `rgba(${r},${g},${b},${alpha})`;
-}
-function isTodayCell(cell){return !!(cell&&cell.date&&cell.date===todayStr());}
+document.addEventListener('contextmenu', function(e){ e.preventDefault(); });
 
+var CARD_COLORS = ['#5ac8fa','#af52de','#ff2d55','#ff9500','#34c759','#30b0c7','#5856d6','#ffcc00'];
+var ACCENT_COLORS = ['#007aff','#5856d6','#af52de','#ff2d55','#ff9500','#34c759','#30b0c7','#8e8e93'];
+var DAYS = ['Пн','Вт','Ср','Чт','Пт','Сб','Вс'];
+var MONTHS = ['Январь','Февраль','Март','Апрель','Май','Июнь','Июль','Август','Сентябрь','Октябрь','Ноябрь','Декабрь'];
+var MONTHS_GEN = ['января','февраля','марта','апреля','мая','июня','июля','августа','сентября','октября','ноября','декабря'];
+var STORAGE_KEY = 'miniapp-v25';
+var OLD_KEYS = ['miniapp-constructor-v23','miniapp-constructor-v22','miniapp-constructor-v21','miniapp-constructor-v20','miniapp-constructor-v19'];
+
+function $(s){ return document.querySelector(s); }
+function $$(s){ return Array.prototype.slice.call(document.querySelectorAll(s)); }
+function esc(s){ return String(s||'').replace(/[&<>"']/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
+function pad(n){ return String(n).padStart(2,'0'); }
+function newId(p){ return (p||'id')+'_'+Date.now().toString(36)+Math.random().toString(36).slice(2,6); }
+function todayStr(){ var d=new Date(); return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate()); }
+function parseDate(s){ if(!s) return null; var p=s.split('-'); if(p.length!==3) return null; var d=new Date(+p[0],+p[1]-1,+p[2]); return isNaN(d)?null:d; }
+function toDateStr(d){ return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate()); }
+function addDays(d,n){ var r=new Date(d); r.setDate(r.getDate()+n); return r; }
+function daysInMonth(y,m){ return new Date(y,m+1,0).getDate(); }
+function fmtBadge(s){ var d=parseDate(s); return d ? pad(d.getDate())+'.'+pad(d.getMonth()+1) : ''; }
+function fmtFull(d){ return d.getDate()+' '+MONTHS_GEN[d.getMonth()]+', '+(DAYS[(d.getDay()+6)%7]||''); }
+
+function toast(msg){
+  var el=$('#toast'); if(!el)return;
+  el.textContent=msg; el.classList.add('show');
+  clearTimeout(toast._t);
+  toast._t=setTimeout(function(){ el.classList.remove('show'); }, 2500);
+}
+function haptic(t){ try { if(tg&&tg.HapticFeedback)tg.HapticFeedback.impactOccurred(t||'light'); } catch(e){} }
+
+/* === Модель === */
+function makeNotify(){ return {enabled:false,mode:'celldate',time:'09:00',date:null,days:[],monthDay:1,hourBefore:false,dayBefore:false}; }
+function makeTask(text){ return {id:newId('t'),text:text,done:false}; }
+function makeCell(name,date){
+  return {id:newId('c'),name:name||'',date:date||null,color:CARD_COLORS[0],
+    colSpan:1,height:96,tasks:[],notify:makeNotify()};
+}
+function makeView(title,icon,removable){
+  return {id:newId('v'),title:title||'Модуль',icon:icon||'📆',removable:removable!==false,
+    columnCount:7,cells:[]};
+}
+
+/* === Миграция === */
 function migrateNotify(n){
-  const out=makeNotify();
-  if(!n)return out;
-  out.enabled=!!n.enabled;
-  out.time=n.time||'09:00';
-  const validModes=['celldate','daily','weekly','monthly','once'];
-  if(n.mode&&validModes.includes(n.mode))out.mode=n.mode;
-  else if(n.mode==='smart')out.mode='celldate';
-  if(n.date)out.date=n.date;
-  if(n.monthDay)out.monthDay=n.monthDay;
-  if(typeof n.hourBefore==='boolean')out.hourBefore=n.hourBefore;
-  if(typeof n.dayBefore==='boolean')out.dayBefore=n.dayBefore;
-  if(Array.isArray(n.days)&&n.days.length>0){
-    out.days=n.days.slice();
-    if(!n.mode||n.mode==='smart')out.mode='weekly';
-  }
-  return out;
+  var o=makeNotify();
+  if(!n||typeof n!=='object') return o;
+  o.enabled=!!n.enabled;
+  o.time=n.time||'09:00';
+  var modes=['celldate','daily','weekly','monthly','once'];
+  if(n.mode && modes.indexOf(n.mode)>=0) o.mode=n.mode;
+  else if(n.mode==='smart') o.mode='celldate';
+  if(n.date) o.date=n.date;
+  if(n.monthDay) o.monthDay=n.monthDay;
+  if(typeof n.hourBefore==='boolean') o.hourBefore=n.hourBefore;
+  if(typeof n.dayBefore==='boolean') o.dayBefore=n.dayBefore;
+  if(Array.isArray(n.days)){ o.days=n.days.filter(function(d){return typeof d==='number';}); }
+  return o;
 }
-function migrateView(view){
-  if(Array.isArray(view.columns)){
-    view.columnCount=Math.max(1,view.columns.length);
-    view.cells=view.columns.flat();
-    delete view.columns;
+function migrateCell(c){
+  if(!c||typeof c!=='object') return makeCell();
+  var o=makeCell();
+  if(c.id) o.id=c.id;
+  if(typeof c.name==='string') o.name=c.name;
+  if(typeof c.date==='string' && parseDate(c.date)) o.date=c.date;
+  else o.date=null;
+  if(typeof c.color==='string') o.color=c.color;
+  var span = c.colSpan || c.widthMultiplier || 1;
+  if(typeof span==='number' && span>0) o.colSpan=Math.min(10, Math.round(span));
+  if(typeof c.height==='number') o.height=Math.max(60, Math.min(800, c.height));
+  if(Array.isArray(c.tasks)){
+    o.tasks=c.tasks.map(function(t){
+      if(!t||typeof t!=='object') return null;
+      return {id:t.id||newId('t'), text:String(t.text||''), done:!!t.done};
+    }).filter(function(t){ return t && t.text; });
   }
-  if(typeof view.columnCount!=='number')view.columnCount=DEFAULT_COLUMNS;
-  if(!Array.isArray(view.cells))view.cells=[];
-  view.cells.forEach(c=>{
-    if(typeof c.colSpan!=='number'){
-      c.colSpan=typeof c.widthMultiplier==='number'?Math.round(c.widthMultiplier):1;
-    }
-    delete c.widthMultiplier;
-    if(typeof c.colSpan!=='number')c.colSpan=1;
-    if(typeof c.height!=='number')c.height=DEFAULT_HEIGHT;
-    if(typeof c.date!=='string')c.date=null;
-    c.notify=migrateNotify(c.notify);
-  });
-  if(typeof view.rowsPerColumn!=='number'||view.rowsPerColumn<1){
-    view.rowsPerColumn=Math.max(1,Math.ceil(view.cells.length/Math.max(1,view.columnCount)));
-  }
-  return view;
+  o.notify=migrateNotify(c.notify);
+  return o;
 }
-function makeDefaultView(){
-  const cells=[];
-  for(let i=0;i<7;i++)cells.push(makeCell(DAY_NAMES[i],i,null));
-  return {id:'v_planner',type:'planner',title:'Планировщик',icon:'📅',removable:false,
-    columnCount:DEFAULT_COLUMNS,rowsPerColumn:1,cells,filter:'all'};
+function migrateView(v){
+  if(!v||typeof v!=='object') return null;
+  var o=makeView(v.title||'Модуль', v.icon||'📆', v.removable!==false);
+  if(v.id) o.id=v.id;
+  if(typeof v.columnCount==='number' && v.columnCount>=1) o.columnCount=Math.min(15, Math.round(v.columnCount));
+  var rawCells = Array.isArray(v.cells) ? v.cells : (Array.isArray(v.columns) ? v.columns.flat() : []);
+  o.cells = rawCells.map(migrateCell);
+  return o;
 }
-function makeDefaultState(){
-  return {theme:'light',accent:'#007aff',currentViewId:'v_planner',views:[makeDefaultView()]};
+function defaultState(){
+  var v=makeView('Планировщик','📅',false);
+  v.columnCount=7;
+  for(var i=0;i<7;i++) v.cells.push(makeCell(DAYS[i],null));
+  return {theme:'light', accent:'#007aff', currentViewId:v.id, views:[v]};
 }
 function loadState(){
   try{
-    const s=JSON.parse(localStorage.getItem(STORAGE_KEY));
-    if(s&&typeof s==='object'&&Array.isArray(s.views)&&s.views.length){
-      s.views=s.views.map(migrateView); return s;
-    }
-  }catch(e){}
-  for(const key of OLD_STORAGE_KEYS){
-    try{
-      const old=JSON.parse(localStorage.getItem(key));
-      if(old&&typeof old==='object'&&Array.isArray(old.views)&&old.views.length){
-        old.views=old.views.map(migrateView); return old;
+    var raw=localStorage.getItem(STORAGE_KEY);
+    if(raw){
+      var s=JSON.parse(raw);
+      if(s && Array.isArray(s.views) && s.views.length){
+        var migrated=s.views.map(migrateView).filter(Boolean);
+        if(migrated.length){
+          s.views=migrated;
+          if(!s.currentViewId || !s.views.find(function(x){return x.id===s.currentViewId;}))
+            s.currentViewId=s.views[0].id;
+          return s;
+        }
       }
-    }catch(e){}
+    }
+  }catch(e){ console.warn('load v25',e); }
+  for(var i=0;i<OLD_KEYS.length;i++){
+    try{
+      var raw2=localStorage.getItem(OLD_KEYS[i]);
+      if(!raw2) continue;
+      var s2=JSON.parse(raw2);
+      if(!s2 || !Array.isArray(s2.views) || !s2.views.length) continue;
+      var migrated2=s2.views.map(migrateView).filter(Boolean);
+      if(migrated2.length){
+        s2.views=migrated2;
+        if(!s2.currentViewId || !s2.views.find(function(x){return x.id===s2.currentViewId;}))
+          s2.currentViewId=s2.views[0].id;
+        console.log('migrated from',OLD_KEYS[i]);
+        return s2;
+      }
+    }catch(e){ console.warn('load old',OLD_KEYS[i],e); }
   }
-  return makeDefaultState();
+  return defaultState();
 }
-let state=loadState();
+
+var state = loadState();
+try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch(e){}
+
+var ui = {
+  editing:false,
+  currentCellId:null,
+  editingCellId:null,
+  searchQuery:'',
+  lastResizedCellId:null,
+  newPreset:'week',
+  newDateChoice:'month1',
+  bindStart:null,
+  bindStep:'1',
+  bindTargets:{},
+  notifyTarget:null,
+  notifyData:null,
+  notifyPick:{},
+  undoStack:[],
+  dragState:null,
+  longPressTimer:null
+};
+
+function currentView(){
+  var v = state.views.find(function(x){ return x.id===state.currentViewId; });
+  if(!v){ v=state.views[0]; state.currentViewId=v.id; }
+  return v;
+}
 function saveState(){
-  try{localStorage.setItem(STORAGE_KEY,JSON.stringify(state));}catch(e){}
-  pushToBackend();
+  try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch(e){}
 }
 
-let currentViewId=state.currentViewId||state.views[0].id;
-let searchQuery='';
-let currentCellId=null;
-let dragState=null;
-let longPressTimer=null;
-let suppressClick=false;
-let confirmCallback=null;
-let editMode=false;
-let selectedPreset='week';
-let selectedDateStart='month1';
-let lastResizedCellId=null;
-let pendingNotifyTarget=null;
-let pendingNotifyData=null;
-let bindTargetIds=new Set();
-let bindStep='1';
-
-const undoStack=[]; const UNDO_LIMIT=20;
 function pushUndo(){
-  undoStack.push(JSON.stringify(state));
-  if(undoStack.length>UNDO_LIMIT)undoStack.shift();
+  ui.undoStack.push(JSON.stringify(state));
+  if(ui.undoStack.length>20) ui.undoStack.shift();
   updateUndoBtn();
 }
 function updateUndoBtn(){
-  const b=$('#undoBtn'); if(!b)return; b.disabled=undoStack.length===0;
+  var b=$('#btnUndo'); if(b) b.disabled = ui.undoStack.length===0;
 }
 function doUndo(){
-  if(!undoStack.length)return;
-  const prev=undoStack.pop();
+  if(!ui.undoStack.length) return;
+  var prev=ui.undoStack.pop();
   try{
-    state=JSON.parse(prev); saveState(); renderContent(); renderSettings();
-    haptic('medium'); toast('Отменено');
-  }catch(e){console.error(e);}
+    state=JSON.parse(prev);
+    saveState();
+    updateTheme(); updateAccent();
+    render(); renderSettings();
+    toast('Отменено');
+  }catch(e){ console.error(e); }
   updateUndoBtn();
 }
 
-const $=(s,r=document)=>r.querySelector(s);
-const $$=(s,r=document)=>[...r.querySelectorAll(s)];
-function escapeHtml(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
-let toastTimer=null;
-function toast(msg){const el=$('#toast');el.textContent=msg;el.classList.add('show');
-  clearTimeout(toastTimer);toastTimer=setTimeout(()=>el.classList.remove('show'),2500);}
-function haptic(t='light'){try{tg?.HapticFeedback?.impactOccurred(t);}catch(e){}}
-
-function getUserId(){return tg?.initDataUnsafe?.user?.id||null;}
-async function pushToBackend(){
-  if(!BOT_API)return; const uid=getUserId(); if(!uid)return;
-  try{await fetch(BOT_API.replace(/\/$/,'')+'/api/sync',{method:'POST',
-    headers:{'Content-Type':'application/json'},body:JSON.stringify({userId:uid,state})});}catch(e){}
-}
-async function pullFromBackend(){
-  if(!BOT_API)return false;
-  const uid=getUserId(); if(!uid)return false;
+function updateTheme(){
+  document.documentElement.setAttribute('data-theme', state.theme||'light');
   try{
-    const r=await fetch(BOT_API.replace(/\/$/,'')+'/api/state/'+uid);
-    if(!r.ok)return false;
-    const data=await r.json();
-    if(!data.ok||!data.state)return false;
-    mergeDone(state,data.state);
-    try{localStorage.setItem(STORAGE_KEY,JSON.stringify(state));}catch(e){}
-    return true;
-  }catch(e){return false;}
-}
-function mergeDone(local,remote){
-  const lookup={};
-  (remote.views||[]).forEach(v=>(v.cells||[]).forEach(c=>
-    (c.tasks||[]).forEach(t=>{lookup[t.id]=t;})));
-  (local.views||[]).forEach(v=>(v.cells||[]).forEach(c=>
-    (c.tasks||[]).forEach(t=>{
-      if(lookup[t.id]&&typeof lookup[t.id].done==='boolean')t.done=lookup[t.id].done;
-    })));
-}
-setInterval(async()=>{if(await pullFromBackend())renderContent();},30000);
-
-function applyTheme(){
-  document.documentElement.dataset.theme=state.theme;
-  try{const c=state.theme==='dark'?'#1c1c1e':'#f5f5f7';
-    tg?.setHeaderColor?.(c); tg?.setBackgroundColor?.(c);}catch(e){}
-}
-function applyAccent(){
-  document.documentElement.style.setProperty('--accent',state.accent);
-  const [r,g,b]=[1,3,5].map(i=>parseInt(state.accent.slice(i,i+2),16));
-  document.documentElement.style.setProperty('--accent-soft',`rgba(${r},${g},${b},0.16)`);
-}
-
-function getSearchWords(){ if(!searchQuery)return []; return searchQuery.split(/\s+/).filter(Boolean); }
-function matchCell(cell,words){
-  if(!words.length)return true;
-  const hay=(cell.name+' '+(cell.date||'')+' '+cell.tasks.map(t=>t.text).join(' ')).toLowerCase();
-  return words.every(w=>hay.includes(w));
-}
-function highlightText(text,words){
-  if(!words.length)return escapeHtml(text);
-  const escaped=words.map(w=>w.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'));
-  const re=new RegExp('('+escaped.sort((a,b)=>b.length-a.length).join('|')+')','gi');
-  return escapeHtml(text).replace(re,'<mark>$1</mark>');
-}
-
-function openModal(m){m.classList.add('open'); document.body.style.overflow='hidden'; updateBack();}
-function closeModal(m){m.classList.remove('open');
-  if(!$$('.modal.open').length)document.body.style.overflow=''; updateBack();}
-function updateBack(){if(!tg?.BackButton)return;
-  if($$('.modal.open').length)tg.BackButton.show(); else tg.BackButton.hide();}
-function askConfirm(title,text,action){
-  $('#confirmTitle').textContent=title;
-  $('#confirmText').textContent=text;
-  confirmCallback=action;
-  openModal($('#confirmModal'));
-}
-function openSearch(){$('#searchOverlay').classList.add('open'); setTimeout(()=>$('#globalSearch').focus(),100);}
-function closeSearch(){$('#searchOverlay').classList.remove('open');
-  $('#globalSearch').value=''; if(searchQuery){searchQuery=''; renderContent();}}
-
-function updateDockSize(){
-  const dock=$('#dock'); if(!dock)return;
-  const avail=window.innerWidth-24;
-  dock.style.maxWidth=avail+'px';
-  const scroll=dock.querySelector('.dock-scroll'); if(!scroll)return;
-  scroll.style.maxWidth=Math.max(100,avail-16-56-6)+'px';
-}
-
-function renderDock(){
-  const dock=$('#dock'); dock.innerHTML='';
-  const scroll=document.createElement('div'); scroll.className='dock-scroll';
-  for(const v of state.views){
-    const btn=document.createElement('button');
-    btn.className='dock-item'+(v.id===currentViewId?' active':'')+(v.removable?' dock-deletable':'');
-    btn.innerHTML=`<span aria-hidden="true">${v.icon}</span>`;
-    btn.addEventListener('click', e=>{
-      if(e.target.closest('.dock-delete'))return;
-      if(v.id===currentViewId)return;
-      haptic(); switchView(v.id);
-    });
-    if(v.removable){
-      const del=document.createElement('button');
-      del.className='dock-delete'; del.textContent='✕';
-      del.setAttribute('aria-label','Удалить модуль');
-      del.addEventListener('click', e=>{
-        e.stopPropagation();
-        const tasksN = v.cells.reduce((s,c)=>s+c.tasks.length,0);
-        askConfirm(`Удалить модуль «${v.title}»?`,
-          `У модуля ${v.cells.length} ячеек${tasksN>0?`, ${tasksN} задач`:''}. Отменить можно через ↶.`,
-          `deleteView:${v.id}`);
-      });
-      btn.appendChild(del);
+    if(tg){
+      var c = state.theme==='dark'?'#1c1c1e':'#f5f5f7';
+      tg.setHeaderColor && tg.setHeaderColor(c);
+      tg.setBackgroundColor && tg.setBackgroundColor(c);
     }
-    scroll.appendChild(btn);
-  }
-  dock.appendChild(scroll);
-  const addBtn=document.createElement('button');
-  addBtn.className='dock-add'; addBtn.textContent='+';
-  addBtn.addEventListener('click', ()=>{
-    haptic();
-    $('#newViewName').value=''; $('#newViewIcon').value='📆';
-    selectedPreset='week'; selectedDateStart='month1';
-    $$('#presetGrid .preset-tile').forEach(t=>t.classList.toggle('active',t.dataset.preset==='week'));
-    $$('#dateStartBlock [data-datestart]').forEach(x=>x.classList.toggle('active',x.dataset.datestart==='month1'));
-    $('#customDateRow').style.display='none';
-    $('#customStartDate').value='';
-    updateDateStartHint();
-    openModal($('#createViewModal'));
-    const inp=$('#newViewName');
-    if(inp){
-      inp.focus();
-      setTimeout(()=>{try{inp.focus();inp.click();}catch(e){}},80);
-      setTimeout(()=>{try{inp.focus();}catch(e){}},350);
-    }
-  });
-  dock.appendChild(addBtn);
-  updateDockSize(); requestAnimationFrame(updateDockSize);
+  }catch(e){}
+}
+function updateAccent(){
+  var c = state.accent || '#007aff';
+  document.documentElement.style.setProperty('--accent', c);
+  var r=parseInt(c.slice(1,3),16)||0, g=parseInt(c.slice(3,5),16)||0, b=parseInt(c.slice(5,7),16)||0;
+  document.documentElement.style.setProperty('--soft', 'rgba('+r+','+g+','+b+',0.16)');
 }
 
-function updateDateStartHint(){
-  const el=$('#dateStartHint'); if(!el)return;
-  const preset=selectedPreset;
-  if(preset==='week') el.textContent='7 ячеек от выбранной даты.';
-  else if(preset==='month'){
-    if(selectedDateStart==='month1') el.textContent='Все дни выбранного месяца.';
-    else el.textContent='30 дней вперёд от выбранной даты.';
-  } else if(preset==='year'){
-    if(selectedDateStart==='month1') el.textContent='12 месяцев с текущего месяца (1-е число).';
-    else el.textContent='12 месяцев начиная с месяца выбранной даты.';
-  } else el.textContent='';
-}
-
-function updateTodayInfo(){
-  const el=$('#todayInfo'); if(!el)return;
-  el.textContent='Сегодня — '+formatDateFull(new Date());
-}
-function switchView(viewId){
-  currentViewId=viewId; state.currentViewId=viewId; saveState();
-  const v=state.views.find(x=>x.id===viewId);
-  $('#pageTitle').textContent=v?.title||'';
-  updateTodayInfo(); renderDock(); renderContent(); closeSearch();
-  window.scrollTo({top:0,behavior:'instant'});
-  setTimeout(()=>scrollToToday(v),350);
-  updateUndoBtn();
-}
-function scrollToToday(view){
-  if(!view)return;
-  const grid=$('#columnsContainer'); if(!grid)return;
-  for(const cell of view.cells){
-    if(!isTodayCell(cell))continue;
-    const card=grid.querySelector(`[data-cell-id="${cell.id}"]`);
-    if(!card)continue;
-    const rect=card.getBoundingClientRect();
-    if(rect.top<20||rect.bottom>window.innerHeight-170){
-      card.scrollIntoView({behavior:'smooth',block:'center'});
-    }
-    return;
+/* === Рендер === */
+function render(){
+  try{
+    updateTheme(); updateAccent();
+    var v=currentView();
+    $('#title').textContent = v.title || '';
+    $('#todayInfo').textContent = 'Сегодня — '+fmtFull(new Date());
+    renderContent();
+    renderDock();
+  }catch(e){
+    console.error('render err', e);
+    var c=$('#content');
+    if(c) c.innerHTML='<p class="empty" style="color:#ff3b30">Ошибка: '+esc(e.message)+'</p>';
   }
 }
 
 function renderContent(){
-  const c=$('#content'); c.innerHTML='';
-  if(searchQuery){
-    renderSearchResults(c);
+  var c=$('#content');
+  c.innerHTML='';
+  if(ui.searchQuery){
+    renderSearch(c);
     return;
   }
-  const v=state.views.find(x=>x.id===currentViewId);
-  if(!v){switchView(state.views[0].id); return;}
-  renderPlanner(c,v);
-  document.body.classList.toggle('edit-mode',editMode);
-  $('#editBtn').classList.toggle('active',editMode);
+  var v=currentView();
+  var wrap=document.createElement('div');
+  wrap.className='grid-wrap';
+  var grid=document.createElement('div');
+  grid.className='grid';
+  var N=Math.max(1, v.columnCount);
+  grid.style.gridTemplateColumns='repeat('+N+', minmax(80px, 1fr))';
+  grid.style.minWidth = (N*80)+'px';
+
+  if(!v.cells.length){
+    grid.innerHTML='<p class="empty" style="grid-column:1/-1">Модуль пуст. Добавьте ячейки в настройках.</p>';
+  } else {
+    v.cells.forEach(function(cell, idx){
+      var card = buildCard(cell, v);
+      var span = Math.min(Math.max(1, cell.colSpan||1), N);
+      card.style.gridColumn = 'span '+span;
+      card.style.minHeight = (cell.height||96)+'px';
+      grid.appendChild(card);
+    });
+  }
+  wrap.appendChild(grid);
+  c.appendChild(wrap);
+  document.body.classList.toggle('editing', ui.editing);
+  $('#btnEdit').classList.toggle('active', ui.editing);
   updateApplyButtons();
 }
 
-function updateApplyButtons(){
-  const hasLast=lastResizedCellId!==null;
-  const am=$('#applyModuleBtn'); if(am)am.disabled=!hasLast;
-  const ac=$('#applyColumnBtn'); if(ac)ac.disabled=!hasLast;
-}
+function buildCard(cell, view){
+  var card=document.createElement('div');
+  card.className='card'+(cell.date && cell.date===todayStr()?' today':'');
+  card.setAttribute('data-cell', cell.id);
 
-function renderSearchResults(root){
-  const words=getSearchWords();
-  if(!words.length)return;
-  const currentMatches=[];
-  const otherMatches=[];
-  state.views.forEach(v=>{
-    v.cells.forEach(cell=>{
-      const inName = cell.name && words.every(w=>cell.name.toLowerCase().includes(w));
-      const inDate = cell.date && words.some(w=>formatDateBadge(cell.date).includes(w));
-      const matchedTasks = cell.tasks.filter(t=>words.every(w=>t.text.toLowerCase().includes(w)));
-      const allTasksMatch = words.every(w=>cell.tasks.some(t=>t.text.toLowerCase().includes(w)));
-      if(!(inName||inDate||allTasksMatch))return;
-      const item={view:v,cell,matchedTasks:matchedTasks.length?matchedTasks:cell.tasks};
-      if(v.id===currentViewId)currentMatches.push(item);
-      else otherMatches.push(item);
-    });
-  });
-  const box=document.createElement('div');
-  box.className='search-results';
-  if(currentMatches.length){
-    const t=document.createElement('div');
-    t.className='search-section-title';
-    t.textContent='В текущем модуле';
-    box.appendChild(t);
-    currentMatches.forEach(m=>box.appendChild(buildSearchResult(m,words,false)));
+  var badge = '';
+  if(cell.date){
+    var isToday = cell.date===todayStr();
+    badge = '<span class="badge'+(isToday?' is-today':'')+'">'+fmtBadge(cell.date)+'</span>';
   }
-  if(otherMatches.length){
-    if(currentMatches.length){
-      const div=document.createElement('div');
-      div.className='search-divider';
-      box.appendChild(div);
-    } else {
-      const t=document.createElement('div');
-      t.className='search-section-title';
-      t.textContent='Найдено в других модулях';
-      box.appendChild(t);
-    }
-    otherMatches.forEach(m=>box.appendChild(buildSearchResult(m,words,true)));
+  var nameCls = cell.name ? 'cell-name' : 'cell-name empty';
+  var nameText = cell.name ? esc(cell.name) : 'Назовите';
+  var hasNotify = cell.notify && cell.notify.enabled;
+  var isNarrow = (Math.min(cell.colSpan||1, view.columnCount) === 1 && view.columnCount >= 5);
+
+  var head = document.createElement('div');
+  head.className='card-head';
+  head.innerHTML = badge +
+    '<div class="'+nameCls+'" data-name>'+nameText+'</div>' +
+    '<div class="card-actions">'+
+      '<button class="mini-btn'+(hasNotify?' on':'')+'" data-notify title="Уведомления">🔔</button>'+
+      '<button class="mini-btn" data-settings title="Настройки">⚙️</button>'+
+    '</div>';
+  card.appendChild(head);
+
+  var tasks = document.createElement('div');
+  tasks.className='cell-tasks';
+  card.appendChild(tasks);
+  renderTasksInCard(cell, tasks, isNarrow);
+
+  if(ui.editing){
+    var rh=document.createElement('div');
+    rh.className='resize-w'; rh.textContent='↔'; rh.title='Ширина';
+    rh.addEventListener('pointerdown', function(e){ e.stopPropagation(); e.preventDefault(); startWidthResize(e, card, cell, view); });
+    card.appendChild(rh);
+    var rh2=document.createElement('div');
+    rh2.className='resize-h'; rh2.textContent='↕'; rh2.title='Высота';
+    rh2.addEventListener('pointerdown', function(e){ e.stopPropagation(); e.preventDefault(); startHeightResize(e, card, cell, view); });
+    card.appendChild(rh2);
   }
-  if(!currentMatches.length && !otherMatches.length){
-    box.innerHTML='<p class="empty">Ничего не найдено</p>';
-  }
-  root.appendChild(box);
-}
 
-function buildSearchResult(item,words,isOther){
-  const{view,cell}=item;
-  const btn=document.createElement('button');
-  btn.className='search-result';
-  const dateStr = cell.date ? formatDateBadge(cell.date)+' · ' : '';
-  const nameStr = cell.name ? escapeHtml(cell.name) : 'Без названия';
-  let preview = '';
-  if(item.matchedTasks.length){
-    const taskText = item.matchedTasks[0].text;
-    preview = '☐ '+highlightText(taskText,words);
-    if(item.matchedTasks.length>1) preview += ' и ещё '+(item.matchedTasks.length-1);
-  } else {
-    preview = 'Ячейка';
-  }
-  btn.innerHTML = `
-    <div class="search-result-head">
-      ${isOther?`<span class="search-result-module">${view.icon} ${escapeHtml(view.title)}</span>`:''}
-      <b>${dateStr}${nameStr}</b>
-    </div>
-    <div class="search-result-body">${preview}</div>`;
-  btn.addEventListener('click', ()=>{
-    if(isOther){
-      switchView(view.id);
-      setTimeout(()=>{
-        const grid=$('#columnsContainer');
-        if(!grid)return;
-        const card=grid.querySelector(`[data-cell-id="${cell.id}"]`);
-        if(card){
-          card.scrollIntoView({behavior:'smooth',block:'center'});
-          card.classList.add('flash');
-          setTimeout(()=>card.classList.remove('flash'),2200);
-        }
-      },400);
-    } else {
-      openTasksModal(cell);
-    }
-    haptic();
-  });
-  return btn;
-}
-
-function renderPlanner(root,view){
-  const hintText = editMode
-    ? '✏️ <b>↔</b> справа — ширина. <b>↕</b> снизу — высота. ✕ на доке — удалить модуль.'
-    : 'Тап на имя — переименовать. Тап на поле — задачи. 🔔 — уведомления. ✏️ — правка.';
-  root.innerHTML=`
-    <div class="filters" id="plannerFilters"></div>
-    <div class="col-nav" id="colNav"></div>
-    <div class="columns-container" id="columnsContainer"></div>
-    <p class="hint">${hintText}</p>`;
-  renderFilters(view);
-  renderColNav(view);
-  renderGrid(view);
-  $('#plannerFilters').addEventListener('click',e=>{
-    const b=e.target.closest('[data-filter]'); if(!b)return;
-    view.filter=b.dataset.filter; saveState();
-    renderFilters(view); renderGrid(view); haptic();
-  });
-  $('#colNav').addEventListener('click',e=>{
-    const b=e.target.closest('[data-col]'); if(!b)return;
-    scrollToColumn(parseInt(b.dataset.col));
-    $$('#colNav button').forEach(x=>x.classList.toggle('active',x===b));
-    haptic();
-  });
-}
-function renderFilters(view){
-  const f=$('#plannerFilters'); if(!f)return;
-  const items=[{k:'all',t:'Все'},{k:'busy',t:'С задачами'},{k:'empty',t:'Свободные'}];
-  f.innerHTML='';
-  for(const it of items){
-    const b=document.createElement('button');
-    b.dataset.filter=it.k; b.textContent=it.t;
-    b.className=(view.filter||'all')===it.k?'active':'';
-    f.appendChild(b);
-  }
-}
-function renderColNav(view){
-  const nav=$('#colNav'); if(!nav)return;
-  nav.innerHTML='';
-  if(view.columnCount<=1)return;
-  for(let i=0;i<view.columnCount;i++){
-    const b=document.createElement('button');
-    b.dataset.col=i; b.textContent=i+1;
-    nav.appendChild(b);
-  }
-}
-
-function computeGridMetrics(view){
-  const N = Math.max(1, view.columnCount);
-  const effective = new Array(N).fill(1);
-  view.cells.forEach((cell, idx) => {
-    const baseCol = idx % N;
-    const span = Math.max(1, Math.min(N, cell.colSpan || 1));
-    if (span > effective[baseCol]) effective[baseCol] = span;
-  });
-  const offsets = new Array(N).fill(0);
-  let total = 0;
-  for(let i=0;i<N;i++){ offsets[i]=total; total+=effective[i]; }
-  return { effective, offsets, total, N };
-}
-function scrollToColumn(idx){
-  const c=$('#columnsContainer'); if(!c)return;
-  const v=state.views.find(x=>x.id===currentViewId); if(!v)return;
-  const { effective, offsets } = computeGridMetrics(v);
-  if(idx<0||idx>=offsets.length)return;
-  const totalCells = effective.reduce((s,e)=>s+e,0);
-  const totalScroll = c.scrollWidth - c.clientWidth;
-  if(totalScroll<=0)return;
-  const ratio = offsets[idx] / Math.max(1, totalCells - effective[idx]);
-  c.scrollTo({left: totalScroll * ratio, behavior:'smooth'});
-}
-function currentViewColumnCount(){
-  const v=state.views.find(x=>x.id===currentViewId);
-  return v?v.columnCount:1;
-}
-function renderGrid(view){
-  const container=$('#columnsContainer'); if(!container)return;
-  container.innerHTML='';
-  const metrics = computeGridMetrics(view);
-  container.style.gridTemplateColumns=`repeat(${metrics.total}, minmax(70px, 1fr))`;
-  const words=getSearchWords();
-  const visibleIdx=[];
-  view.cells.forEach((cell,idx)=>{
-    const mq=matchCell(cell,words);
-    const f=view.filter||'all';
-    const mf=f==='all'?true:f==='busy'?cell.tasks.length>0:f==='empty'?cell.tasks.length===0:true;
-    if(mq&&mf) visibleIdx.push(idx);
-  });
-  if(!visibleIdx.length){
-    container.innerHTML='<p class="empty">Нет подходящих</p>';
-    return;
-  }
-  visibleIdx.forEach(idx=>{
-    const cell=view.cells[idx];
-    const baseCol = idx % metrics.N;
-    const row = Math.floor(idx / metrics.N);
-    const gridColStart = metrics.offsets[baseCol] + 1;
-    const gridSpan = Math.min(cell.colSpan || 1, metrics.effective[baseCol]);
-    const gridRowStart = row + 1;
-    const card=buildCellCard(view,cell,words,idx,baseCol);
-    card.style.gridRow = gridRowStart + ' / span 1';
-    card.style.gridColumn = gridColStart + ' / span ' + gridSpan;
-    container.appendChild(card);
-  });
-}
-
-function notifyHasSettings(n){
-  if(!n||!n.enabled)return false;
-  if(n.mode==='once')return !!n.date;
-  if(n.mode==='weekly')return n.days&&n.days.length>0;
-  if(n.mode==='monthly')return !!n.monthDay;
-  return true;
-}
-
-function gridSpanFinal(cell, view){
-  const m = computeGridMetrics(view);
-  const idx = view.cells.indexOf(cell);
-  const baseCol = idx % m.N;
-  return Math.min(cell.colSpan || 1, m.effective[baseCol]);
-}
-
-function renderTasksPreview(cell, words, isNarrow){
-  if(!cell.tasks.length){
-    return '<div class="cell-empty">Нажмите, чтобы добавить задачи</div>';
-  }
-  if(isNarrow && cell.tasks.length > 1){
-    const n = cell.tasks.length;
-    const word = (n>=2 && n<=4) ? 'задачи' : 'задач';
-    return '<div class="cell-count">' + n + ' ' + word + '</div>';
-  }
-  return cell.tasks.map(t=>`
-    <div class="cell-task">
-      <button class="cell-checkbox${t.done?' checked':''}" data-toggle="${t.id}" style="--cb-color:${cell.color}">
-        ${t.done?'<svg viewBox="0 0 20 20" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M4 10l4 4 8-8"/></svg>':''}
-      </button>
-      <span class="cell-task-text${t.done?' done':''}" data-text="${t.id}">${highlightText(t.text,words)}</span>
-    </div>
-  `).join('');
-}
-
-function attachTaskListeners(card, cell, view){
-  card.querySelectorAll('[data-toggle]').forEach(btn=>{
-    btn.addEventListener('click', e=>{
-      e.stopPropagation();
-      const task=cell.tasks.find(t=>t.id===btn.dataset.toggle);
-      if(task){ task.done=!task.done; saveState(); haptic(); refreshCard(card,cell,view); }
-    });
-  });
-  card.querySelectorAll('[data-text]').forEach(span=>{
-    span.addEventListener('click', e=>{
-      e.stopPropagation();
-      const task=cell.tasks.find(t=>t.id===span.dataset.text);
-      if(!task) return;
-      startInlineEdit(span, task.text, false, n=>{
-        task.text = n || task.text; saveState(); refreshCard(card,cell,view);
-      });
-    });
-  });
-}
-
-function buildCellCard(view,cell,words,idx,baseCol){
-  const card=document.createElement('div');
-  card.className='day-card'+(isTodayCell(cell)?' is-today':'');
-  card.dataset.cellId=cell.id;
-  card.dataset.draggable='true';
-  card.draggable=false;
-  card.dataset.baseCol=baseCol;
-  card.dataset.idx=idx;
-  card.style.setProperty('--card-color',cell.color);
-  card.style.minHeight=(cell.height||DEFAULT_HEIGHT)+'px';
-  card.style.maxHeight=(cell.height||DEFAULT_HEIGHT)+'px';
-
-  const dateBadge = cell.date
-    ? `<span class="date-badge${cell.date===todayStr()?' is-today-badge':''}">${formatDateBadge(cell.date)}</span>`
-    : '';
-  const nameText = cell.name || '';
-  const nameHtml = nameText
-    ? highlightText(nameText, words)
-    : '<span class="empty-name">Назовите</span>';
-  const tasksBg = hexToRgba(cell.color,0.12);
-  const hasNotify = notifyHasSettings(cell.notify);
-  const isNarrow = (gridSpanFinal(cell, view) === 1 && view.columnCount >= 5);
-  const tasksHtml = renderTasksPreview(cell, words, isNarrow);
-
-  card.innerHTML = `
-    <div class="day-head">
-      <div class="day-head-left">
-        ${dateBadge}
-        <div class="day-name${nameText?'':' empty-name'}" data-name>${nameHtml}</div>
-      </div>
-      <div class="day-actions">
-        <button class="mini-btn ${hasNotify?'bell-on':''}" data-notify title="Уведомления">🔔</button>
-        <button class="mini-btn" data-settings title="Настройки">⚙️</button>
-      </div>
-    </div>
-    <div class="cell-tasks" data-tasks style="background:${tasksBg}">${tasksHtml}</div>
-    <div class="drag-handle-w" data-width title="Ширина">↔</div>
-    <div class="drag-handle-h" data-resize title="Высота">↕</div>`;
-
-  card.querySelector('[data-name]').addEventListener('click', e=>{
+  head.querySelector('[data-name]').addEventListener('click', function(e){
     e.stopPropagation();
-    const el=e.currentTarget;
-    startInlineEdit(el, cell.name||'', true, n=>{
-      cell.name = n || '';
-      saveState(); refreshCard(card, cell, view);
+    inlineEdit(e.currentTarget, cell.name||'', function(val){
+      cell.name=val; saveState(); render();
     });
   });
-  card.querySelector('[data-notify]').addEventListener('click', e=>{
+  head.querySelector('[data-notify]').addEventListener('click', function(e){
     e.stopPropagation(); openNotifyForCell(cell);
   });
-  card.querySelector('[data-settings]').addEventListener('click', e=>{
+  head.querySelector('[data-settings]').addEventListener('click', function(e){
     e.stopPropagation(); openCellModal(cell);
   });
-  attachTaskListeners(card, cell, view);
-  card.addEventListener('click', e=>{
-    if(editMode) return;
-    if(suppressClick){ suppressClick=false; return; }
-    if(e.target.closest('[data-name],[data-settings],[data-notify],[data-toggle],[data-text],[data-resize],[data-width]')) return;
+
+  card.addEventListener('click', function(e){
+    if(ui.editing) return;
+    if(e.target.closest('.card-head, .cell-tasks, [data-name], [data-notify], [data-settings], .resize-w, .resize-h')) return;
     openTasksModal(cell);
   });
-  card.addEventListener('pointerdown', e=>{
-    if(e.target.closest('[data-name],[data-settings],[data-notify],[data-toggle],[data-text],[data-resize],[data-width]')) return;
-    if(e.button && e.button!==0) return;
-    if(editMode){ startDrag(card,cell,view); }
-    else { longPressTimer=setTimeout(()=>startDrag(card,cell,view), LONG_PRESS_MS); }
-  });
-  const cancelPress=()=>{ if(longPressTimer){ clearTimeout(longPressTimer); longPressTimer=null; } };
-  card.addEventListener('pointerup', cancelPress);
-  card.addEventListener('pointercancel', cancelPress);
-  card.addEventListener('pointermove', cancelPress);
 
-  card.querySelector('[data-resize]').addEventListener('pointerdown', e=>{
+  card.addEventListener('pointerdown', function(e){
+    if(!ui.editing) return;
+    if(e.target.closest('.card-head, [data-name], [data-notify], [data-settings], .resize-w, .resize-h')) return;
     if(e.button && e.button!==0) return;
-    e.stopPropagation(); e.preventDefault();
-    startHeightResize(e, card, cell, view);
+    startDrag(card, cell, view);
   });
-  card.querySelector('[data-width]').addEventListener('pointerdown', e=>{
-    if(e.button && e.button!==0) return;
-    e.stopPropagation(); e.preventDefault();
-    startWidthResize(e, card, cell, view);
-  });
+
   return card;
 }
 
-function refreshCard(card, cell, view){
-  const tasksBox=card.querySelector('[data-tasks]'); if(!tasksBox) return;
-  const words=getSearchWords();
-  tasksBox.style.background = hexToRgba(cell.color, 0.12);
-  card.style.setProperty('--card-color', cell.color);
-  card.classList.toggle('is-today', isTodayCell(cell));
-  const bellBtn=card.querySelector('[data-notify]');
-  if(bellBtn) bellBtn.classList.toggle('bell-on', notifyHasSettings(cell.notify));
-  const headLeft=card.querySelector('.day-head-left');
-  if(headLeft){
-    const badge = cell.date
-      ? `<span class="date-badge${cell.date===todayStr()?' is-today-badge':''}">${formatDateBadge(cell.date)}</span>` : '';
-    headLeft.innerHTML = badge +
-      `<div class="day-name${cell.name?'':' empty-name'}" data-name>${cell.name ? highlightText(cell.name, words) : '<span class="empty-name">Назовите</span>'}</div>`;
-    const newName = headLeft.querySelector('[data-name]');
-    if(newName){
-      newName.addEventListener('click', ev=>{
-        ev.stopPropagation();
-        startInlineEdit(newName, cell.name||'', true, n2=>{
-          cell.name = n2||''; saveState(); refreshCard(card,cell,view);
-        });
-      });
-    }
+function renderTasksInCard(cell, container, isNarrow){
+  container.innerHTML='';
+  if(!cell.tasks.length){
+    container.innerHTML='<div class="empty-tasks">Нажмите, чтобы добавить</div>';
+    return;
   }
-  const isNarrow = gridSpanFinal(cell, view) === 1 && view.columnCount >= 5;
-  tasksBox.innerHTML = renderTasksPreview(cell, words, isNarrow);
-  attachTaskListeners(card, cell, view);
+  if(isNarrow && cell.tasks.length > 1){
+    container.innerHTML='<div class="count-tasks">'+cell.tasks.length+' задач</div>';
+    return;
+  }
+  cell.tasks.forEach(function(t){
+    var row=document.createElement('div');
+    row.className='ctask';
+    var cb=document.createElement('button');
+    cb.className='ctask-cb'+(t.done?' checked':'');
+    cb.innerHTML = t.done
+      ? '<svg viewBox="0 0 20 20" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M4 10l4 4 8-8"/></svg>'
+      : '';
+    cb.addEventListener('click', function(e){
+      e.stopPropagation();
+      t.done=!t.done; saveState(); render();
+    });
+    row.appendChild(cb);
+    var txt=document.createElement('span');
+    txt.className='ctask-text'+(t.done?' done':'');
+    txt.textContent=t.text;
+    txt.addEventListener('click', function(e){
+      e.stopPropagation();
+      inlineEdit(txt, t.text, function(val){
+        t.text=val||t.text; saveState(); render();
+      });
+    });
+    row.appendChild(txt);
+    container.appendChild(row);
+  });
 }
 
-function startInlineEdit(el, oldText, isName, onSave){
-  const input=document.createElement('input');
-  input.type='text'; input.value=oldText;
-  input.className = isName ? 'name-edit-input' : 'task-edit-input';
-  el.replaceWith(input); input.focus();
+function inlineEdit(el, oldText, onSave){
+  var input=document.createElement('input');
+  input.type='text';
+  input.value=oldText;
+  input.style.cssText='flex:1;min-width:0;background:transparent;border:none;'+
+    'color:inherit;font:inherit;padding:2px 0;border-bottom:2px solid var(--accent);outline:none';
+  el.replaceWith(input);
+  input.focus();
   input.setSelectionRange(input.value.length, input.value.length);
-  let done=false;
-  const finish=save=>{
+  var done=false;
+  function finish(save){
     if(done) return; done=true;
-    const v=input.value.trim();
+    var v=input.value.trim();
     input.replaceWith(el);
-    onSave(save ? v : oldText);
-  };
-  input.addEventListener('blur', ()=>finish(true));
-  input.addEventListener('keydown', e=>{
+    if(save && v && v!==oldText) onSave(v);
+    else if(!save) onSave(null);
+  }
+  input.addEventListener('blur', function(){ finish(true); });
+  input.addEventListener('keydown', function(e){
     if(e.key==='Enter'){ e.preventDefault(); input.blur(); }
     else if(e.key==='Escape'){ e.preventDefault(); finish(false); }
   });
 }
 
+/* === Ресайз === */
 function startHeightResize(e, card, cell, view){
   pushUndo();
-  const startY=e.clientY;
-  const startH=cell.height||DEFAULT_HEIGHT;
+  var startY=e.clientY, startH=cell.height||96;
   haptic();
-  const move=ev=>{
+  function move(ev){
     if(ev.cancelable) ev.preventDefault();
-    const dy=ev.clientY-startY;
-    cell.height=Math.max(MIN_HEIGHT, Math.min(MAX_HEIGHT, startH+dy));
+    cell.height = Math.max(60, Math.min(800, startH + (ev.clientY-startY)));
     card.style.minHeight=cell.height+'px';
-    card.style.maxHeight=cell.height+'px';
-  };
-  const up=()=>{
+  }
+  function up(){
     document.removeEventListener('pointermove', move);
     document.removeEventListener('pointerup', up);
     document.removeEventListener('pointercancel', up);
-    saveState(); haptic('medium');
-    lastResizedCellId=cell.id;
-    updateApplyButtons();
-  };
+    saveState(); ui.lastResizedCellId=cell.id; updateApplyButtons();
+  }
   document.addEventListener('pointermove', move, {passive:false});
   document.addEventListener('pointerup', up);
   document.addEventListener('pointercancel', up);
@@ -1390,969 +995,1029 @@ function startHeightResize(e, card, cell, view){
 
 function startWidthResize(e, card, cell, view){
   pushUndo();
-  const startX=e.clientX;
-  const startSpan = cell.colSpan || 1;
-  const metrics = computeGridMetrics(view);
-  const container=card.parentElement;
-  if(!container) return;
-  const containerW=container.getBoundingClientRect().width;
-  const baseCellWidth = containerW / Math.max(1, metrics.total);
+  var startX=e.clientX;
+  var startSpan=cell.colSpan||1;
+  var gridEl = card.parentElement;
+  var containerW = gridEl ? gridEl.getBoundingClientRect().width : 300;
+  var N = Math.max(1, view.columnCount);
+  var colW = (containerW - 10*(N-1)) / N;
   haptic();
-  let lastSpan=startSpan;
-  const move=ev=>{
+  var lastSpan=startSpan;
+  function move(ev){
     if(ev.cancelable) ev.preventDefault();
-    const dx = ev.clientX - startX;
-    const delta = Math.round(dx / baseCellWidth);
-    let newSpan = startSpan + delta;
-    newSpan = Math.max(1, Math.min(view.columnCount, newSpan));
-    if(newSpan !== lastSpan){
-      lastSpan = newSpan;
-      cell.colSpan = newSpan;
-      renderGrid(view);
+    var dx=ev.clientX - startX;
+    var delta=Math.round(dx / (colW+10));
+    var span=Math.max(1, Math.min(N, startSpan + delta));
+    if(span!==lastSpan){
+      lastSpan=span;
+      cell.colSpan=span;
+      card.style.gridColumn='span '+span;
     }
-  };
-  const up=()=>{
+  }
+  function up(){
     document.removeEventListener('pointermove', move);
     document.removeEventListener('pointerup', up);
     document.removeEventListener('pointercancel', up);
-    saveState(); haptic('medium');
-    lastResizedCellId=cell.id;
-    renderContent();
-    updateApplyButtons();
-    toast('Ширина: '+cell.colSpan+' столбц'+(cell.colSpan===1?'':'ов'));
-  };
+    saveState(); ui.lastResizedCellId=cell.id;
+    render(); updateApplyButtons();
+    toast('Ширина: '+cell.colSpan+'/'+N);
+  }
   document.addEventListener('pointermove', move, {passive:false});
   document.addEventListener('pointerup', up);
   document.addEventListener('pointercancel', up);
 }
 
-function applySizeToAllModule(){
-  if(!lastResizedCellId) return;
-  const v=state.views.find(x=>x.id===currentViewId); if(!v) return;
-  const src=v.cells.find(c=>c.id===lastResizedCellId); if(!src) return;
+function updateApplyButtons(){
+  var has=!!ui.lastResizedCellId;
+  var b1=$('#btnApplyModule'), b2=$('#btnApplyColumn');
+  if(b1) b1.disabled=!has;
+  if(b2) b2.disabled=!has;
+}
+
+function applySizeToModule(){
+  if(!ui.lastResizedCellId) return;
+  var v=currentView();
+  var src=v.cells.find(function(c){return c.id===ui.lastResizedCellId;});
+  if(!src) return;
   pushUndo();
-  v.cells.forEach(c=>{ c.colSpan = src.colSpan; c.height = src.height; });
-  saveState(); renderContent(); haptic('medium');
-  toast('Размер применён ко всему модулю ('+v.cells.length+' ячеек)');
+  v.cells.forEach(function(c){ c.colSpan=src.colSpan; c.height=src.height; });
+  saveState(); render(); toast('Применено ко всему модулю');
 }
 function applySizeToColumn(){
-  if(!lastResizedCellId) return;
-  const v=state.views.find(x=>x.id===currentViewId); if(!v) return;
-  const src=v.cells.find(c=>c.id===lastResizedCellId); if(!src) return;
-  const srcIdx=v.cells.indexOf(src);
-  const baseCol = srcIdx % v.columnCount;
+  if(!ui.lastResizedCellId) return;
+  var v=currentView();
+  var srcIdx=v.cells.findIndex(function(c){return c.id===ui.lastResizedCellId;});
+  if(srcIdx<0) return;
+  var src=v.cells[srcIdx];
+  var baseCol=srcIdx % v.columnCount;
   pushUndo();
-  let count=0;
-  v.cells.forEach((c,i)=>{
-    if(i%v.columnCount === baseCol){ c.colSpan = src.colSpan; c.height = src.height; count++; }
+  var n=0;
+  v.cells.forEach(function(c, i){
+    if(i%v.columnCount===baseCol){ c.colSpan=src.colSpan; c.height=src.height; n++; }
   });
-  saveState(); renderContent(); haptic('medium');
-  toast('Размер применён к столбцу '+(baseCol+1)+' ('+count+' ячеек)');
+  saveState(); render(); toast('Применено к столбцу '+(baseCol+1)+' ('+n+' ячеек)');
 }
 
+/* === Drag === */
 function startDrag(card, cell, view){
-  longPressTimer=null;
   haptic('medium');
-  suppressClick=true;
-  dragState={card, cell, view, target:null, targetCellId:null};
-  card.classList.add('dragging');
-  const move=ev=>{
-    if(!dragState) return;
+  ui.dragState={card:card, cell:cell, view:view, target:null};
+  card.style.opacity=0.5;
+  function move(ev){
+    if(!ui.dragState) return;
     if(ev.cancelable) ev.preventDefault();
-    $$('.drag-target').forEach(el=>el.classList.remove('drag-target'));
-    const el=document.elementFromPoint(ev.clientX, ev.clientY);
-    const target=el?.closest('[data-draggable]');
+    $$('.card').forEach(function(el){ el.style.outline=''; });
+    var el=document.elementFromPoint(ev.clientX, ev.clientY);
+    var target=el ? el.closest('.card') : null;
     if(target && target!==card){
-      target.classList.add('drag-target');
-      dragState.target=target;
-      dragState.targetCellId=target.dataset.cellId;
+      target.style.outline='2px solid var(--accent)';
+      ui.dragState.target=target;
     } else {
-      dragState.target=null;
-      dragState.targetCellId=null;
+      ui.dragState.target=null;
     }
-  };
-  const up=()=>{
+  }
+  function up(){
     document.removeEventListener('pointermove', move);
     document.removeEventListener('pointerup', up);
     document.removeEventListener('pointercancel', up);
-    endDrag();
-  };
+    if(ui.dragState && ui.dragState.target){
+      var targetId=ui.dragState.target.getAttribute('data-cell');
+      var cells=view.cells;
+      var sIdx=cells.indexOf(cell);
+      if(sIdx>=0) cells.splice(sIdx, 1);
+      var tIdx=cells.findIndex(function(c){return c.id===targetId;});
+      if(tIdx>=0) cells.splice(tIdx, 0, cell);
+      else cells.push(cell);
+      pushUndo();
+      saveState();
+      haptic('medium');
+    }
+    $$('.card').forEach(function(el){ el.style.outline=''; el.style.opacity=''; });
+    ui.dragState=null;
+    render();
+  }
   document.addEventListener('pointermove', move, {passive:false});
   document.addEventListener('pointerup', up);
   document.addEventListener('pointercancel', up);
 }
-function endDrag(){
-  if(!dragState){ suppressClick=false; return; }
-  const {cell, view, targetCellId}=dragState;
-  if(targetCellId){
-    pushUndo();
-    const cells=view.cells;
-    const sIdx=cells.indexOf(cell);
-    if(sIdx>=0) cells.splice(sIdx,1);
-    const tIdx=cells.findIndex(c=>c.id===targetCellId);
-    if(tIdx>=0) cells.splice(tIdx,0,cell);
-    else cells.push(cell);
-    saveState(); haptic('medium');
-  }
-  dragState?.card?.classList.remove('dragging');
-  $$('.drag-target').forEach(el=>el.classList.remove('drag-target'));
-  dragState=null;
-  setTimeout(()=>{ suppressClick=false; }, 100);
-  renderContent();
+
+/* === Модалки === */
+function openM(id){ var m=document.getElementById(id); if(m) m.classList.add('open'); }
+function closeM(id){ var m=document.getElementById(id); if(m) m.classList.remove('open'); }
+
+/* Модалка ячейки */
+function openCellModal(cell){
+  ui.editingCellId=cell.id;
+  $('#cellTitle').textContent = cell.name || 'Ячейка';
+  $('#cellName').value = cell.name || '';
+  $('#cellDate').value = cell.date || '';
+  renderCellSwatches(cell);
+  $('#cellNotifyToggle').classList.toggle('on', !!(cell.notify && cell.notify.enabled));
+  $('#cellNotifyFields').style.display = (cell.notify && cell.notify.enabled) ? 'flex' : 'none';
+  $('#cellNotifyTime').value = (cell.notify && cell.notify.time) || '09:00';
+  updateCellNotifyHint(cell);
+  openM('mCell');
+}
+function renderCellSwatches(cell){
+  var w=$('#cellSwatches'); w.innerHTML='';
+  CARD_COLORS.forEach(function(c){
+    var b=document.createElement('button');
+    b.className='swatch'+(c===cell.color?' active':'');
+    b.style.background=c;
+    b.addEventListener('click', function(){
+      cell.color=c;
+      $$('#cellSwatches .swatch').forEach(function(x){ x.classList.remove('active'); });
+      b.classList.add('active');
+    });
+    w.appendChild(b);
+  });
+}
+function updateCellNotifyHint(cell){
+  var el=$('#cellNotifyHint'); if(!el) return;
+  var n=cell.notify;
+  if(!n || !n.enabled){ el.textContent=''; el.style.display='none'; return; }
+  el.style.display='block';
+  var parts=[];
+  if(n.mode==='celldate'){
+    parts.push(cell.date ? 'Сработает '+fmtBadge(cell.date)+' в '+n.time : '⚠️ У ячейки нет даты');
+  } else if(n.mode==='daily') parts.push('Каждый день в '+n.time);
+  else if(n.mode==='weekly') parts.push('Дни: '+(n.days||[]).map(function(i){return DAYS[i];}).join(', ')+' в '+n.time);
+  else if(n.mode==='monthly') parts.push('Каждое '+(n.monthDay||1)+' число в '+n.time);
+  else if(n.mode==='once') parts.push(n.date ? 'Разово '+fmtBadge(n.date) : '⚠️ Дата не указана');
+  el.textContent=parts.join(' · ');
 }
 
+/* Модалка задач */
 function openTasksModal(cell){
-  currentCellId=cell.id;
+  ui.editingCellId=cell.id;
   $('#tasksTitle').textContent = cell.name || 'Задачи';
-  updateTasksSubtitle(cell);
-  $('#newTask').value='';
+  updateTasksSub(cell);
   renderTasksList(cell);
-  openModal($('#tasksModal'));
-  setTimeout(()=>{ try{ $('#newTask').focus(); }catch(e){} }, 250);
+  $('#newTaskInput').value='';
+  openM('mTasks');
+  setTimeout(function(){ try{ $('#newTaskInput').focus(); }catch(e){} }, 260);
 }
-function updateTasksSubtitle(cell){
-  const parts=[];
-  if(cell.date) parts.push(formatDateBadge(cell.date));
-  const n=cell.tasks.length;
-  if(n===0) parts.push('пусто');
-  else if(n===1) parts.push('1 задача');
-  else if(n>=2 && n<=4) parts.push(n+' задачи');
-  else parts.push(n+' задач');
-  const el=$('#tasksSubtitle');
-  if(el) el.textContent = parts.join(' · ');
+function updateTasksSub(cell){
+  var parts=[];
+  if(cell.date) parts.push(fmtBadge(cell.date));
+  var n=cell.tasks.length;
+  parts.push(n===0?'пусто': n+' задач'+(n===1?'а':n<=4?'и':''));
+  $('#tasksSub').textContent=parts.join(' · ');
 }
 function renderTasksList(cell){
-  const list=$('#taskList'); list.innerHTML='';
+  var list=$('#tasksList'); list.innerHTML='';
   if(!cell.tasks.length){
-    list.innerHTML='<p class="empty" style="padding:24px 12px">Задач нет. Добавьте первую ↓</p>';
+    list.innerHTML='<div class="empty-sm">Задач нет. Добавьте первую ↓</div>';
     return;
   }
-  cell.tasks.forEach(task=>{
-    const row=document.createElement('div'); row.className='task-item';
-    const cb=document.createElement('button');
-    cb.className='checkbox'+(task.done?' checked':'');
-    cb.style.setProperty('--cb-color', cell.color);
-    cb.innerHTML=task.done
-      ? '<svg viewBox="0 0 20 20" fill="none" stroke="#fff" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 10l4 4 8-8"/></svg>'
-      : '';
-    cb.addEventListener('click', ()=>{ task.done=!task.done; saveState(); renderTasksList(cell); refreshCellsInView(cell); });
+  cell.tasks.forEach(function(t){
+    var row=document.createElement('div');
+    row.className='task-item';
+    var cb=document.createElement('button');
+    cb.className='cb'+(t.done?' checked':'');
+    cb.innerHTML = t.done ? '<svg viewBox="0 0 20 20" fill="none" stroke="#fff" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 10l4 4 8-8"/></svg>' : '';
+    cb.addEventListener('click', function(){
+      t.done=!t.done; saveState(); renderTasksList(cell); updateTasksSub(cell); render();
+    });
     row.appendChild(cb);
-    const txt=document.createElement('span');
-    txt.className='task-text'+(task.done?' done':''); txt.textContent=task.text;
-    txt.addEventListener('click', ()=>{
-      startInlineEdit(txt, task.text, false, n=>{
-        task.text=n||task.text; saveState(); renderTasksList(cell); refreshCellsInView(cell);
+    var txt=document.createElement('span');
+    txt.className='txt'+(t.done?' done':'');
+    txt.textContent=t.text;
+    txt.addEventListener('click', function(){
+      inlineEdit(txt, t.text, function(val){
+        if(val) t.text=val;
+        saveState(); renderTasksList(cell); render();
       });
     });
     row.appendChild(txt);
-    const del=document.createElement('button');
-    del.className='mini-btn'; del.textContent='✕';
-    del.addEventListener('click', ()=>{
-      const i=cell.tasks.indexOf(task); if(i>=0) cell.tasks.splice(i,1);
-      saveState(); renderTasksList(cell); refreshCellsInView(cell); updateTasksSubtitle(cell);
+    var del=document.createElement('button');
+    del.className='del'; del.textContent='✕';
+    del.addEventListener('click', function(){
+      var i=cell.tasks.indexOf(t);
+      if(i>=0) cell.tasks.splice(i,1);
+      saveState(); renderTasksList(cell); updateTasksSub(cell); render();
     });
     row.appendChild(del);
     list.appendChild(row);
   });
 }
-function refreshCellsInView(cell){
-  const cards=$$(`[data-cell-id="${cell.id}"]`);
-  const view=state.views.find(v=>v.id===currentViewId);
-  cards.forEach(card=>refreshCard(card, cell, view));
-}
-function getCurrentCell(){
-  const v=state.views.find(x=>x.id===currentViewId); if(!v) return null;
-  return v.cells.find(c=>c.id===currentCellId)||null;
-}
 
-function openCellModal(cell){
-  currentCellId=cell.id;
-  $('#cellTitle').textContent = cell.name || 'Ячейка';
-  $('#cellNameInput').value = cell.name || '';
-  $('#cellDateInput').value = cell.date || '';
-  renderCellSwatches(cell);
-  $('#cellColorCustom').value = cell.color;
-  const n=cell.notify||makeNotify();
-  $('#cellNotifyToggle').classList.toggle('on', !!n.enabled);
-  $('#cellNotifyFields').style.display = n.enabled ? 'block' : 'none';
-  $('#cellNotifyTime').value = n.time || '09:00';
-  updateCellNotifyHint(cell);
-  openModal($('#cellModal'));
+/* Модалка уведомлений */
+function openNotifyForCell(cell){
+  ui.notifyTarget={type:'cell', ids:{}};
+  ui.notifyTarget.ids[cell.id]=true;
+  ui.notifyData = JSON.parse(JSON.stringify(cell.notify||makeNotify()));
+  $('#notifyTitle').textContent='Уведомления: '+(cell.name||'ячейка');
+  $('#notifyApplySection').style.display='none';
+  fillNotifyForm();
+  openM('mNotify');
 }
-function updateCellNotifyHint(cell){
-  const hint = $('#cellNotifyHint');
-  if(!hint) return;
-  const n=cell.notify;
-  if(!n || !n.enabled){ hint.textContent=''; return; }
-  const parts=[];
-  if(n.mode==='celldate'){
-    if(cell.date) parts.push('Сработает '+formatDateBadge(cell.date)+' в '+n.time);
-    else parts.push('⚠️ У ячейки нет даты.');
-  } else if(n.mode==='daily'){ parts.push('Каждый день в '+n.time); }
-  else if(n.mode==='weekly'){ parts.push('По дням: '+(n.days||[]).map(i=>DAY_NAMES[i]).join(', ')+' в '+n.time); }
-  else if(n.mode==='monthly'){ parts.push('Каждое '+(n.monthDay||1)+'-е число в '+n.time); }
-  else if(n.mode==='once'){ parts.push(n.date ? 'Разово '+formatDateBadge(n.date)+' в '+n.time : '⚠️ Укажите дату в уведомлении'); }
-  if(n.hourBefore) parts.push('· за час');
-  if(n.dayBefore) parts.push('· за день');
-  hint.textContent = parts.join(' ');
-}
-function renderCellSwatches(cell){
-  const wrap=$('#cellSwatches'); wrap.innerHTML='';
-  for(const c of CARD_PALETTE){
-    const b=document.createElement('button');
-    b.className='swatch'+(c===cell.color?' active':'');
-    b.style.background=c; b.style.color=c;
-    b.addEventListener('click', ()=>{
-      cell.color=c; saveState(); renderCellSwatches(cell);
-      $('#cellColorCustom').value=c;
-      refreshCellsInView(cell);
-    });
-    wrap.appendChild(b);
-  }
-}
-
-function renderSettings(){
-  const v=state.views.find(x=>x.id===currentViewId); if(!v) return;
-  $$('[data-theme-set]').forEach(b=>{
-    b.style.background = b.dataset.themeSet===state.theme ? 'var(--accent)' : 'var(--bg-3)';
-    b.style.color = b.dataset.themeSet===state.theme ? '#fff' : 'var(--text)';
-  });
-  const rows = Math.max(1, v.rowsPerColumn || 1);
-  const ms=$('#moduleSettings');
-  ms.innerHTML = `
-    <div class="setting-block">
-      <div class="setting-label">Название модуля</div>
-      <input type="text" class="modal-input" id="moduleTitleInput" value="${escapeHtml(v.title)}">
-      <div class="setting-label">Иконка</div>
-      <input type="text" class="modal-input" id="moduleIconInput" value="${escapeHtml(v.icon)}" maxlength="2" style="text-align:center;font-size:22px">
-    </div>
-    <div class="setting-block">
-      <div class="setting-label">Акцентный цвет</div>
-      <div class="swatches" id="accentSwatches"></div>
-      <div class="color-row">
-        <input type="color" id="accentCustom" class="color-input" value="${state.accent}">
-        <span style="font-size:13px;color:var(--text-dim)">Свой цвет</span>
-      </div>
-    </div>
-    <div class="setting-block">
-      <div class="setting-label">Структура сетки</div>
-      <div class="total-display">
-        <b>${v.cells.length}</b> ячеек = <b>${v.columnCount}</b> × <b>${rows}</b>
-        <div style="font-size:11px;margin-top:4px;opacity:.75">столбцов × ячеек в столбце</div>
-      </div>
-      <div class="grid-counter-label">1. Столбцов</div>
-      <div class="counter-row">
-        <button class="counter-btn" id="colsMinus">−</button>
-        <div class="num-value" id="colsValue">${v.columnCount}</div>
-        <button class="counter-btn" id="colsPlus">+</button>
-      </div>
-      <div class="grid-counter-label">2. Ячеек в столбце</div>
-      <div class="counter-row">
-        <button class="counter-btn" id="rowsMinus">−</button>
-        <div class="num-value" id="rowsValue">${rows}</div>
-        <button class="counter-btn" id="rowsPlus">+</button>
-      </div>
-      <div class="grid-counter-label">3. Всего ячеек</div>
-      <div class="counter-row">
-        <button class="counter-btn" id="cellsMinus">−</button>
-        <div class="num-value" id="cellsValue">${v.cells.length}</div>
-        <button class="counter-btn" id="cellsPlus">+</button>
-      </div>
-    </div>
-    <div class="setting-block">
-      <div class="setting-label">Привязка дат</div>
-      <button class="btn" id="openDateBindingBtn">📅 Привязать даты к ячейкам</button>
-      <div class="setting-hint">Выберите ячейки и задайте им даты по шагу.</div>
-    </div>
-    <div class="setting-block">
-      <div class="setting-label">Сброс модуля</div>
-      <button class="btn danger" id="resetModuleBtn">Сбросить «${escapeHtml(v.title)}»</button>
-    </div>`;
-  const sw=$('#accentSwatches'); sw.innerHTML='';
-  for(const c of ACCENT_PALETTE){
-    const b=document.createElement('button');
-    b.className='swatch'+(c===state.accent?' active':'');
-    b.style.background=c; b.style.color=c;
-    b.addEventListener('click', ()=>{ state.accent=c; saveState(); applyAccent(); renderSettings(); });
-    sw.appendChild(b);
-  }
-  $('#accentCustom').addEventListener('input', e=>{ state.accent=e.target.value; saveState(); applyAccent(); });
-  $('#moduleTitleInput').addEventListener('change', e=>{
-    const t=e.target.value.trim(); if(!t) return;
-    v.title=t; saveState(); $('#pageTitle').textContent=t; renderDock();
-  });
-  $('#moduleIconInput').addEventListener('change', e=>{
-    const t=e.target.value.trim() || '📆'; v.icon=t; saveState(); renderDock();
-  });
-  $('#colsMinus').addEventListener('click', ()=>setColumnsCount(v, v.columnCount-1));
-  $('#colsPlus').addEventListener('click', ()=>setColumnsCount(v, v.columnCount+1));
-  $('#colsValue').addEventListener('click', ()=>{
-    const n=prompt('Сколько столбцов?', v.columnCount);
-    if(n===null) return; const num=parseInt(n); if(isNaN(num)||num<1) return;
-    setColumnsCount(v, num);
-  });
-  $('#rowsMinus').addEventListener('click', ()=>setRowsCount(v, rows-1));
-  $('#rowsPlus').addEventListener('click', ()=>setRowsCount(v, rows+1));
-  $('#rowsValue').addEventListener('click', ()=>{
-    const n=prompt('Сколько ячеек в столбце?', rows);
-    if(n===null) return; const num=parseInt(n); if(isNaN(num)||num<1) return;
-    setRowsCount(v, num);
-  });
-  $('#cellsMinus').addEventListener('click', ()=>setTotalCells(v, v.cells.length-1));
-  $('#cellsPlus').addEventListener('click', ()=>setTotalCells(v, v.cells.length+1));
-  $('#cellsValue').addEventListener('click', ()=>{
-    const n=prompt('Сколько всего ячеек?', v.cells.length);
-    if(n===null) return; const num=parseInt(n); if(isNaN(num)||num<1) return;
-    setTotalCells(v, num);
-  });
-  $('#resetModuleBtn').addEventListener('click', ()=>{
-    askConfirm(`Сбросить модуль «${v.title}»?`,
-      'Все ячейки, задачи и уведомления этого модуля будут удалены.',
-      `reset:${v.id}`);
-  });
-  $('#openDateBindingBtn').addEventListener('click', ()=>{
-    closeModal($('#settingsModal'));
-    setTimeout(()=>openDateBinding(), 100);
-  });
-  const del=$('#moduleDelete');
-  if(v.removable){
-    del.innerHTML = `<div class="setting-block">
-      <div class="setting-label">Удалить модуль</div>
-      <button class="btn danger" id="deleteModuleBtn">Удалить «${escapeHtml(v.title)}»</button>
-    </div>`;
-    $('#deleteModuleBtn').addEventListener('click', ()=>{
-      askConfirm(`Удалить модуль «${v.title}»?`,
-        `У модуля ${v.cells.length} ячеек${v.cells.reduce((s,c)=>s+c.tasks.length,0)>0 ?
-          `, ${v.cells.reduce((s,c)=>s+c.tasks.length,0)} задач` : ''}. Отменить можно через ↶.`,
-        `deleteView:${v.id}`);
-    });
-  } else del.innerHTML='';
-}
-
-function checkDataLoss(v, newCount){
-  if(newCount >= v.cells.length) return {ok:true};
-  const toRemove = v.cells.slice(newCount);
-  const withTasks = toRemove.filter(c=>c.tasks.length>0).length;
-  const withDates = toRemove.filter(c=>c.date).length;
-  if(withTasks===0 && withDates===0) return {ok:true};
-  return {ok:false, withTasks, withDates, count:toRemove.length};
-}
-function setTotalCells(v, newCount){
-  if(newCount<1) newCount=1;
-  if(v.columnCount > newCount) v.columnCount = Math.max(1, newCount);
-  const check = checkDataLoss(v, newCount);
-  if(!check.ok){
-    askConfirm('Уменьшить количество ячеек?',
-      `Будет удалено ${check.count} ячеек, из них с задачами: ${check.withTasks}, с датами: ${check.withDates}. Продолжить?`,
-      `resize:${v.id}:${newCount}:total`);
-    return;
-  }
-  pushUndo();
-  resizeCellsTo(v, newCount);
-  v.rowsPerColumn = Math.max(1, Math.ceil(v.cells.length / v.columnCount));
-  const target = v.columnCount * v.rowsPerColumn;
-  if(v.cells.length !== target) resizeCellsTo(v, target);
-  saveState(); renderContent(); renderSettings();
-}
-function setColumnsCount(v, newCols){
-  if(newCols<1) newCols=1;
-  if(newCols>v.cells.length) newCols=Math.max(1, v.cells.length);
-  v.columnCount = newCols;
-  v.rowsPerColumn = Math.max(1, Math.ceil(v.cells.length / v.columnCount));
-  const target = v.columnCount * v.rowsPerColumn;
-  if(target < v.cells.length){
-    const check = checkDataLoss(v, target);
-    if(!check.ok){
-      askConfirm('Уменьшить столбцы?',
-        `Приведёт к удалению ${check.count} ячеек (с задачами: ${check.withTasks}, с датами: ${check.withDates}). Продолжить?`,
-        `resize:${v.id}:${newCols}:cols`);
-      return;
-    }
-  }
-  pushUndo();
-  resizeCellsTo(v, target);
-  saveState(); renderContent(); renderSettings();
-}
-function setRowsCount(v, newRows){
-  if(newRows<1) newRows=1;
-  const target = v.columnCount * newRows;
-  if(target < v.cells.length){
-    const check = checkDataLoss(v, target);
-    if(!check.ok){
-      askConfirm('Уменьшить ячеек в столбце?',
-        `Приведёт к удалению ${check.count} ячеек (с задачами: ${check.withTasks}, с датами: ${check.withDates}). Продолжить?`,
-        `resize:${v.id}:${newRows}:rows`);
-      return;
-    }
-  }
-  pushUndo();
-  v.rowsPerColumn = newRows;
-  resizeCellsTo(v, target);
-  saveState(); renderContent(); renderSettings();
-}
-function resizeCellsTo(v, target){
-  if(target<1) target=1;
-  if(target < v.cells.length){ v.cells = v.cells.slice(0, target); }
-  else { while(v.cells.length < target) v.cells.push(makeCell('', v.cells.length, null)); }
-}
-
 function openNotifyForModule(){
-  const v=state.views.find(x=>x.id===currentViewId); if(!v) return;
-  pendingNotifyTarget={type:'module', cellIds:new Set(v.cells.map(c=>c.id))};
-  pendingNotifyData=makeNotify();
-  pendingNotifyData.enabled=true;
-  pendingNotifyData.mode='celldate';
+  var v=currentView();
+  ui.notifyTarget={type:'module', ids:{}};
+  v.cells.forEach(function(c){ ui.notifyTarget.ids[c.id]=true; });
+  ui.notifyData = makeNotify();
+  ui.notifyData.enabled=true;
+  ui.notifyData.mode='celldate';
   $('#notifyTitle').textContent='Уведомления модуля';
   $('#notifyApplySection').style.display='block';
-  renderNotifyCellList(v);
-  fillNotifyForm(pendingNotifyData);
-  openModal($('#notifyModal'));
+  renderNotifyPickList(v);
+  fillNotifyForm();
+  openM('mNotify');
 }
-function openNotifyForCell(cell){
-  pendingNotifyTarget={type:'cell', cellIds:new Set([cell.id])};
-  pendingNotifyData=JSON.parse(JSON.stringify(cell.notify || makeNotify()));
-  $('#notifyTitle').textContent='Уведомления «'+(cell.name||'ячейка')+'»';
-  $('#notifyApplySection').style.display='none';
-  fillNotifyForm(pendingNotifyData);
-  openModal($('#notifyModal'));
-}
-function fillNotifyForm(n){
-  $('#notifyEnabledToggle').classList.toggle('on', !!n.enabled);
-  $('#notifyBody').style.display = n.enabled ? 'block' : 'none';
-  $$('#notifyModeTabs button').forEach(b=>b.classList.toggle('active', b.dataset.mode === n.mode));
-  $('#notifyTime').value = n.time || '09:00';
+function fillNotifyForm(){
+  var n=ui.notifyData;
+  $('#notifyEnabled').classList.toggle('on', !!n.enabled);
+  $('#notifyBody').style.display = n.enabled ? 'flex' : 'none';
+  $$('#notifyModes button').forEach(function(b){
+    b.classList.toggle('active', b.dataset.mode===n.mode);
+  });
+  $('#notifyTime').value = n.time||'09:00';
   $('#notifyHourBefore').checked = !!n.hourBefore;
   $('#notifyDayBefore').checked = !!n.dayBefore;
-  renderNotifyModeContent(n);
+  renderNotifyModeContent();
 }
-function renderNotifyModeContent(n){
-  const wrap=$('#notifyModeContent'); if(!wrap) return;
-  wrap.innerHTML='';
+function renderNotifyModeContent(){
+  var wrap=$('#notifyModeContent'); wrap.innerHTML='';
+  var n=ui.notifyData;
   if(n.mode==='celldate'){
-    const block=document.createElement('div'); block.className='setting-block';
-    block.innerHTML = `<div class="smart-preview ok" style="margin-top:0">
-      Напоминание придёт в <b>дату этой ячейки</b> в указанное время.</div>`;
-    wrap.appendChild(block);
+    wrap.innerHTML='<div class="info accent">Напоминание придёт в <b>дату этой ячейки</b> в указанное время.</div>';
   } else if(n.mode==='once'){
-    const block=document.createElement('div'); block.className='setting-block';
-    block.innerHTML = `<div class="setting-label">Дата</div><div id="calContainer"></div>`;
-    wrap.appendChild(block);
-    renderCalendar($('#calContainer'), n.date, dateStr=>{
-      n.date=dateStr;
-      renderCalendar($('#calContainer'), dateStr, d2=>{ n.date=d2; });
-    });
+    wrap.innerHTML='<div class="field"><label>Дата</label><div id="calContainer"></div></div>';
+    renderCalendar($('#calContainer'), n.date, function(ds){ n.date=ds; });
   } else if(n.mode==='weekly'){
-    const block=document.createElement('div'); block.className='setting-block';
-    block.innerHTML = `<div class="setting-label">Дни недели</div><div class="day-select" id="notifyDaySelect"></div>`;
-    wrap.appendChild(block);
-    const sel=$('#notifyDaySelect');
-    const days=n.days||[];
-    DAY_NAMES.forEach((lbl,i)=>{
-      const b=document.createElement('button');
-      b.textContent=lbl; b.className=days.includes(i)?'on':'';
-      b.addEventListener('click', ()=>{
+    wrap.innerHTML='<div class="field"><label>Дни недели</label><div class="day-select" id="daySel"></div></div>';
+    var ds=$('#daySel');
+    DAYS.forEach(function(name, i){
+      var b=document.createElement('button');
+      b.textContent=name;
+      b.classList.toggle('on', (n.days||[]).indexOf(i)>=0);
+      b.addEventListener('click', function(){
         if(!n.days) n.days=[];
-        const idx=n.days.indexOf(i);
-        if(idx>=0) n.days.splice(idx,1); else n.days.push(i);
-        b.classList.toggle('on', n.days.includes(i));
+        var idx=n.days.indexOf(i);
+        if(idx>=0) n.days.splice(idx,1);
+        else n.days.push(i);
+        b.classList.toggle('on', n.days.indexOf(i)>=0);
       });
-      sel.appendChild(b);
+      ds.appendChild(b);
     });
   } else if(n.mode==='monthly'){
-    const block=document.createElement('div'); block.className='setting-block';
-    block.innerHTML = `<div class="setting-label">Число месяца</div>
-      <input type="number" min="1" max="31" class="modal-input" id="notifyMonthDay" value="${n.monthDay||1}">`;
-    wrap.appendChild(block);
-    $('#notifyMonthDay').addEventListener('input', e=>{
-      const v=parseInt(e.target.value); if(!isNaN(v) && v>=1 && v<=31) n.monthDay=v;
+    wrap.innerHTML='<div class="field"><label>Число месяца</label><input type="number" id="mdInput" min="1" max="31" value="'+(n.monthDay||1)+'"></div>';
+    $('#mdInput').addEventListener('input', function(e){
+      var v=parseInt(e.target.value); if(v>=1 && v<=31) n.monthDay=v;
     });
   } else if(n.mode==='daily'){
-    const block=document.createElement('div'); block.className='setting-block';
-    block.innerHTML = `<div class="smart-preview ok" style="margin-top:0">Каждый день в указанное время.</div>`;
-    wrap.appendChild(block);
+    wrap.innerHTML='<div class="info accent">Каждый день в указанное время.</div>';
   }
 }
-function renderNotifyCellList(v){
-  const list=$('#notifyCellList'); list.innerHTML='';
-  const checked = pendingNotifyTarget?.cellIds || new Set();
-  v.cells.forEach(cell=>{
-    const btn=document.createElement('button');
-    btn.className='cell-pick-item'+(checked.has(cell.id)?' checked':'');
-    const label = (cell.date ? formatDateBadge(cell.date)+' ' : '') + (cell.name || 'Без имени');
-    btn.innerHTML = `<span class="cell-pick-check">${checked.has(cell.id)?'✓':''}</span>
-      <span class="cell-pick-label">${escapeHtml(label)}</span>`;
-    btn.addEventListener('click', ()=>{
-      if(checked.has(cell.id)) checked.delete(cell.id);
-      else checked.add(cell.id);
-      btn.classList.toggle('checked', checked.has(cell.id));
-      btn.querySelector('.cell-pick-check').textContent = checked.has(cell.id)?'✓':'';
+function renderNotifyPickList(v){
+  var list=$('#notifyPickList'); list.innerHTML='';
+  v.cells.forEach(function(cell){
+    var checked=!!ui.notifyTarget.ids[cell.id];
+    var btn=document.createElement('button');
+    btn.className='pick-item'+(checked?' checked':'');
+    var lbl = (cell.date?fmtBadge(cell.date)+' ':'') + (cell.name||'Без имени');
+    btn.innerHTML = '<span class="pick-cb">'+(checked?'✓':'')+'</span><span class="pick-label">'+esc(lbl)+'</span>';
+    btn.addEventListener('click', function(){
+      if(ui.notifyTarget.ids[cell.id]) delete ui.notifyTarget.ids[cell.id];
+      else ui.notifyTarget.ids[cell.id]=true;
+      var now=!!ui.notifyTarget.ids[cell.id];
+      btn.classList.toggle('checked', now);
+      btn.querySelector('.pick-cb').textContent = now?'✓':'';
     });
     list.appendChild(btn);
   });
 }
-function renderCalendar(container, selectedDate, onPick){
-  let viewDate = selectedDate ? new Date(selectedDate+'T00:00:00') : new Date();
+function renderCalendar(container, selected, onPick){
+  if(!container) return;
+  var viewDate = selected ? parseDate(selected) : new Date();
+  if(!viewDate) viewDate = new Date();
   viewDate.setDate(1);
-  function build(selected){
-    const year=viewDate.getFullYear();
-    const month=viewDate.getMonth();
-    const firstDay=new Date(year, month, 1);
-    const startWeekday=(firstDay.getDay()+6)%7;
-    const days=daysInMonth(year, month);
-    const today = todayStr();
-    let html=`<div class="cal-header">
-      <button class="cal-nav" data-prev>◀</button>
-      <div class="cal-month">${MONTH_FULL[month]} ${year}</div>
-      <button class="cal-nav" data-next>▶</button>
-    </div><div class="cal-grid">`;
-    ['Пн','Вт','Ср','Чт','Пт','Сб','Вс'].forEach(d=>{ html+=`<div class="cal-dow">${d}</div>`; });
-    for(let i=0;i<startWeekday;i++) html+='<div></div>';
-    for(let d=1;d<=days;d++){
-      const dStr=`${year}-${pad(month+1)}-${pad(d)}`;
-      const cls=['cal-day'];
-      if(dStr===today) cls.push('cal-today');
-      if(dStr===selected) cls.push('cal-selected');
-      html+=`<button class="${cls.join(' ')}" data-date="${dStr}">${d}</button>`;
+  function build(sel){
+    var y=viewDate.getFullYear(), m=viewDate.getMonth();
+    var first=new Date(y,m,1);
+    var startW=(first.getDay()+6)%7;
+    var dim=daysInMonth(y,m);
+    var today=todayStr();
+    var html='<div class="cal-head">'+
+      '<button data-prev>◀</button>'+
+      '<div class="cal-title">'+MONTHS[m]+' '+y+'</div>'+
+      '<button data-next>▶</button></div><div class="cal-grid">';
+    DAYS.forEach(function(d){ html+='<div class="cal-dow">'+d+'</div>'; });
+    for(var i=0;i<startW;i++) html+='<div></div>';
+    for(var d=1;d<=dim;d++){
+      var ds=y+'-'+pad(m+1)+'-'+pad(d);
+      var cls='cal-day';
+      if(ds===today) cls+=' today';
+      if(ds===sel) cls+=' sel';
+      html+='<button class="'+cls+'" data-date="'+ds+'">'+d+'</button>';
     }
     html+='</div>';
     container.innerHTML=html;
-    container.querySelector('[data-prev]').onclick = ()=>{ viewDate.setMonth(viewDate.getMonth()-1); build(selected); };
-    container.querySelector('[data-next]').onclick = ()=>{ viewDate.setMonth(viewDate.getMonth()+1); build(selected); };
-    container.querySelectorAll('.cal-day').forEach(b=>{
-      b.onclick = ()=>{ const d=b.dataset.date; onPick(d); build(d); };
+    container.querySelector('[data-prev]').onclick=function(){ viewDate.setMonth(viewDate.getMonth()-1); build(sel); };
+    container.querySelector('[data-next]').onclick=function(){ viewDate.setMonth(viewDate.getMonth()+1); build(sel); };
+    Array.prototype.forEach.call(container.querySelectorAll('.cal-day'), function(b){
+      b.onclick=function(){
+        var d=b.getAttribute('data-date');
+        onPick(d); build(d);
+      };
     });
   }
-  build(selectedDate);
+  build(selected);
 }
 
-function openDateBinding(){
-  const v=state.views.find(x=>x.id===currentViewId); if(!v) return;
-  bindTargetIds = new Set(v.cells.map(c=>c.id));
-  bindStep='1';
-  $('#bindingStartDate').value = todayStr();
-  $$('#bindingStepRow [data-step]').forEach(b=>b.classList.toggle('active', b.dataset.step==='1'));
-  $('#customStepRow').style.display='none';
-  renderBindCellList(v);
+/* Модалка привязки дат */
+function openBind(){
+  var v=currentView();
+  ui.bindStart = todayStr();
+  ui.bindStep = '1';
+  ui.bindTargets = {};
+  v.cells.forEach(function(c){ ui.bindTargets[c.id]=true; });
+  $('#bindStart').value = ui.bindStart;
+  $$('#bindSteps button').forEach(function(b){ b.classList.toggle('active', b.dataset.step==='1'); });
+  $('#bindCustomWrap').style.display='none';
+  renderBindPickList(v);
   updateBindPreview();
-  openModal($('#dateBindingModal'));
+  openM('mBind');
 }
-function renderBindCellList(v){
-  const list=$('#bindCellList'); list.innerHTML='';
-  v.cells.forEach((cell, idx)=>{
-    const btn=document.createElement('button');
-    const checked = bindTargetIds.has(cell.id);
-    btn.className='cell-pick-item'+(checked?' checked':'');
-    const label = '#'+(idx+1)+' ' + (cell.date?formatDateBadge(cell.date)+' ':'') + (cell.name||'Без имени');
-    btn.innerHTML = `<span class="cell-pick-check">${checked?'✓':''}</span>
-      <span class="cell-pick-label">${escapeHtml(label)}</span>`;
-    btn.addEventListener('click', ()=>{
-      if(bindTargetIds.has(cell.id)) bindTargetIds.delete(cell.id);
-      else bindTargetIds.add(cell.id);
-      btn.classList.toggle('checked', bindTargetIds.has(cell.id));
-      btn.querySelector('.cell-pick-check').textContent = bindTargetIds.has(cell.id)?'✓':'';
+function renderBindPickList(v){
+  var list=$('#bindPickList'); list.innerHTML='';
+  v.cells.forEach(function(cell, idx){
+    var checked=!!ui.bindTargets[cell.id];
+    var btn=document.createElement('button');
+    btn.className='pick-item'+(checked?' checked':'');
+    var lbl = '#'+(idx+1)+' '+(cell.date?fmtBadge(cell.date)+' ':'')+(cell.name||'Без имени');
+    btn.innerHTML = '<span class="pick-cb">'+(checked?'✓':'')+'</span><span class="pick-label">'+esc(lbl)+'</span>';
+    btn.addEventListener('click', function(){
+      if(ui.bindTargets[cell.id]) delete ui.bindTargets[cell.id];
+      else ui.bindTargets[cell.id]=true;
+      var now=!!ui.bindTargets[cell.id];
+      btn.classList.toggle('checked', now);
+      btn.querySelector('.pick-cb').textContent = now?'✓':'';
       updateBindPreview();
     });
     list.appendChild(btn);
   });
 }
 function getBindStepDays(){
-  if(bindStep==='1') return 1;
-  const c=parseInt($('#customStepInput').value);
-  return isNaN(c)||c<1 ? 1 : c;
+  if(ui.bindStep==='1') return 1;
+  var v=parseInt($('#bindCustomStep').value);
+  return isNaN(v)||v<1 ? 1 : v;
 }
 function updateBindPreview(){
-  const v=state.views.find(x=>x.id===currentViewId); if(!v) return;
-  const el=$('#bindPreview'); if(!el) return;
-  const startVal=$('#bindingStartDate').value;
-  const start = startVal ? strToDate(startVal) : new Date();
-  if(!start){ el.textContent=''; return; }
-  const step=getBindStepDays();
-  const orderedCells = v.cells
-    .map((cell,idx)=>({cell,idx}))
-    .filter(o=>bindTargetIds.has(o.cell.id))
-    .sort((a,b)=>a.idx-b.idx);
-  if(!orderedCells.length){ el.className='smart-preview'; el.textContent='Ничего не выбрано.'; return; }
-  let cursor=new Date(start);
-  let first='', last='';
-  orderedCells.forEach(({cell}, i)=>{
-    const dStr = dateToStr(cursor);
-    if(i===0) first = formatDateBadge(dStr);
-    last = formatDateBadge(dStr);
-    cursor = addDays(cursor, step);
+  var v=currentView();
+  var el=$('#bindPreview'); if(!el) return;
+  var start = parseDate(ui.bindStart) || new Date();
+  var step=getBindStepDays();
+  var ordered=v.cells
+    .map(function(c,i){ return {cell:c, idx:i}; })
+    .filter(function(o){ return ui.bindTargets[o.cell.id]; })
+    .sort(function(a,b){ return a.idx-b.idx; });
+  if(!ordered.length){ el.textContent='Ничего не выбрано.'; el.classList.remove('accent'); return; }
+  var cursor=new Date(start);
+  var first='', last='';
+  ordered.forEach(function(o, i){
+    var ds=toDateStr(cursor);
+    if(i===0) first=fmtBadge(ds);
+    last=fmtBadge(ds);
+    cursor=addDays(cursor, step);
   });
-  el.className='smart-preview ok';
-  el.textContent = `${orderedCells.length} ячеек: с ${first} по ${last}`;
+  el.classList.add('accent');
+  el.textContent = ordered.length+' ячеек: с '+first+' по '+last;
 }
-function applyDateBinding(){
-  const v=state.views.find(x=>x.id===currentViewId); if(!v) return;
-  if(!bindTargetIds.size){ toast('Выберите хотя бы одну ячейку'); return; }
-  const startVal=$('#bindingStartDate').value;
-  const start = startVal ? strToDate(startVal) : new Date();
-  if(!start){ toast('Укажите стартовую дату'); return; }
-  const step=getBindStepDays();
+function applyBind(){
+  var v=currentView();
+  var targetIds=ui.bindTargets;
+  if(!Object.keys(targetIds).length){ toast('Выберите ячейки'); return; }
+  var start = parseDate(ui.bindStart) || new Date();
+  var step=getBindStepDays();
   pushUndo();
-  const orderedCells = v.cells
-    .map((cell,idx)=>({cell,idx}))
-    .filter(o=>bindTargetIds.has(o.cell.id))
-    .sort((a,b)=>a.idx-b.idx);
-  let cursor=new Date(start);
-  orderedCells.forEach(({cell})=>{
-    cell.date = dateToStr(cursor);
-    cursor = addDays(cursor, step);
+  var ordered=v.cells
+    .map(function(c,i){ return {cell:c, idx:i}; })
+    .filter(function(o){ return targetIds[o.cell.id]; })
+    .sort(function(a,b){ return a.idx-b.idx; });
+  var cursor=new Date(start);
+  ordered.forEach(function(o){
+    o.cell.date = toDateStr(cursor);
+    cursor=addDays(cursor, step);
   });
-  saveState(); renderContent();
-  closeModal($('#dateBindingModal'));
-  haptic('medium');
-  toast('Даты привязаны к '+orderedCells.length+' ячейкам');
+  saveState(); closeM('mBind'); render();
+  toast('Даты привязаны к '+ordered.length+' ячейкам');
 }
 
-function generatePresetCells(preset, startDate, startMode){
-  const start = startDate ? strToDate(startDate) : new Date();
-  if(preset==='empty'){
-    return DAY_NAMES.slice(0,5).map((n,i)=>makeCell(n, i, null));
+/* Модалка создания */
+function openCreate(){
+  $('#newTitle').value='';
+  $('#newIcon').value='📆';
+  ui.newPreset='week';
+  ui.newDateChoice='month1';
+  $$('#newPresets .preset').forEach(function(b){ b.classList.toggle('active', b.dataset.preset==='week'); });
+  $$('#newDateChoices button').forEach(function(b){ b.classList.toggle('active', b.dataset.choice==='month1'); });
+  $('#newCustomWrap').style.display='none';
+  $('#newCustomDate').value='';
+  updateNewHint();
+  openM('mCreate');
+  setTimeout(function(){ try{ $('#newTitle').focus(); }catch(e){} }, 260);
+}
+function updateNewHint(){
+  var el=$('#newHint'); if(!el) return;
+  if(ui.newPreset==='empty') el.textContent='5 пустых ячеек без дат.';
+  else if(ui.newPreset==='week') el.textContent='7 дней от выбранной даты.';
+  else if(ui.newPreset==='month'){
+    if(ui.newDateChoice==='month1') el.textContent='Все дни выбранного месяца (как календарь).';
+    else el.textContent='30 дней вперёд от выбранной даты.';
   }
-  if(preset==='week'){
-    const cells=[];
-    for(let i=0;i<7;i++){
-      const d=addDays(start, i);
-      cells.push(makeCell(DAY_NAMES[(d.getDay()+6)%7], i, dateToStr(d)));
+  else if(ui.newPreset==='year') el.textContent='12 месяцев начиная с текущего месяца (1-е число).';
+}
+function createNewView(){
+  var title=$('#newTitle').value.trim();
+  var icon=$('#newIcon').value.trim() || '📆';
+  if(!title){ toast('Введите название'); return; }
+  var startDate;
+  if(ui.newDateChoice==='month1'){
+    var t=new Date(); startDate = new Date(t.getFullYear(), t.getMonth(), 1);
+  } else if(ui.newDateChoice==='today'){
+    startDate = new Date();
+  } else {
+    var cd=$('#newCustomDate').value;
+    if(!cd){ toast('Выберите дату'); return; }
+    startDate = parseDate(cd) || new Date();
+  }
+  var cells=[];
+  if(ui.newPreset==='empty'){
+    for(var i=0;i<5;i++) cells.push(makeCell('',null));
+  } else if(ui.newPreset==='week'){
+    for(var j=0;j<7;j++){
+      var d=addDays(startDate, j);
+      cells.push(makeCell(DAYS[(d.getDay()+6)%7], toDateStr(d)));
     }
-    return cells;
-  }
-  if(preset==='month'){
-    const cells=[];
-    if(startMode==='month1'){
-      const y=start.getFullYear();
-      const m=start.getMonth();
-      const n=daysInMonth(y, m);
-      for(let i=0;i<n;i++){
-        const d=new Date(y, m, i+1);
-        cells.push(makeCell('', i, dateToStr(d)));
+  } else if(ui.newPreset==='month'){
+    if(ui.newDateChoice==='month1'){
+      var y=startDate.getFullYear(), m=startDate.getMonth();
+      var dim=daysInMonth(y,m);
+      for(var k=0;k<dim;k++){
+        var dd=new Date(y,m,k+1);
+        cells.push(makeCell('', toDateStr(dd)));
       }
     } else {
-      for(let i=0;i<30;i++){
-        const d=addDays(start, i);
-        cells.push(makeCell('', i, dateToStr(d)));
+      for(var kk=0;kk<30;kk++){
+        var dd2=addDays(startDate, kk);
+        cells.push(makeCell('', toDateStr(dd2)));
       }
     }
-    return cells;
-  }
-  if(preset==='year'){
-    const cells=[];
-    const baseMonth = start.getMonth();
-    const baseYear = start.getFullYear();
-    for(let i=0;i<12;i++){
-      const m = baseMonth + i;
-      const y = baseYear + Math.floor(m/12);
-      const mm = m % 12;
-      const d = new Date(y, mm, 1);
-      cells.push(makeCell(MONTH_FULL[mm], i, dateToStr(d)));
+  } else if(ui.newPreset==='year'){
+    var baseY=startDate.getFullYear(), baseM=startDate.getMonth();
+    for(var y2=0;y2<12;y2++){
+      var mm=baseM+y2;
+      var yy=baseY+Math.floor(mm/12);
+      var mmm=mm%12;
+      var dd3=new Date(yy, mmm, 1);
+      cells.push(makeCell(MONTHS[mmm], toDateStr(dd3)));
     }
-    return cells;
   }
-  return DAY_NAMES.map((n,i)=>makeCell(n, i, null));
+  var target=Math.ceil(cells.length/7)*7;
+  while(cells.length<target) cells.push(makeCell('', null));
+  var nv=makeView(title, icon, true);
+  nv.columnCount=7;
+  nv.cells=cells;
+  state.views.push(nv);
+  state.currentViewId=nv.id;
+  saveState(); closeM('mCreate'); render();
+  toast('Модуль «'+title+'» создан');
 }
 
-function createView(){
-  const name=$('#newViewName').value.trim();
-  const icon=$('#newViewIcon').value.trim() || '📆';
-  if(!name){ toast('Введите название'); return; }
-  let startDate=null;
-  if(selectedDateStart==='month1'){
-    const t=new Date();
-    startDate = dateToStr(new Date(t.getFullYear(), t.getMonth(), 1));
-  } else if(selectedDateStart==='today'){
-    startDate = todayStr();
+/* === Настройки модуля === */
+function renderSettings(){
+  var v=currentView();
+  var body=$('#settingsBody'); if(!body) return;
+  var rows=Math.max(1, Math.ceil(v.cells.length/Math.max(1,v.columnCount)));
+  var html = '<div class="set-block">'+
+    '<div class="set-label">Название</div>'+
+    '<input class="set-title-input" value="'+esc(v.title)+'" style="width:100%;padding:12px 14px;border:1px solid var(--border);background:var(--bg3);color:var(--text);font-size:15px;border-radius:12px;outline:none;margin-bottom:8px">'+
+    '<div class="set-label">Иконка</div>'+
+    '<input class="set-icon-input" value="'+esc(v.icon)+'" maxlength="2" style="width:100%;padding:12px 14px;border:1px solid var(--border);background:var(--bg3);color:var(--text);font-size:20px;border-radius:12px;outline:none;text-align:center">'+
+    '</div>'+
+    '<div class="set-block">'+
+    '<div class="set-label">Акцентный цвет</div>'+
+    '<div class="swatches" id="setAccentSwatches" style="margin-bottom:8px"></div>'+
+    '</div>'+
+    '<div class="set-block">'+
+    '<div class="set-label">Сетка</div>'+
+    '<div class="total"><b>'+v.cells.length+'</b> ячеек = <b>'+v.columnCount+'</b> × <b>'+rows+'</b></div>'+
+    '<div class="label-sm">Столбцов</div>'+
+    '<div class="counter" data-kind="cols">'+
+    '<button data-op="-">−</button><div class="val" data-value="'+v.columnCount+'">'+v.columnCount+'</div><button data-op="+">+</button>'+
+    '</div>'+
+    '<div class="label-sm">Ячеек в столбце</div>'+
+    '<div class="counter" data-kind="rows">'+
+    '<button data-op="-">−</button><div class="val" data-value="'+rows+'">'+rows+'</div><button data-op="+">+</button>'+
+    '</div>'+
+    '<div class="label-sm">Всего ячеек</div>'+
+    '<div class="counter" data-kind="total">'+
+    '<button data-op="-">−</button><div class="val" data-value="'+v.cells.length+'">'+v.cells.length+'</div><button data-op="+">+</button>'+
+    '</div>'+
+    '</div>'+
+    '<div class="set-block">'+
+    '<div class="set-label">Привязка дат</div>'+
+    '<button class="btn" id="openBindBtn">📅 Привязать даты к ячейкам</button>'+
+    '</div>'+
+    '<div class="set-block">'+
+    '<div class="set-label">Тема</div>'+
+    '<div class="row">'+
+    '<button class="btn '+(state.theme==='light'?'primary':'')+'" data-theme="light">☀️ Светлая</button>'+
+    '<button class="btn '+(state.theme==='dark'?'primary':'')+'" data-theme="dark">🌙 Тёмная</button>'+
+    '</div>'+
+    '</div>';
+  if(v.removable){
+    html+='<div class="set-block"><div class="set-label">Удалить модуль</div>'+
+      '<button class="btn danger" id="deleteModuleBtn">Удалить «'+esc(v.title)+'»</button></div>';
+  }
+  body.innerHTML=html;
+
+  var titleInp=body.querySelector('.set-title-input');
+  titleInp.addEventListener('change', function(e){
+    var t=e.target.value.trim(); if(!t) return;
+    v.title=t; saveState(); render();
+  });
+  var iconInp=body.querySelector('.set-icon-input');
+  iconInp.addEventListener('change', function(e){
+    var t=e.target.value.trim()||'📆';
+    v.icon=t; saveState(); render();
+  });
+  var sw=body.querySelector('#setAccentSwatches');
+  ACCENT_COLORS.forEach(function(c){
+    var b=document.createElement('button');
+    b.className='swatch'+(c===state.accent?' active':'');
+    b.style.background=c;
+    b.addEventListener('click', function(){
+      state.accent=c; saveState(); updateAccent();
+      Array.prototype.forEach.call(sw.children, function(x){ x.classList.remove('active'); });
+      b.classList.add('active');
+    });
+    sw.appendChild(b);
+  });
+
+  body.querySelectorAll('.counter').forEach(function(counter){
+    var kind=counter.dataset.kind;
+    counter.querySelectorAll('button').forEach(function(b){
+      b.addEventListener('click', function(){
+        var op=b.dataset.op;
+        var delta = op==='+' ? 1 : -1;
+        if(kind==='cols'){
+          var nc=Math.max(1, v.columnCount+delta);
+          if(nc>v.cells.length) nc=v.cells.length;
+          if(nc<1) nc=1;
+          v.columnCount=nc;
+          if(v.cells.length % v.columnCount) addCellsToFill(v);
+          saveState(); render(); renderSettings();
+        } else if(kind==='rows'){
+          var curRows=Math.max(1, Math.ceil(v.cells.length/v.columnCount));
+          var nr=Math.max(1, curRows+delta);
+          var target=v.columnCount*nr;
+          changeCellCount(v, target);
+        } else {
+          changeCellCount(v, v.cells.length+delta);
+        }
+      });
+    });
+  });
+
+  body.querySelector('#openBindBtn').addEventListener('click', function(){
+    closeM('mSettings'); setTimeout(openBind, 80);
+  });
+
+  body.querySelectorAll('[data-theme]').forEach(function(b){
+    b.addEventListener('click', function(){
+      state.theme=b.dataset.theme;
+      saveState(); updateTheme(); renderSettings();
+    });
+  });
+
+  var delBtn=body.querySelector('#deleteModuleBtn');
+  if(delBtn) delBtn.addEventListener('click', function(){
+    confirmDialog('Удалить модуль?',
+      'Модуль «'+v.title+'»: '+v.cells.length+' ячеек, '+
+      v.cells.reduce(function(s,c){return s+c.tasks.length;},0)+' задач. Отменить можно через ↶.',
+      function(){
+        pushUndo();
+        state.views=state.views.filter(function(x){ return x.id!==v.id; });
+        if(!state.views.length){
+          var dv=makeView('Планировщик','📅',false);
+          for(var i=0;i<7;i++) dv.cells.push(makeCell(DAYS[i], null));
+          state.views=[dv];
+        }
+        state.currentViewId=state.views[0].id;
+        saveState(); closeM('mSettings'); render();
+        toast('Модуль удалён');
+      });
+  });
+}
+
+function addCellsToFill(v){
+  var N=v.columnCount;
+  var target=Math.ceil(v.cells.length/N)*N;
+  while(v.cells.length<target) v.cells.push(makeCell('', null));
+}
+
+function changeCellCount(v, newCount){
+  if(newCount<1) newCount=1;
+  if(newCount===v.cells.length) return;
+  if(newCount<v.cells.length){
+    var removed=v.cells.slice(newCount);
+    var withData=removed.filter(function(c){ return c.tasks.length>0 || c.name || c.date; });
+    if(withData.length){
+      confirmDialog('Уменьшить количество ячеек?',
+        'Будет удалено '+removed.length+' ячеек, из них с данными: '+withData.length+'. Продолжить?',
+        function(){
+          pushUndo();
+          v.cells=v.cells.slice(0,newCount);
+          if(v.columnCount>v.cells.length) v.columnCount=Math.max(1, v.cells.length);
+          saveState(); render(); renderSettings();
+        });
+      return;
+    }
+    pushUndo();
+    v.cells=v.cells.slice(0,newCount);
+    if(v.columnCount>v.cells.length) v.columnCount=Math.max(1, v.cells.length);
   } else {
-    const val=$('#customStartDate').value;
-    if(!val){ toast('Выберите дату'); return; }
-    startDate = val;
+    pushUndo();
+    while(v.cells.length<newCount) v.cells.push(makeCell('', null));
   }
-  const cells=generatePresetCells(selectedPreset, startDate, selectedDateStart);
-  const columnCount=DEFAULT_COLUMNS;
-  const rowsPerColumn=Math.max(1, Math.ceil(cells.length/columnCount));
-  const target=columnCount*rowsPerColumn;
-  while(cells.length<target) cells.push(makeCell('', cells.length, null));
-  const newView={id:makeId('v'), type:'planner', title:name, icon, removable:true,
-    filter:'all', columnCount, rowsPerColumn, cells};
-  state.views.push(newView);
-  saveState();
-  closeModal($('#createViewModal'));
-  switchView(newView.id);
-  toast('Модуль «'+name+'» создан'); haptic();
+  saveState(); render(); renderSettings();
 }
 
-window.addEventListener('resize', updateDockSize);
-$('#searchBtn').addEventListener('click', openSearch);
-$('#searchClose').addEventListener('click', closeSearch);
-$('#globalSearch').addEventListener('input', e=>{
-  searchQuery=e.target.value.trim().toLowerCase();
-  renderContent();
-});
-$('#editBtn').addEventListener('click', ()=>{
-  editMode=!editMode; haptic();
-  document.body.classList.toggle('edit-mode', editMode);
-  $('#editBtn').classList.toggle('active', editMode);
-  renderContent();
-  if(editMode) toast('✏️ ↔ ширина, ↕ высота. ✕ на доке — удалить.');
-});
-$('#undoBtn').addEventListener('click', doUndo);
-$('#applyModuleBtn').addEventListener('click', applySizeToAllModule);
-$('#applyColumnBtn').addEventListener('click', applySizeToColumn);
-$('#settingsBtn').addEventListener('click', ()=>{ renderSettings(); openModal($('#settingsModal')); });
-$('#notifyBtn').addEventListener('click', openNotifyForModule);
+function confirmDialog(title, text, onYes){
+  $('#confirmTitle').textContent=title;
+  $('#confirmText').textContent=text;
+  $('#confirmYes').onclick=function(){
+    closeM('mConfirm'); onYes();
+  };
+  openM('mConfirm');
+}
 
-$('#settingsModal').addEventListener('click', e=>{
-  const t=e.target.closest('[data-theme-set]');
-  if(t){ state.theme=t.dataset.themeSet; applyTheme(); saveState(); renderSettings(); }
+/* === Dock === */
+function renderDock(){
+  var dock=$('#dock'); dock.innerHTML='';
+  state.views.forEach(function(v){
+    var b=document.createElement('button');
+    b.className='dock-btn'+(v.id===state.currentViewId?' active':'');
+    b.textContent=v.icon;
+    b.addEventListener('click', function(e){
+      if(e.target.closest('.dock-delete')) return;
+      state.currentViewId=v.id; saveState(); render();
+    });
+    if(v.removable && ui.editing){
+      var del=document.createElement('button');
+      del.className='dock-delete'; del.textContent='✕';
+      del.addEventListener('click', function(e){
+        e.stopPropagation();
+        var tasksN=v.cells.reduce(function(s,c){return s+c.tasks.length;},0);
+        confirmDialog('Удалить модуль «'+v.title+'»?',
+          'У модуля '+v.cells.length+' ячеек'+(tasksN>0?', '+tasksN+' задач':'')+'. Отменить можно через ↶.',
+          function(){
+            pushUndo();
+            state.views=state.views.filter(function(x){ return x.id!==v.id; });
+            if(!state.views.length){
+              var dv=makeView('Планировщик','📅',false);
+              for(var i=0;i<7;i++) dv.cells.push(makeCell(DAYS[i], null));
+              state.views=[dv];
+            }
+            state.currentViewId=state.views[0].id;
+            saveState(); render(); toast('Модуль удалён');
+          });
+      });
+      b.appendChild(del);
+    }
+    dock.appendChild(b);
+  });
+  var add=document.createElement('button');
+  add.className='dock-btn add'; add.textContent='+';
+  add.addEventListener('click', openCreate);
+  dock.appendChild(add);
+}
+
+/* === Поиск === */
+function renderSearch(root){
+  var q=ui.searchQuery.toLowerCase();
+  var words=q.split(/\s+/).filter(Boolean);
+  var curId=state.currentViewId;
+  var cur=[], other=[];
+  state.views.forEach(function(v){
+    v.cells.forEach(function(cell){
+      var hay=(cell.name+' '+(cell.date?fmtBadge(cell.date):'')+' '+
+        cell.tasks.map(function(t){return t.text;}).join(' ')).toLowerCase();
+      var ok=words.every(function(w){ return hay.indexOf(w)>=0; });
+      if(!ok) return;
+      var matched=cell.tasks.filter(function(t){
+        return words.every(function(w){ return t.text.toLowerCase().indexOf(w)>=0; });
+      });
+      var item={view:v, cell:cell, matched:matched.length?matched:cell.tasks};
+      if(v.id===curId) cur.push(item);
+      else other.push(item);
+    });
+  });
+
+  if(cur.length){
+    var t1=document.createElement('div');
+    t1.className='results-section'; t1.textContent='В текущем модуле';
+    root.appendChild(t1);
+    cur.forEach(function(it){ root.appendChild(buildHit(it, false)); });
+  }
+  if(other.length){
+    if(cur.length){
+      var d=document.createElement('div');
+      d.className='results-div'; root.appendChild(d);
+    } else {
+      var t2=document.createElement('div');
+      t2.className='results-section'; t2.textContent='Найдено в других модулях';
+      root.appendChild(t2);
+    }
+    other.forEach(function(it){ root.appendChild(buildHit(it, true)); });
+  }
+  if(!cur.length && !other.length){
+    root.innerHTML='<p class="empty">Ничего не найдено</p>';
+  }
+}
+function buildHit(item, otherView){
+  var v=item.view, cell=item.cell;
+  var btn=document.createElement('button');
+  btn.className='search-hit';
+  var dateStr = cell.date ? fmtBadge(cell.date)+' · ' : '';
+  var nameStr = cell.name ? esc(cell.name) : 'Без названия';
+  var prev = item.matched.length
+    ? '☐ '+esc(item.matched[0].text)
+    : 'Ячейка';
+  var moduleLabel = otherView ? '<span class="hit-module">'+v.icon+' '+esc(v.title)+'</span>' : '';
+  btn.innerHTML = '<div class="hit-meta">'+moduleLabel+'<b>'+dateStr+nameStr+'</b></div>'+
+    '<div class="hit-body">'+prev+'</div>';
+  btn.addEventListener('click', function(){
+    if(otherView){
+      state.currentViewId=v.id; saveState();
+      ui.searchQuery=''; $('#searchInput').value='';
+      $('#searchOverlay').classList.remove('open');
+      render();
+      setTimeout(function(){
+        var el=document.querySelector('[data-cell="'+cell.id+'"]');
+        if(el){
+          el.scrollIntoView({behavior:'smooth', block:'center'});
+          el.classList.add('flash');
+          setTimeout(function(){ el.classList.remove('flash'); }, 2000);
+        }
+      }, 300);
+    } else {
+      openTasksModal(cell);
+    }
+  });
+  return btn;
+}
+
+/* === События === */
+$('#btnSearch').addEventListener('click', function(){
+  $('#searchOverlay').classList.toggle('open');
+  if($('#searchOverlay').classList.contains('open')){
+    setTimeout(function(){ $('#searchInput').focus(); }, 100);
+  } else {
+    ui.searchQuery=''; $('#searchInput').value=''; render();
+  }
+});
+$('#searchClose').addEventListener('click', function(){
+  $('#searchOverlay').classList.remove('open');
+  ui.searchQuery=''; $('#searchInput').value=''; render();
+});
+$('#searchInput').addEventListener('input', function(e){
+  ui.searchQuery=e.target.value.trim();
+  render();
 });
 
-$('#cellNameInput').addEventListener('input', e=>{
-  const cell=getCurrentCell(); if(!cell) return;
-  cell.name=e.target.value; saveState();
-  $('#cellTitle').textContent = cell.name || 'Ячейка';
-  refreshCellsInView(cell);
-});
-$('#cellDateInput').addEventListener('change', e=>{
-  const cell=getCurrentCell(); if(!cell) return;
-  cell.date = e.target.value || null;
-  saveState(); refreshCellsInView(cell); updateCellNotifyHint(cell);
-});
-$('#cellDateClear').addEventListener('click', ()=>{
-  const cell=getCurrentCell(); if(!cell) return;
-  cell.date=null; $('#cellDateInput').value='';
-  saveState(); refreshCellsInView(cell); updateCellNotifyHint(cell);
-});
-$('#cellColorCustom').addEventListener('input', e=>{
-  const cell=getCurrentCell(); if(!cell) return;
-  cell.color=e.target.value; saveState(); renderCellSwatches(cell); refreshCellsInView(cell);
-});
-$('#cellNotifyBtn').addEventListener('click', ()=>{
-  const cell=getCurrentCell(); if(!cell) return;
-  closeModal($('#cellModal'));
-  setTimeout(()=>openNotifyForCell(cell), 100);
-});
-$('#cellNotifyToggle').addEventListener('click', ()=>{
-  const cell=getCurrentCell(); if(!cell) return;
-  const on=!$('#cellNotifyToggle').classList.contains('on');
-  $('#cellNotifyToggle').classList.toggle('on', on);
-  $('#cellNotifyFields').style.display = on ? 'block' : 'none';
-  if(!cell.notify) cell.notify=makeNotify();
-  cell.notify.enabled=on; saveState(); haptic();
-  refreshCellsInView(cell); updateCellNotifyHint(cell);
-});
-$('#cellNotifyTime').addEventListener('change', e=>{
-  const cell=getCurrentCell(); if(!cell) return;
-  if(!cell.notify) cell.notify=makeNotify();
-  cell.notify.time = e.target.value || '09:00';
-  saveState(); updateCellNotifyHint(cell);
-});
-$('#cellDeleteBtn').addEventListener('click', ()=>{
-  const cell=getCurrentCell(); if(!cell) return;
-  askConfirm('Удалить ячейку?',
-    `Будут удалены «${cell.name||'без имени'}», её задачи (${cell.tasks.length}) и дата.`,
-    `deleteCell:${cell.id}`);
-});
-$('#openGridSettingsFromCell').addEventListener('click', ()=>{
-  closeModal($('#cellModal'));
-  setTimeout(()=>{ renderSettings(); openModal($('#settingsModal')); }, 100);
+$('#btnEdit').addEventListener('click', function(){
+  ui.editing=!ui.editing;
+  $('#btnEdit').classList.toggle('active', ui.editing);
+  render();
+  toast(ui.editing ? '✏️ Режим правки: ↔ ширина, ↕ высота, ✕ на доке — удалить' : 'Готово');
 });
 
-$('#tasksNotifyBtn').addEventListener('click', ()=>{
-  const cell=getCurrentCell(); if(!cell) return;
-  closeModal($('#tasksModal'));
-  setTimeout(()=>openNotifyForCell(cell), 100);
+$('#btnNotify').addEventListener('click', openNotifyForModule);
+$('#btnSettings').addEventListener('click', function(){
+  renderSettings(); openM('mSettings');
 });
-$('#tasksSettingsBtn').addEventListener('click', ()=>{
-  const cell=getCurrentCell(); if(!cell) return;
-  closeModal($('#tasksModal'));
-  setTimeout(()=>openCellModal(cell), 100);
+$('#btnUndo').addEventListener('click', doUndo);
+$('#btnApplyModule').addEventListener('click', applySizeToModule);
+$('#btnApplyColumn').addEventListener('click', applySizeToColumn);
+
+$('#title').addEventListener('click', function(){
+  var v=currentView();
+  var t=prompt('Название модуля:', v.title);
+  if(t && t.trim()){ v.title=t.trim(); saveState(); render(); }
 });
 
-$('#addTaskBtn').addEventListener('click', ()=>{
-  const inp=$('#newTask'); const text=inp.value.trim(); if(!text) return;
-  const cell=getCurrentCell(); if(!cell) return;
-  cell.tasks.push(makeTask(text)); inp.value='';
-  saveState(); renderTasksList(cell); refreshCellsInView(cell); updateTasksSubtitle(cell); haptic();
+/* Модалка ячейки */
+$('#cellName').addEventListener('input', function(e){
+  var cell=currentView().cells.find(function(c){return c.id===ui.editingCellId;});
+  if(!cell) return;
+  cell.name=e.target.value;
+  $('#cellTitle').textContent=cell.name||'Ячейка';
 });
-$('#newTask').addEventListener('keydown', e=>{
+$('#cellDate').addEventListener('change', function(e){
+  var cell=currentView().cells.find(function(c){return c.id===ui.editingCellId;});
+  if(!cell) return;
+  cell.date=e.target.value||null;
+  updateCellNotifyHint(cell);
+});
+$('#cellDateClear').addEventListener('click', function(){
+  var cell=currentView().cells.find(function(c){return c.id===ui.editingCellId;});
+  if(!cell) return;
+  cell.date=null; $('#cellDate').value='';
+  updateCellNotifyHint(cell);
+});
+$('#cellNotifyToggle').addEventListener('click', function(){
+  var cell=currentView().cells.find(function(c){return c.id===ui.editingCellId;});
+  if(!cell) return;
+  cell.notify=cell.notify||makeNotify();
+  cell.notify.enabled=!cell.notify.enabled;
+  this.classList.toggle('on', cell.notify.enabled);
+  $('#cellNotifyFields').style.display=cell.notify.enabled?'flex':'none';
+  updateCellNotifyHint(cell);
+});
+$('#cellNotifyTime').addEventListener('change', function(e){
+  var cell=currentView().cells.find(function(c){return c.id===ui.editingCellId;});
+  if(!cell) return;
+  cell.notify=cell.notify||makeNotify();
+  cell.notify.time=e.target.value||'09:00';
+  updateCellNotifyHint(cell);
+});
+$('#cellSave').addEventListener('click', function(){
+  var cell=currentView().cells.find(function(c){return c.id===ui.editingCellId;});
+  if(!cell) return;
+  cell.name=$('#cellName').value.trim();
+  cell.date=$('#cellDate').value||null;
+  saveState(); closeM('mCell'); render();
+});
+$('#cellDelete').addEventListener('click', function(){
+  var v=currentView();
+  var cell=v.cells.find(function(c){return c.id===ui.editingCellId;});
+  if(!cell) return;
+  confirmDialog('Удалить ячейку?',
+    '«'+(cell.name||'без названия')+'»: '+cell.tasks.length+' задач.',
+    function(){
+      pushUndo();
+      v.cells=v.cells.filter(function(c){ return c.id!==ui.editingCellId; });
+      saveState(); closeM('mCell'); render();
+    });
+});
+$('#cellNotifyBtn').addEventListener('click', function(){
+  var cell=currentView().cells.find(function(c){return c.id===ui.editingCellId;});
+  if(!cell) return;
+  closeM('mCell'); setTimeout(function(){ openNotifyForCell(cell); }, 80);
+});
+
+/* Модалка задач */
+$('#addTaskBtn').addEventListener('click', function(){
+  var cell=currentView().cells.find(function(c){return c.id===ui.editingCellId;});
+  if(!cell) return;
+  var t=$('#newTaskInput').value.trim();
+  if(!t) return;
+  cell.tasks.push(makeTask(t));
+  $('#newTaskInput').value='';
+  saveState(); renderTasksList(cell); updateTasksSub(cell); render();
+});
+$('#newTaskInput').addEventListener('keydown', function(e){
   if(e.key==='Enter'){ e.preventDefault(); $('#addTaskBtn').click(); }
 });
+$('#tasksNotifyBtn').addEventListener('click', function(){
+  var cell=currentView().cells.find(function(c){return c.id===ui.editingCellId;});
+  if(!cell) return;
+  closeM('mTasks'); setTimeout(function(){ openNotifyForCell(cell); }, 80);
+});
+$('#tasksSettingsBtn').addEventListener('click', function(){
+  var cell=currentView().cells.find(function(c){return c.id===ui.editingCellId;});
+  if(!cell) return;
+  closeM('mTasks'); setTimeout(function(){ openCellModal(cell); }, 80);
+});
 
-$('#presetGrid').addEventListener('click', e=>{
-  const t=e.target.closest('[data-preset]'); if(!t) return;
-  selectedPreset=t.dataset.preset;
-  $$('#presetGrid .preset-tile').forEach(x=>x.classList.toggle('active', x===t));
-  updateDateStartHint();
-  haptic();
+/* Модалка уведомлений */
+$('#notifyEnabled').addEventListener('click', function(){
+  ui.notifyData.enabled=!ui.notifyData.enabled;
+  this.classList.toggle('on', ui.notifyData.enabled);
+  $('#notifyBody').style.display=ui.notifyData.enabled?'flex':'none';
 });
-$('#dateStartBlock').addEventListener('click', e=>{
-  const b=e.target.closest('[data-datestart]'); if(!b) return;
-  selectedDateStart=b.dataset.datestart;
-  $$('#dateStartBlock [data-datestart]').forEach(x=>x.classList.toggle('active', x===b));
-  $('#customDateRow').style.display = selectedDateStart==='custom' ? 'block' : 'none';
-  if(selectedDateStart==='custom' && !$('#customStartDate').value){
-    $('#customStartDate').value = todayStr();
-  }
-  updateDateStartHint();
-  haptic();
+$('#notifyModes').addEventListener('click', function(e){
+  var b=e.target.closest('[data-mode]'); if(!b) return;
+  ui.notifyData.mode=b.dataset.mode;
+  Array.prototype.forEach.call(this.children, function(x){ x.classList.toggle('active', x===b); });
+  renderNotifyModeContent();
 });
-$('#createViewBtn').addEventListener('click', createView);
-
-$('#notifyEnabledToggle').addEventListener('click', ()=>{
-  const on=!$('#notifyEnabledToggle').classList.contains('on');
-  $('#notifyEnabledToggle').classList.toggle('on', on);
-  $('#notifyBody').style.display = on ? 'block' : 'none';
-  if(pendingNotifyData) pendingNotifyData.enabled=on;
+$('#notifyTime').addEventListener('change', function(e){
+  ui.notifyData.time=e.target.value||'09:00';
 });
-$('#notifyModeTabs').addEventListener('click', e=>{
-  const b=e.target.closest('[data-mode]'); if(!b) return;
-  if(!pendingNotifyData) return;
-  pendingNotifyData.mode=b.dataset.mode;
-  $$('#notifyModeTabs button').forEach(x=>x.classList.toggle('active', x===b));
-  renderNotifyModeContent(pendingNotifyData);
+$('#notifyHourBefore').addEventListener('change', function(e){
+  ui.notifyData.hourBefore=e.target.checked;
 });
-$('#notifyTime').addEventListener('change', e=>{
-  if(pendingNotifyData) pendingNotifyData.time=e.target.value || '09:00';
+$('#notifyDayBefore').addEventListener('change', function(e){
+  ui.notifyData.dayBefore=e.target.checked;
 });
-$('#notifyHourBefore').addEventListener('change', e=>{
-  if(pendingNotifyData) pendingNotifyData.hourBefore=e.target.checked;
+$('#notifyPickAll').addEventListener('click', function(){
+  var v=currentView();
+  v.cells.forEach(function(c){ ui.notifyTarget.ids[c.id]=true; });
+  renderNotifyPickList(v);
 });
-$('#notifyDayBefore').addEventListener('change', e=>{
-  if(pendingNotifyData) pendingNotifyData.dayBefore=e.target.checked;
+$('#notifyPickNone').addEventListener('click', function(){
+  var v=currentView();
+  ui.notifyTarget.ids={};
+  renderNotifyPickList(v);
 });
-$('#pickAllCells').addEventListener('click', ()=>{
-  const v=state.views.find(x=>x.id===currentViewId);
-  if(!v || !pendingNotifyTarget) return;
-  v.cells.forEach(c=>pendingNotifyTarget.cellIds.add(c.id));
-  renderNotifyCellList(v);
-});
-$('#pickNoneCells').addEventListener('click', ()=>{
-  const v=state.views.find(x=>x.id===currentViewId);
-  if(!v || !pendingNotifyTarget) return;
-  pendingNotifyTarget.cellIds.clear();
-  renderNotifyCellList(v);
-});
-$('#notifyApplyBtn').addEventListener('click', ()=>{
-  if(!pendingNotifyTarget || !pendingNotifyData) return;
+$('#notifyApply').addEventListener('click', function(){
+  var v=currentView();
+  var ids=ui.notifyTarget.ids;
+  if(!Object.keys(ids).length){ toast('Выберите ячейки'); return; }
   pushUndo();
-  const v=state.views.find(x=>x.id===currentViewId); if(!v) return;
-  let count=0;
-  v.cells.forEach(cell=>{
-    if(pendingNotifyTarget.cellIds.has(cell.id)){
-      cell.notify=JSON.parse(JSON.stringify(pendingNotifyData));
-      count++;
+  var n=0;
+  v.cells.forEach(function(cell){
+    if(ids[cell.id]){
+      cell.notify=JSON.parse(JSON.stringify(ui.notifyData));
+      n++;
     }
   });
-  saveState(); renderContent();
-  if($('#cellModal').classList.contains('open')) updateCellNotifyHint(getCurrentCell());
-  closeModal($('#notifyModal'));
-  haptic('medium');
-  toast('Уведомления применены к '+count+' ячейк'+(count===1?'е':'ам'));
+  saveState(); closeM('mNotify'); render();
+  toast('Уведомления применены к '+n+' ячейкам');
 });
 
-$('#bindingStartDate').addEventListener('change', updateBindPreview);
-$('#bindingStepRow').addEventListener('click', e=>{
-  const b=e.target.closest('[data-step]'); if(!b) return;
-  bindStep=b.dataset.step;
-  $$('#bindingStepRow [data-step]').forEach(x=>x.classList.toggle('active', x===b));
-  $('#customStepRow').style.display = bindStep==='custom' ? 'block' : 'none';
+/* Модалка привязки */
+$('#bindStart').addEventListener('change', function(e){
+  ui.bindStart=e.target.value; updateBindPreview();
+});
+$('#bindSteps').addEventListener('click', function(e){
+  var b=e.target.closest('[data-step]'); if(!b) return;
+  ui.bindStep=b.dataset.step;
+  Array.prototype.forEach.call(this.children, function(x){ x.classList.toggle('active', x===b); });
+  $('#bindCustomWrap').style.display = ui.bindStep==='custom' ? 'block' : 'none';
   updateBindPreview();
 });
-$('#customStepInput').addEventListener('input', updateBindPreview);
-$('#bindPickAll').addEventListener('click', ()=>{
-  const v=state.views.find(x=>x.id===currentViewId); if(!v) return;
-  v.cells.forEach(c=>bindTargetIds.add(c.id));
-  renderBindCellList(v); updateBindPreview();
+$('#bindCustomStep').addEventListener('input', updateBindPreview);
+$('#bindPickAll').addEventListener('click', function(){
+  var v=currentView();
+  v.cells.forEach(function(c){ ui.bindTargets[c.id]=true; });
+  renderBindPickList(v); updateBindPreview();
 });
-$('#bindPickNone').addEventListener('click', ()=>{
-  const v=state.views.find(x=>x.id===currentViewId); if(!v) return;
-  bindTargetIds.clear();
-  renderBindCellList(v); updateBindPreview();
+$('#bindPickNone').addEventListener('click', function(){
+  ui.bindTargets={};
+  renderBindPickList(currentView()); updateBindPreview();
 });
-$('#bindApplyBtn').addEventListener('click', applyDateBinding);
+$('#bindApply').addEventListener('click', applyBind);
 
-$('#confirmYes').addEventListener('click', ()=>{
-  const action=confirmCallback; confirmCallback=null;
-  closeModal($('#confirmModal'));
-  if(!action) return;
-  if(action.startsWith('deleteView:')){
-    const id=action.slice(11);
-    pushUndo();
-    state.views=state.views.filter(v=>v.id!==id);
-    if(currentViewId===id) currentViewId=state.views[0].id;
-    state.currentViewId=currentViewId;
-    saveState(); renderDock(); renderContent();
-    closeModal($('#settingsModal'));
-    toast('Модуль удалён');
-  } else if(action.startsWith('deleteCell:')){
-    const id=action.slice(11);
-    const v=state.views.find(x=>x.id===currentViewId); if(!v) return;
-    pushUndo();
-    v.cells=v.cells.filter(c=>c.id!==id);
-    if(!v.cells.length) v.cells=[makeCell('',0,null)];
-    v.rowsPerColumn=Math.max(1, Math.ceil(v.cells.length/v.columnCount));
-    saveState(); closeModal($('#cellModal')); renderContent();
-  } else if(action.startsWith('reset:')){
-    const id=action.slice(6);
-    const v=state.views.find(x=>x.id===id); if(!v) return;
-    pushUndo();
-    v.cells=[];
-    for(let i=0;i<7;i++) v.cells.push(makeCell(DAY_NAMES[i], i, null));
-    v.columnCount=DEFAULT_COLUMNS;
-    v.rowsPerColumn=1;
-    saveState(); renderContent();
-    closeModal($('#settingsModal'));
-  } else if(action.startsWith('resize:')){
-    const parts=action.split(':');
-    const vId=parts[1]; const val=parseInt(parts[2]); const kind=parts[3];
-    const v=state.views.find(x=>x.id===vId); if(!v) return;
-    pushUndo();
-    if(kind==='total'){
-      resizeCellsTo(v, val);
-      if(v.columnCount>v.cells.length) v.columnCount=Math.max(1, v.cells.length);
-      v.rowsPerColumn=Math.max(1, Math.ceil(v.cells.length/v.columnCount));
-      const target=v.columnCount*v.rowsPerColumn;
-      if(v.cells.length !== target) resizeCellsTo(v, target);
-    } else if(kind==='cols'){
-      v.columnCount=val;
-      v.rowsPerColumn=Math.max(1, Math.ceil(v.cells.length/v.columnCount));
-      const target=v.columnCount*v.rowsPerColumn;
-      if(v.cells.length !== target) resizeCellsTo(v, target);
-    } else if(kind==='rows'){
-      v.rowsPerColumn=val;
-      const target=v.columnCount*v.rowsPerColumn;
-      resizeCellsTo(v, target);
-    }
-    saveState(); renderContent(); renderSettings();
+/* Модалка создания */
+$('#newPresets').addEventListener('click', function(e){
+  var b=e.target.closest('[data-preset]'); if(!b) return;
+  ui.newPreset=b.dataset.preset;
+  Array.prototype.forEach.call(this.children, function(x){ x.classList.toggle('active', x===b); });
+  updateNewHint();
+});
+$('#newDateChoices').addEventListener('click', function(e){
+  var b=e.target.closest('[data-choice]'); if(!b) return;
+  ui.newDateChoice=b.dataset.choice;
+  Array.prototype.forEach.call(this.children, function(x){ x.classList.toggle('active', x===b); });
+  $('#newCustomWrap').style.display = ui.newDateChoice==='custom' ? 'block' : 'none';
+  if(ui.newDateChoice==='custom' && !$('#newCustomDate').value){
+    $('#newCustomDate').value=todayStr();
   }
+  updateNewHint();
 });
+$('#newCreate').addEventListener('click', createNewView);
 
-$$('[data-close]').forEach(b=>b.addEventListener('click', ()=>closeModal(b.closest('.modal'))));
-$$('.modal').forEach(m=>m.addEventListener('click', e=>{ if(e.target===m) closeModal(m); }));
-
-$('#pageTitle').addEventListener('click', function(){
-  const v=state.views.find(x=>x.id===currentViewId); if(!v) return;
-  startInlineEdit(this, v.title, true, n=>{
-    v.title=n||v.title; this.textContent=v.title; saveState(); renderDock();
+/* Закрытие модалок */
+$$('[data-close]').forEach(function(b){
+  b.addEventListener('click', function(){
+    var m=b.closest('.modal');
+    if(m) closeM(m.id);
+  });
+});
+$$('.modal').forEach(function(m){
+  m.addEventListener('click', function(e){
+    if(e.target===m) closeM(m.id);
   });
 });
 
-if(tg?.BackButton){
-  tg.BackButton.onClick(()=>{
-    const o=$$('.modal.open');
-    if(o.length){ o.forEach(closeModal); return; }
-    if(searchQuery) closeSearch();
+/* BackButton */
+if(tg && tg.BackButton){
+  tg.BackButton.onClick(function(){
+    var opens=$$('.modal.open');
+    if(opens.length){ opens.forEach(function(m){ closeM(m.id); }); return; }
+    if(ui.searchQuery){
+      $('#searchOverlay').classList.remove('open');
+      ui.searchQuery=''; $('#searchInput').value='';
+      render();
+    }
   });
 }
 
+/* Init */
 (function init(){
-  applyTheme(); applyAccent();
-  if(!state.views.find(v=>v.id===currentViewId)){ currentViewId=state.views[0].id; }
-  renderDock();
-  switchView(currentViewId);
-  updateBack(); updateUndoBtn();
-  pullFromBackend().then(()=>renderContent());
+  updateTheme(); updateAccent();
+  if(!state.views.find(function(v){return v.id===state.currentViewId;})){
+    state.currentViewId=state.views[0].id;
+  }
+  render();
+  updateUndoBtn();
+  console.log('%cv25 READY','background:#34c759;color:#fff;padding:2px 6px;border-radius:4px');
 })();
 </script>
 </body>
